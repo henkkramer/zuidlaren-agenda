@@ -1,0 +1,9 @@
+node_modules
+.next
+.env
+.env*.local
+npm-debug.log*
+coverage
+implementation-plan/example-UI.png
+data
+*.tsbuildinfo

@@ -1,0 +1,117 @@
+import Link from "next/link";
+import { notFound, redirect } from "next/navigation";
+import { requireBusinessPermission } from "@/lib/business-permissions";
+import { mapActivityRecord } from "@/lib/activity-mapper";
+import { prisma } from "@/lib/prisma";
+import { activityDateParts } from "@/lib/date-format";
+
+type BusinessDashboardPageProps = {
+  params: Promise<{
+    businessId: string;
+  }>;
+};
+
+export const dynamic = "force-dynamic";
+
+export default async function BusinessDashboardPage({ params }: BusinessDashboardPageProps) {
+  const { businessId } = await params;
+  const access = await requireBusinessPermission(businessId);
+
+  if (!access.ok) {
+    if (access.status === 401) {
+      redirect("/account");
+    }
+
+    if (access.status === 404) {
+      notFound();
+    }
+
+    redirect("/business");
+  }
+
+  const [activities, members] = await Promise.all([
+    prisma.activity.findMany({
+      where: { businessId: access.business.id },
+      include: {
+        category: true,
+        location: true,
+      },
+      orderBy: { startAt: "asc" },
+    }),
+    prisma.businessMember.findMany({
+      where: { businessId: access.business.id, active: true },
+      include: { user: true },
+      orderBy: [{ role: "desc" }, { createdAt: "asc" }],
+    }),
+  ]);
+
+  const mappedActivities = activities.map(mapActivityRecord);
+  const canPublish = access.membership.role === "OWNER" || access.membership.canPublishActivities;
+
+  return (
+    <main className="account-page">
+      <section className="account-shell business-dashboard-shell">
+        <Link className="account-back" href="/business">
+          Terug naar bedrijven
+        </Link>
+        <p className="account-kicker">Business dashboard</p>
+        <div className="business-dashboard-header">
+          <div>
+            <h1>{access.business.name}</h1>
+            <p className="account-muted">
+              {access.membership.role === "OWNER" ? "Eigenaar" : "Medewerker"} ·{" "}
+              {access.business.status === "APPROVED" ? "goedgekeurd" : "nog niet goedgekeurd"}
+            </p>
+          </div>
+          <span className="status-pill">{canPublish ? "Kan publiceren" : "Concepten beheren"}</span>
+        </div>
+
+        <div className="business-dashboard-grid">
+          <section className="account-card">
+            <div className="panel-header">
+              <h2>Activiteiten</h2>
+              <Link className="status-pill" href={`/business/${access.business.slug}/activities/new`}>
+                Nieuw
+              </Link>
+            </div>
+            {mappedActivities.length === 0 ? (
+              <p className="account-muted">Nog geen activiteiten voor dit bedrijf.</p>
+            ) : (
+              <div className="business-activity-list">
+                {mappedActivities.slice(0, 8).map((activity) => {
+                  const parts = activityDateParts(activity);
+                  return (
+                    <div className="business-activity-row" key={activity.id}>
+                      <span>
+                        <strong>{activity.title}</strong>
+                        <small>
+                          {parts.longDate} · {parts.time}
+                        </small>
+                      </span>
+                      <span className="status-pill">Live</span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+
+          <section className="account-card">
+            <h2>Team</h2>
+            <div className="business-member-list">
+              {members.map((member) => (
+                <div className="business-member-row" key={member.id}>
+                  <span>
+                    <strong>{member.user.displayName ?? member.user.name ?? member.user.email}</strong>
+                    <small>{member.user.email}</small>
+                  </span>
+                  <span className="status-pill">{member.role === "OWNER" ? "Eigenaar" : "Medewerker"}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      </section>
+    </main>
+  );
+}

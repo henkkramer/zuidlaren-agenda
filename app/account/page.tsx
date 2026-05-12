@@ -1,0 +1,45 @@
+import { AccountPanel } from "@/components/account-panel";
+import { getCurrentSession } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
+
+export default async function AccountPage() {
+  const session = await getCurrentSession();
+
+  if (!session?.user?.id) {
+    return <AccountPanel mode="signed-out" />;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    include: { notificationPreferences: true },
+  });
+
+  if (!user) {
+    return <AccountPanel mode="signed-out" />;
+  }
+
+  const preferences =
+    user.notificationPreferences ??
+    (await prisma.notificationPreference.create({
+      data: { userId: user.id },
+    }));
+
+  return (
+    <AccountPanel
+      mode="signed-in"
+      user={{
+        email: user.email,
+        displayName: user.displayName ?? user.name ?? "",
+        locale: user.locale,
+        deletionRequestedAt: user.deletionRequestedAt?.toISOString() ?? null,
+      }}
+      preferences={{
+        activityReminders: preferences.activityReminders,
+        weeklyDigest: preferences.weeklyDigest,
+        businessUpdates: preferences.businessUpdates,
+      }}
+    />
+  );
+}
