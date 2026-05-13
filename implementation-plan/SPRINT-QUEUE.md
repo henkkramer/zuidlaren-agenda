@@ -14,15 +14,15 @@ This queue is the single execution sequence for the existing implementation plan
 | 5 | Done | Authentication and User Profiles | `04`, `17`, `18` |
 | 6 | Done | Attendance and Personal Agenda | `08`, `04`, `17`, `18` |
 | 7 | Done | Business Backend Foundation | `09`, `10`, `17`, `18` |
-| 8 | In progress | Business Activity Editor and Live Preview | `09`, `06`, `10`, `18` |
-| 9 | Planned | Platform Admin Basics | `14`, `10`, `17`, `18` |
-| 10 | Planned | Media Storage and Uploads | `15`, `09`, `17`, `18` |
-| 11 | Planned | Filtering, Search, and URL State | `07`, `05`, `18` |
-| 12 | Planned | AI Card Assistant Foundation | `11`, `09`, `16`, `17`, `18` |
-| 13 | Planned | Notification Preferences and Email Foundation | `12`, `04`, `16`, `17`, `18` |
-| 14 | Planned | Analytics and Observability | `16`, `17`, `18`, `19` |
-| 15 | Planned | Payments and Billing Foundations | `13`, `14`, `17`, `18` |
-| 16 | Planned | Tailscale Linux Deployment Hardening | `19`, `02`, `18` |
+| 8 | Done | Business Activity Editor and Live Preview | `09`, `06`, `10`, `18` |
+| 9 | Done | Platform Admin Basics | `14`, `10`, `17`, `18` |
+| 10 | Done | Media Storage and Uploads | `15`, `09`, `17`, `18` |
+| 11 | Done | Filtering, Search, and URL State | `07`, `05`, `18` |
+| 12 | Done | AI Card Assistant Foundation | `11`, `09`, `16`, `17`, `18` |
+| 13 | Done | Notification Preferences and Email Foundation | `12`, `04`, `16`, `17`, `18` |
+| 14 | Done | Analytics and Observability | `16`, `17`, `18`, `19` |
+| 15 | Done | Payments and Billing Foundations | `13`, `14`, `17`, `18` |
+| 16 | Next | Tailscale Linux Deployment Hardening | `19`, `02`, `18` |
 | 17 | Planned | MVP Release Hardening | `17`, `18`, `21` |
 | 18 | Future | Mobile App Readiness | `20`, `05`, `08`, `12` |
 
@@ -203,7 +203,7 @@ Acceptance:
 
 ## Sprint 8 - Business Activity Editor and Live Preview
 
-Status: In progress
+Status: Done
 
 Goal:
 
@@ -224,7 +224,7 @@ Acceptance:
 
 ## Sprint 9 - Platform Admin Basics
 
-Status: Planned
+Status: Done
 
 Goal:
 
@@ -249,7 +249,7 @@ Acceptance:
 
 ## Sprint 10 - Media Storage and Uploads
 
-Status: Planned
+Status: Done
 
 Goal:
 
@@ -271,7 +271,7 @@ Acceptance:
 
 ## Sprint 11 - Filtering, Search, and URL State
 
-Status: Planned
+Status: Done
 
 Goal:
 
@@ -293,7 +293,7 @@ Acceptance:
 
 ## Sprint 12 - AI Card Assistant Foundation
 
-Status: Planned
+Status: Done
 
 Goal:
 
@@ -315,7 +315,7 @@ Acceptance:
 
 ## Sprint 13 - Notification Preferences and Email Foundation
 
-Status: Planned
+Status: Done
 
 Goal:
 
@@ -336,7 +336,7 @@ Acceptance:
 
 ## Sprint 14 - Analytics and Observability
 
-Status: Planned
+Status: Done
 
 Goal:
 
@@ -357,7 +357,7 @@ Acceptance:
 
 ## Sprint 15 - Payments and Billing Foundations
 
-Status: Planned
+Status: Done
 
 Goal:
 
@@ -377,7 +377,7 @@ Acceptance:
 
 ## Sprint 16 - Tailscale Linux Deployment Hardening
 
-Status: Planned
+Status: Next
 
 Goal:
 

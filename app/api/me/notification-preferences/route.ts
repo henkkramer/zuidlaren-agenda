@@ -6,18 +6,59 @@ type PreferencesPayload = {
   activityReminders?: unknown;
   weeklyDigest?: unknown;
   businessUpdates?: unknown;
+  categorySlugs?: unknown;
+  locationSlugs?: unknown;
 };
 
 function serializePreferences(preferences: {
   activityReminders: boolean;
   weeklyDigest: boolean;
   businessUpdates: boolean;
+  categorySlugs: string[];
+  locationSlugs: string[];
 }) {
   return {
     activityReminders: preferences.activityReminders,
     weeklyDigest: preferences.weeklyDigest,
     businessUpdates: preferences.businessUpdates,
+    categorySlugs: preferences.categorySlugs,
+    locationSlugs: preferences.locationSlugs,
   };
+}
+
+function parseSlugList(value: unknown) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return Array.from(
+    new Set(
+      value
+        .filter((item): item is string => typeof item === "string")
+        .map((item) => item.trim())
+        .filter((item) => /^[a-z0-9_-]{1,60}$/.test(item)),
+    ),
+  ).slice(0, 20);
+}
+
+async function filterAllowedSlugs(input: string[], model: "category" | "location") {
+  if (input.length === 0) {
+    return [];
+  }
+
+  if (model === "category") {
+    const records = await prisma.activityCategory.findMany({
+      where: { slug: { in: input } },
+      select: { slug: true },
+    });
+    return records.map((record) => record.slug);
+  }
+
+  const records = await prisma.location.findMany({
+    where: { slug: { in: input } },
+    select: { slug: true },
+  });
+  return records.map((record) => record.slug);
 }
 
 export async function GET() {
@@ -44,18 +85,26 @@ export async function PATCH(request: Request) {
   }
 
   const payload = (await request.json()) as PreferencesPayload;
+  const [categorySlugs, locationSlugs] = await Promise.all([
+    filterAllowedSlugs(parseSlugList(payload.categorySlugs), "category"),
+    filterAllowedSlugs(parseSlugList(payload.locationSlugs), "location"),
+  ]);
   const preferences = await prisma.notificationPreference.upsert({
     where: { userId: session.user.id },
     update: {
       activityReminders: payload.activityReminders === true,
       weeklyDigest: payload.weeklyDigest === true,
       businessUpdates: payload.businessUpdates === true,
+      categorySlugs,
+      locationSlugs,
     },
     create: {
       userId: session.user.id,
       activityReminders: payload.activityReminders === true,
       weeklyDigest: payload.weeklyDigest === true,
       businessUpdates: payload.businessUpdates === true,
+      categorySlugs,
+      locationSlugs,
     },
   });
 

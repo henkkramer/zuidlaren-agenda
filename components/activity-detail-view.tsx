@@ -27,6 +27,14 @@ export function ActivityDetailView({ activity, onBack }: { activity: Activity; o
     setStatus(response.ok ? "Toegevoegd aan mijn agenda" : "Kon activiteit niet opslaan");
   }
 
+  function trackSourceClick() {
+    void fetch("/api/analytics/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event: "activity_source_click", activityId: activity.id }),
+    });
+  }
+
   return (
     <>
       <div className="detail-hero" style={{ backgroundImage: `url(${activity.imageUrl})` }}>
@@ -117,7 +125,7 @@ export function ActivityDetailView({ activity, onBack }: { activity: Activity; o
         </button>
         {status ? <p className="action-status">{status}</p> : null}
         <div style={{ height: 12 }} />
-        <a className="outline-button" href={activity.sourceUrl}>
+        <a className="outline-button" href={activity.sourceUrl} onClick={trackSourceClick}>
           Open originele website <ExternalLink size={17} />
         </a>
       </div>
