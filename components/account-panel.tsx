@@ -21,6 +21,12 @@ type AccountPanelProps =
         activityReminders: boolean;
         weeklyDigest: boolean;
         businessUpdates: boolean;
+        categorySlugs: string[];
+        locationSlugs: string[];
+      };
+      preferenceOptions: {
+        categories: Array<{ slug: string; name: string }>;
+        locations: Array<{ slug: string; name: string }>;
       };
     };
 
@@ -31,7 +37,7 @@ export function AccountPanel(props: AccountPanelProps) {
   const [preferences, setPreferences] = useState(
     props.mode === "signed-in"
       ? props.preferences
-      : { activityReminders: false, weeklyDigest: false, businessUpdates: false },
+      : { activityReminders: false, weeklyDigest: false, businessUpdates: false, categorySlugs: [], locationSlugs: [] },
   );
   const [deletionRequested, setDeletionRequested] = useState(
     props.mode === "signed-in" ? Boolean(props.user.deletionRequestedAt) : false,
@@ -68,6 +74,14 @@ export function AccountPanel(props: AccountPanelProps) {
 
   function updatePreference(key: keyof typeof preferences) {
     const nextPreferences = { ...preferences, [key]: !preferences[key] };
+    setPreferences(nextPreferences);
+    void savePreferences(nextPreferences);
+  }
+
+  function togglePreferenceList(key: "categorySlugs" | "locationSlugs", slug: string) {
+    const current = preferences[key];
+    const nextList = current.includes(slug) ? current.filter((item) => item !== slug) : [...current, slug];
+    const nextPreferences = { ...preferences, [key]: nextList };
     setPreferences(nextPreferences);
     void savePreferences(nextPreferences);
   }
@@ -155,6 +169,36 @@ export function AccountPanel(props: AccountPanelProps) {
                 />
                 Updates van organisatoren
               </label>
+              <div className="preference-group">
+                <strong>Categorieën</strong>
+                <div className="preference-chip-grid">
+                  {props.preferenceOptions.categories.map((category) => (
+                    <label className="preference-chip" key={category.slug}>
+                      <input
+                        checked={preferences.categorySlugs.includes(category.slug)}
+                        onChange={() => togglePreferenceList("categorySlugs", category.slug)}
+                        type="checkbox"
+                      />
+                      {category.name}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className="preference-group">
+                <strong>Locaties</strong>
+                <div className="preference-chip-grid">
+                  {props.preferenceOptions.locations.map((location) => (
+                    <label className="preference-chip" key={location.slug}>
+                      <input
+                        checked={preferences.locationSlugs.includes(location.slug)}
+                        onChange={() => togglePreferenceList("locationSlugs", location.slug)}
+                        type="checkbox"
+                      />
+                      {location.name}
+                    </label>
+                  ))}
+                </div>
+              </div>
               <button className="outline-button" onClick={() => signOut({ callbackUrl: "/" })} type="button">
                 Uitloggen
               </button>

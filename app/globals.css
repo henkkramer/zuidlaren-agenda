@@ -228,7 +228,7 @@ a {
 
 .secondary-filters {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
   padding: 10px 18px 16px;
 }
@@ -239,11 +239,100 @@ a {
   font-size: 0.76rem;
 }
 
+.search-row {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 12px 18px 0;
+}
+
+.search-row input,
+.date-filter-row input,
+.filter-select select {
+  min-height: 40px;
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.76);
+  color: var(--color-charcoal);
+  padding: 0 10px;
+}
+
+.search-row button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--color-green-deep);
+  color: white;
+  padding: 0 14px;
+  font-weight: 850;
+}
+
+.filter-select {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 6px;
+  align-items: center;
+}
+
+.date-filter-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 0 18px 14px;
+}
+
+.date-filter-row label {
+  display: grid;
+  gap: 5px;
+  color: var(--color-muted-text);
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.active-filter-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 0 18px 16px;
+}
+
+.active-filter-row button {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.76);
+  color: var(--color-charcoal);
+  padding: 0 10px;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
 .feed-list {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
   padding: 0 18px 24px;
+}
+
+.feed-empty-state {
+  margin: 0 18px 22px;
+}
+
+.load-more-link {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  margin: 0 18px 24px;
+  border-radius: 12px;
+  background: var(--color-green-deep);
+  color: white;
+  font-weight: 850;
 }
 
 .activity-card {
@@ -934,6 +1023,41 @@ a {
   padding: 0;
 }
 
+.preference-group {
+  display: grid;
+  gap: 8px;
+}
+
+.preference-group strong {
+  color: var(--color-charcoal);
+  font-size: 0.86rem;
+}
+
+.preference-chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.preference-chip {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0 10px;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.preference-chip input {
+  min-height: 16px;
+  width: 16px;
+  padding: 0;
+}
+
 .personal-agenda-shell {
   padding-right: 18px;
   padding-left: 18px;
@@ -1060,6 +1184,13 @@ a {
   gap: 10px;
 }
 
+.business-row-actions,
+.business-editor-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .business-editor-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(320px, 0.78fr);
@@ -1084,6 +1215,147 @@ a {
   gap: 12px;
 }
 
+.notification-campaign-form {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-inline-button {
+  border: 0;
+  cursor: pointer;
+}
+
+.analytics-metric-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.analytics-metric-grid span {
+  display: grid;
+  gap: 3px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.62);
+  padding: 10px;
+}
+
+.analytics-metric-grid strong {
+  color: var(--color-green-deep);
+  font-size: 1.2rem;
+}
+
+.analytics-metric-grid small {
+  color: var(--color-muted-text);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.ai-assist-panel {
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(79, 111, 70, 0.2);
+  border-radius: 14px;
+  background: rgba(248, 246, 241, 0.82);
+  padding: 14px;
+}
+
+.ai-assist-panel h3 {
+  margin: 2px 0 0;
+  color: var(--color-green-deep);
+  font-size: 1.05rem;
+}
+
+.ai-action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.ai-action-button,
+.ai-apply-button {
+  min-height: 38px;
+  border-radius: 10px;
+  font-size: 0.78rem;
+}
+
+.ai-suggestion-box {
+  display: grid;
+  gap: 10px;
+  border-radius: 12px;
+  background: white;
+  padding: 12px;
+}
+
+.ai-note-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--color-muted-text);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.ai-field-suggestion {
+  display: grid;
+  gap: 7px;
+  border-top: 1px solid var(--color-border);
+  padding-top: 10px;
+}
+
+.ai-field-suggestion:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.ai-field-suggestion strong {
+  color: var(--color-charcoal);
+  font-size: 0.82rem;
+}
+
+.ai-field-suggestion p {
+  margin: 0;
+  color: var(--color-muted-text);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.admin-shell {
+  width: min(100%, 1180px);
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.admin-table {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.62);
+  padding: 10px 12px;
+}
+
+.admin-row strong,
+.admin-row small {
+  display: block;
+}
+
+.admin-row small {
+  color: var(--color-muted-text);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
 @media (max-width: 1050px) {
   .showcase-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -1095,6 +1367,11 @@ a {
 
   .feed-list {
     grid-template-columns: 1fr;
+  }
+
+  .secondary-filters,
+  .date-filter-row {
+    grid-template-columns: 1fr 1fr;
   }
 
   .feature-strip,
@@ -1190,8 +1467,15 @@ a {
   }
 
   .business-editor-grid,
-  .business-editor-two {
+  .business-editor-two,
+  .ai-action-grid,
+  .admin-grid {
     grid-template-columns: 1fr;
+  }
+
+  .admin-row {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .business-editor-preview {

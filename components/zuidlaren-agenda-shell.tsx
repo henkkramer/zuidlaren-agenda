@@ -9,6 +9,7 @@ import { FilterControls } from "@/components/filter-controls";
 import { MobileHeader } from "@/components/mobile-header";
 import type { Activity } from "@/lib/activity-types";
 import { getPublicActivities } from "@/lib/activity-service";
+import { toQueryString, type ActivityFilterOptions, type ActivityFilterState } from "@/lib/public-activity-query";
 
 function BrandHeader() {
   return (
@@ -25,8 +26,20 @@ function BrandHeader() {
   );
 }
 
-function PublicAgenda({ onOpen }: { onOpen: (activity: Activity) => void }) {
-  const activities = getPublicActivities();
+function PublicAgenda({
+  activities,
+  filterOptions,
+  filters,
+  hasMore,
+  onOpen,
+}: {
+  activities: Activity[];
+  filterOptions: ActivityFilterOptions;
+  filters: ActivityFilterState;
+  hasMore: boolean;
+  onOpen: (activity: Activity) => void;
+}) {
+  const moreQuery = toQueryString(filters, { limit: filters.limit + 24 });
 
   return (
     <>
@@ -35,18 +48,51 @@ function PublicAgenda({ onOpen }: { onOpen: (activity: Activity) => void }) {
         <span>{activities.length} activiteiten</span>
         <span>Mei t/m december 2026</span>
       </div>
-      <FilterControls />
+      <FilterControls filters={filters} options={filterOptions} />
       <div className="feed-list">
         {activities.map((activity) => (
           <ActivityCard activity={activity} key={activity.id} onOpen={onOpen} />
         ))}
       </div>
+      {activities.length === 0 ? (
+        <div className="empty-state feed-empty-state">
+          <h2>Geen activiteiten gevonden</h2>
+          <p>Pas je filters aan of wis alle filters om opnieuw te zoeken.</p>
+        </div>
+      ) : null}
+      {hasMore ? (
+        <a className="load-more-link" href={`/?${moreQuery}`}>
+          Meer laden
+        </a>
+      ) : null}
     </>
   );
 }
 
-export function ZuidlarenAgendaShell() {
+export function ZuidlarenAgendaShell({
+  filterOptions,
+  filters,
+  hasMore = false,
+  initialActivities,
+}: {
+  filterOptions?: ActivityFilterOptions;
+  filters?: ActivityFilterState;
+  hasMore?: boolean;
+  initialActivities?: Activity[];
+}) {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
+  const activities = initialActivities?.length ? initialActivities : getPublicActivities();
+  const activeFilters = filters ?? { limit: 24 };
+  const options = filterOptions ?? { categories: [], indoorOutdoor: [], locations: [], organizers: [], types: [] };
+
+  function openActivity(activity: Activity) {
+    setSelectedActivity(activity);
+    void fetch("/api/analytics/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event: "activity_view", activityId: activity.id }),
+    });
+  }
 
   return (
     <main className="app-page">
@@ -56,7 +102,7 @@ export function ZuidlarenAgendaShell() {
           {selectedActivity ? (
             <ActivityDetailView activity={selectedActivity} onBack={() => setSelectedActivity(null)} />
           ) : (
-            <PublicAgenda onOpen={setSelectedActivity} />
+            <PublicAgenda activities={activities} filterOptions={options} filters={activeFilters} hasMore={hasMore} onOpen={openActivity} />
           )}
         </section>
       </div>

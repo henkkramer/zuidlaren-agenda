@@ -8,11 +8,17 @@ dist/
 build/
 .cache/
 coverage/
+tsconfig.tsbuildinfo
+.turbo/
+.vercel/
+playwright-report/
+test-results/
 
 data/
 backups/
 logs/
 uploads/
+public/uploads/
 
 *.sqlite
 *.sqlite-shm

@@ -35,6 +35,56 @@ enum BusinessMemberRole {
   EMPLOYEE
 }
 
+enum ReportStatus {
+  OPEN
+  REVIEWED
+  DISMISSED
+}
+
+enum AiUsageStatus {
+  SUCCEEDED
+  BLOCKED
+  FAILED
+}
+
+enum NotificationCampaignStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  SENT
+}
+
+enum NotificationDeliveryStatus {
+  PENDING
+  SKIPPED
+  SENT
+  FAILED
+}
+
+enum PaymentSubscriptionStatus {
+  INACTIVE
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+}
+
+enum PaymentTransactionStatus {
+  PENDING
+  PAID
+  FAILED
+  CANCELED
+  REFUNDED
+}
+
+enum WebhookEventStatus {
+  RECEIVED
+  PROCESSED
+  DUPLICATE
+  REJECTED
+  FAILED
+}
+
 model User {
   id                      String                  @id @default(cuid())
   name                    String?
@@ -42,6 +92,8 @@ model User {
   emailVerified           DateTime?
   image                   String?
   displayName             String?
+  isAdmin                 Boolean                 @default(false)
+  disabledAt              DateTime?
   locale                  String                  @default("nl-NL")
   deletionRequestedAt     DateTime?
   createdAt               DateTime                @default(now())
@@ -51,6 +103,12 @@ model User {
   attendances             Attendance[]
   notificationPreferences NotificationPreference?
   businessMemberships     BusinessMember[]
+  reports                 Report[]
+  mediaAssets             MediaAsset[]
+  aiUsageLogs             AiUsageLog[]
+  requestedCampaigns      NotificationCampaign[] @relation("NotificationCampaignRequester")
+  approvedCampaigns       NotificationCampaign[] @relation("NotificationCampaignApprover")
+  notificationDeliveries  NotificationDelivery[]
 }
 
 model Account {
@@ -95,6 +153,8 @@ model NotificationPreference {
   activityReminders   Boolean  @default(false)
   weeklyDigest        Boolean  @default(false)
   businessUpdates     Boolean  @default(false)
+  categorySlugs       String[]  @default([])
+  locationSlugs       String[]  @default([])
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 
@@ -111,6 +171,13 @@ model Business {
   updatedAt   DateTime       @updatedAt
   activities  Activity[]
   members     BusinessMember[]
+  mediaAssets MediaAsset[]
+  aiUsageLogs AiUsageLog[]
+  notificationCampaigns NotificationCampaign[]
+  paymentCustomer PaymentCustomer?
+  paymentSubscriptions PaymentSubscription[]
+  paymentTransactions PaymentTransaction[]
+  invoiceReferences InvoiceReference[]
 }
 
 model BusinessMember {
@@ -176,11 +243,57 @@ model Activity {
   business   Business? @relation(fields: [businessId], references: [id])
 
   attendances Attendance[]
+  reports     Report[]
+  notificationCampaigns NotificationCampaign[]
+  analyticsDailyMetrics AnalyticsDailyMetric[]
 
   @@index([status, startAt])
   @@index([categoryId, startAt])
   @@index([locationId, startAt])
   @@index([businessId, startAt])
+}
+
+model Report {
+  id          String       @id @default(cuid())
+  reason      String
+  details     String?
+  status      ReportStatus @default(OPEN)
+  resolution  String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  reporterId String?
+  reporter   User? @relation(fields: [reporterId], references: [id], onDelete: SetNull)
+
+  activityId String?
+  activity   Activity? @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@index([status, createdAt])
+  @@index([activityId, status])
+}
+
+model MediaAsset {
+  id           String   @id @default(cuid())
+  filename     String
+  originalName String
+  mimeType     String
+  sizeBytes    Int
+  width        Int?
+  height       Int?
+  storageKey   String   @unique
+  publicUrl    String
+  createdAt    DateTime @default(now())
+  deletedAt    DateTime?
+
+  ownerUserId String
+  ownerUser   User @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+
+  businessId String?
+  business   Business? @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([ownerUserId, createdAt])
+  @@index([businessId, createdAt])
+  @@index([deletedAt])
 }
 
 model Attendance {
@@ -219,4 +332,241 @@ model FeatureFlag {
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model AnalyticsDailyMetric {
+  id            String   @id @default(cuid())
+  day           DateTime
+  metric        String
+  dimensionsKey String   @default("global")
+  activityId    String?
+  category      String?
+  location      String?
+  count         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  activity Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
+
+  @@unique([day, metric, dimensionsKey])
+  @@index([metric, day])
+  @@index([activityId, day])
+}
+
+model PaymentCustomer {
+  id                 String   @id @default(cuid())
+  provider           String   @default("mollie")
+  providerCustomerId String?
+  billingEmail       String?
+  billingName        String?
+  billingReference   String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  businessId String   @unique
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  subscriptions PaymentSubscription[]
+  transactions  PaymentTransaction[]
+  invoices      InvoiceReference[]
+
+  @@unique([provider, providerCustomerId])
+  @@index([provider])
+}
+
+model PaymentSubscription {
+  id                     String                    @id @default(cuid())
+  provider               String                    @default("mollie")
+  providerSubscriptionId String?
+  planKey                String
+  status                 PaymentSubscriptionStatus @default(INACTIVE)
+  amountCents            Int                       @default(0)
+  currency               String                    @default("EUR")
+  currentPeriodStart     DateTime?
+  currentPeriodEnd       DateTime?
+  canceledAt             DateTime?
+  createdAt              DateTime                  @default(now())
+  updatedAt              DateTime                  @updatedAt
+
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  customerId String?
+  customer   PaymentCustomer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  transactions PaymentTransaction[]
+
+  @@unique([provider, providerSubscriptionId])
+  @@index([businessId, status])
+  @@index([planKey, status])
+}
+
+model PaymentTransaction {
+  id                    String                   @id @default(cuid())
+  provider              String                   @default("mollie")
+  providerTransactionId String?
+  description           String
+  status                PaymentTransactionStatus @default(PENDING)
+  amountCents           Int
+  currency              String                   @default("EUR")
+  paidAt                DateTime?
+  failedAt              DateTime?
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  customerId String?
+  customer   PaymentCustomer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  subscriptionId String?
+  subscription   PaymentSubscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  invoices InvoiceReference[]
+
+  @@unique([provider, providerTransactionId])
+  @@index([businessId, createdAt])
+  @@index([status, createdAt])
+}
+
+model InvoiceReference {
+  id             String   @id @default(cuid())
+  invoiceNumber  String?
+  provider       String   @default("internal")
+  providerUrl    String?
+  amountCents    Int
+  currency       String   @default("EUR")
+  issuedAt       DateTime?
+  dueAt          DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  customerId String?
+  customer   PaymentCustomer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  transactionId String?
+  transaction   PaymentTransaction? @relation(fields: [transactionId], references: [id], onDelete: SetNull)
+
+  @@index([businessId, createdAt])
+  @@index([invoiceNumber])
+}
+
+model WebhookEventLog {
+  id              String             @id @default(cuid())
+  provider        String
+  eventId         String
+  eventType       String
+  status          WebhookEventStatus @default(RECEIVED)
+  signatureValid  Boolean            @default(false)
+  payloadSummary  Json?
+  error           String?
+  receivedAt      DateTime           @default(now())
+  processedAt     DateTime?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  @@unique([provider, eventId])
+  @@index([provider, receivedAt])
+  @@index([status, receivedAt])
+}
+
+model NotificationCampaign {
+  id             String                     @id @default(cuid())
+  title          String
+  message        String                     @db.Text
+  status         NotificationCampaignStatus @default(PENDING)
+  targetCategory String?
+  targetLocation String?
+  requestedAt    DateTime                   @default(now())
+  approvedAt     DateTime?
+  sentAt         DateTime?
+  createdAt      DateTime                   @default(now())
+  updatedAt      DateTime                   @updatedAt
+
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  activityId String?
+  activity   Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
+
+  requestedById String
+  requestedBy   User @relation("NotificationCampaignRequester", fields: [requestedById], references: [id], onDelete: Cascade)
+
+  approvedById String?
+  approvedBy   User? @relation("NotificationCampaignApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+
+  deliveries NotificationDelivery[]
+
+  @@index([businessId, requestedAt])
+  @@index([status, requestedAt])
+  @@index([activityId])
+}
+
+model NotificationDelivery {
+  id          String                     @id @default(cuid())
+  channel     String                     @default("email")
+  status      NotificationDeliveryStatus @default(PENDING)
+  reason      String?
+  provider    String?
+  providerId  String?
+  attemptedAt DateTime?
+  deliveredAt DateTime?
+  createdAt   DateTime                   @default(now())
+  updatedAt   DateTime                   @updatedAt
+
+  campaignId String
+  campaign   NotificationCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, userId, channel])
+  @@index([userId, createdAt])
+  @@index([status, createdAt])
+}
+
+model AiPromptTemplate {
+  id        String       @id @default(cuid())
+  key       String
+  version   Int
+  title     String
+  prompt    String       @db.Text
+  active    Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  usageLogs AiUsageLog[]
+
+  @@unique([key, version])
+  @@index([key, active])
+}
+
+model AiUsageLog {
+  id               String        @id @default(cuid())
+  action           String
+  provider         String
+  status           AiUsageStatus @default(SUCCEEDED)
+  inputTokens      Int           @default(0)
+  outputTokens     Int           @default(0)
+  costCents        Int           @default(0)
+  inputSummary     String?
+  outputSummary    String?
+  error            String?
+  createdAt        DateTime      @default(now())
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  promptTemplateId String?
+  promptTemplate   AiPromptTemplate? @relation(fields: [promptTemplateId], references: [id], onDelete: SetNull)
+
+  @@index([businessId, createdAt])
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
 }

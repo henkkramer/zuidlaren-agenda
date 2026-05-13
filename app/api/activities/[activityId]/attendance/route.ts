@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { recordAnalyticsMetric } from "@/lib/analytics";
 import { getCurrentSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -94,6 +95,15 @@ export async function POST(request: Request, context: AttendanceRouteContext) {
     create: {
       userId,
       activityId: activity.id,
+      status,
+      visibility,
+    },
+  });
+
+  await recordAnalyticsMetric({
+    metric: "attendance_click",
+    activityId: activity.id,
+    dimensions: {
       status,
       visibility,
     },

@@ -11,10 +11,14 @@ export default async function AccountPage() {
     return <AccountPanel mode="signed-out" />;
   }
 
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    include: { notificationPreferences: true },
-  });
+  const [user, categories, locations] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: session.user.id },
+      include: { notificationPreferences: true },
+    }),
+    prisma.activityCategory.findMany({ orderBy: { name: "asc" } }),
+    prisma.location.findMany({ orderBy: { name: "asc" }, take: 16 }),
+  ]);
 
   if (!user) {
     return <AccountPanel mode="signed-out" />;
@@ -39,6 +43,12 @@ export default async function AccountPage() {
         activityReminders: preferences.activityReminders,
         weeklyDigest: preferences.weeklyDigest,
         businessUpdates: preferences.businessUpdates,
+        categorySlugs: preferences.categorySlugs,
+        locationSlugs: preferences.locationSlugs,
+      }}
+      preferenceOptions={{
+        categories: categories.map((category) => ({ slug: category.slug, name: category.name })),
+        locations: locations.map((location) => ({ slug: location.slug, name: location.name })),
       }}
     />
   );

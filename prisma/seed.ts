@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { aiActivityActions } from "../lib/ai-card-assistant-types";
 import { categoryLabels } from "../lib/activity-types";
 import { mockActivities } from "../lib/mock-activities";
 import { slugify } from "../lib/slugify";
@@ -112,6 +113,37 @@ async function main() {
       description: "Enables AI assistance in the business activity editor."
     }
   });
+
+  await prisma.featureFlag.upsert({
+    where: { key: "billing_foundation" },
+    update: { enabled: false },
+    create: {
+      key: "billing_foundation",
+      enabled: false,
+      description: "Keeps payment and billing foundations visible for admins without enabling live payments."
+    }
+  });
+
+  for (const action of aiActivityActions) {
+    await prisma.aiPromptTemplate.upsert({
+      where: {
+        key_version: {
+          key: `activity-assist.${action}`,
+          version: 1
+        }
+      },
+      update: {
+        active: true
+      },
+      create: {
+        key: `activity-assist.${action}`,
+        version: 1,
+        title: `Activity assist: ${action}`,
+        prompt: "Help a Zuidlaren business improve an activity card. Return review-only suggestions; never publish or save content.",
+        active: true
+      }
+    });
+  }
 
   const activityCount = await prisma.activity.count();
   console.log(`Seeded ${activityCount} activities.`);
