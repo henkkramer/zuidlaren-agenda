@@ -51,6 +51,9 @@ for (const key of ["DATABASE_URL", "NEXTAUTH_URL", "NEXTAUTH_SECRET", "EMAIL_FRO
   assert(envExample.includes(key), `.env.example is missing ${key}`);
 }
 
+const dockerCompose = read("docker-compose.yml");
+assert(dockerCompose.includes('cpuset: "0-1"'), 'docker-compose.yml must pin the web service with cpuset: "0-1"');
+
 const capabilities = buildMobileCapabilities();
 assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/public/activities"), "Mobile capabilities must expose public activities");
 assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/me/agenda"), "Mobile capabilities must expose personal agenda");
