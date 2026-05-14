@@ -418,7 +418,7 @@ Acceptance:
 
 ## Sprint 18 - Mobile App Readiness
 
-Status: Next
+Status: Done
 
 Goal:
 
