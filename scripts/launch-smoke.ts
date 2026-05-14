@@ -29,6 +29,7 @@ const requiredFiles = [
   "app/api/health/release/route.ts",
   "app/api/public/activities/route.ts",
   "app/api/mobile/capabilities/route.ts",
+  "lib/security-headers.ts",
   "lib/release-checks.ts",
   ".github/workflows/ci.yml",
   "docs/ci-release-gate.md",
@@ -59,6 +60,9 @@ for (const key of ["DATABASE_URL", "NEXTAUTH_URL", "NEXTAUTH_SECRET", "EMAIL_FRO
 
 const dockerCompose = read("docker-compose.yml");
 assert(dockerCompose.includes('cpuset: "0-1"'), 'docker-compose.yml must pin the web service with cpuset: "0-1"');
+
+const nextConfig = read("next.config.ts");
+assert(nextConfig.includes("securityHeadersForNext"), "next.config.ts must apply shared security headers");
 
 const ciWorkflow = read(".github/workflows/ci.yml");
 for (const command of ["npm run lint", "npm run typecheck", "npm run test", "npm run test:e2e", "npm run build"]) {

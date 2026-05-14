@@ -31,6 +31,7 @@ This queue is the single execution sequence for the existing implementation plan
 | 22 | Done | Structured Logging Redaction | `16`, `17`, `18` |
 | 23 | Done | GitHub CI Release Gate | `18`, `21` |
 | 24 | Done | Runtime Release Check Command | `21`, `16`, `18` |
+| 25 | Done | HTTP Security Headers | `17`, `18`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -561,3 +562,23 @@ Acceptance:
 
 - Operator can validate the deployed reverse-proxy URL with one command.
 - Automated tests cover the required runtime endpoint list.
+
+## Sprint 25 - HTTP Security Headers
+
+Status: Done
+
+Goal:
+
+Apply a baseline browser security policy to all app routes.
+
+Scope:
+
+- Shared security header policy.
+- Next.js global header configuration.
+- Tests for CSP, frame protection, content-type sniffing, referrer policy, and permissions policy.
+- Launch smoke guard that keeps the shared policy wired into Next config.
+
+Acceptance:
+
+- All routes receive the shared security headers.
+- Tests fail if the baseline security policy is weakened or disconnected.
