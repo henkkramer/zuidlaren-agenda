@@ -28,6 +28,7 @@ This queue is the single execution sequence for the existing implementation plan
 | 19 | Done | MVP Launch Readiness | `21`, `18`, `17` |
 | 20 | Done | Operator Handoff and Admin Bootstrap | `21`, `14`, `17` |
 | 21 | Done | Permission and Validation Test Coverage | `18`, `10`, `17` |
+| 22 | Done | Structured Logging Redaction | `16`, `17`, `18` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -498,3 +499,23 @@ Acceptance:
 
 - `npm run test` covers critical permission and validation behavior without a live database.
 - Route permission code uses the same tested rule helper.
+
+## Sprint 22 - Structured Logging Redaction
+
+Status: Done
+
+Goal:
+
+Keep operational logs useful without leaking login links, emails, secrets, or message bodies.
+
+Scope:
+
+- Shared structured logging helper.
+- Redaction for sensitive keys and email-like values.
+- Auth, email, health, analytics, and admin bootstrap logging moved to structured logs.
+- Automated redaction tests.
+
+Acceptance:
+
+- Sensitive values are redacted or masked in tested log records.
+- Login URLs and email bodies are no longer written to logs.

@@ -1,5 +1,7 @@
 import "server-only";
 
+import { logInfo } from "@/lib/structured-log";
+
 export type EmailMessage = {
   to: string;
   subject: string;
@@ -14,7 +16,12 @@ export type EmailProvider = {
 export const logEmailProvider: EmailProvider = {
   name: "log",
   async send(message) {
-    console.info(`Zuidlaren Agenda email to ${message.to}: ${message.subject}\n${message.text}`);
+    logInfo("email.send.logged", {
+      email: message.to,
+      provider: "log",
+      subject: message.subject,
+      textLength: message.text.length,
+    });
     return { providerId: `log-${Date.now().toString(36)}` };
   },
 };

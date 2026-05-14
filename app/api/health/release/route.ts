@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { logError } from "@/lib/structured-log";
 
 type CheckState = "ok" | "missing" | "warning" | "error";
 
@@ -39,13 +40,7 @@ export async function GET() {
     if (locations === 0) checks.locations = "warning";
     if (adminUsers === 0) checks.adminUsers = "warning";
   } catch (error) {
-    console.error(
-      JSON.stringify({
-        level: "error",
-        event: "release_health_database_failed",
-        message: error instanceof Error ? error.message : "unknown",
-      }),
-    );
+    logError("release_health_database_failed", { error });
   }
 
   const requiredChecks = ["database", "databaseUrl", "nextAuthSecret", "nextAuthUrl", "emailFrom"];

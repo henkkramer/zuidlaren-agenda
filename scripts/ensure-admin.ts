@@ -2,6 +2,7 @@ import "dotenv/config";
 
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { logError, logInfo } from "../lib/structured-log";
 
 const adminDisplayName = process.env.ADMIN_DISPLAY_NAME?.trim() || "Zuidlaren Agenda beheerder";
 
@@ -54,12 +55,12 @@ async function main() {
     },
   });
 
-  console.info(`Ensured admin user: ${user.email}`);
+  logInfo("operator.admin.ensure.succeeded", { email: user.email, userId: user.id });
 }
 
 main()
   .catch((error) => {
-    console.error(error);
+    logError("operator.admin.ensure.failed", { error });
     process.exit(1);
   })
   .finally(async () => {

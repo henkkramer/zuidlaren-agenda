@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { logError } from "@/lib/structured-log";
 
 export async function GET() {
   try {
@@ -14,13 +15,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error(
-      JSON.stringify({
-        level: "error",
-        event: "readiness_database_failed",
-        message: error instanceof Error ? error.message : "unknown",
-      }),
-    );
+    logError("readiness_database_failed", { error });
     return NextResponse.json(
       {
         ok: false,
