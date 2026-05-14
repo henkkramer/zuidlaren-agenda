@@ -1,6 +1,7 @@
 import "server-only";
 
 import { prisma } from "@/lib/prisma";
+import { logWarn } from "@/lib/structured-log";
 
 export type AnalyticsMetric =
   | "activity_view"
@@ -73,14 +74,10 @@ export async function recordAnalyticsMetric(input: AnalyticsInput) {
       },
     });
   } catch (error) {
-    console.warn(
-      JSON.stringify({
-        level: "warn",
-        event: "analytics_record_failed",
-        metric: input.metric,
-        message: error instanceof Error ? error.message : "unknown",
-      }),
-    );
+    logWarn("analytics_record_failed", {
+      error,
+      metric: input.metric,
+    });
   }
 }
 
