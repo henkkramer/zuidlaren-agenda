@@ -22,8 +22,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 13 | Done | Notification Preferences and Email Foundation | `12`, `04`, `16`, `17`, `18` |
 | 14 | Done | Analytics and Observability | `16`, `17`, `18`, `19` |
 | 15 | Done | Payments and Billing Foundations | `13`, `14`, `17`, `18` |
-| 16 | Next | Tailscale Linux Deployment Hardening | `19`, `02`, `18` |
-| 17 | Planned | MVP Release Hardening | `17`, `18`, `21` |
+| 16 | Done | Tailscale Linux Deployment Hardening | `19`, `02`, `18` |
+| 17 | Next | MVP Release Hardening | `17`, `18`, `21` |
 | 18 | Future | Mobile App Readiness | `20`, `05`, `08`, `12` |
 
 ## Sprint 0 - Planning and UI Direction
@@ -377,7 +377,7 @@ Acceptance:
 
 ## Sprint 16 - Tailscale Linux Deployment Hardening
 
-Status: Next
+Status: Done
 
 Goal:
 
@@ -397,7 +397,7 @@ Acceptance:
 
 ## Sprint 17 - MVP Release Hardening
 
-Status: Planned
+Status: Next
 
 Goal:
 
