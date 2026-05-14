@@ -4,7 +4,7 @@ Mobile-first local activity agenda for Zuidlaren.
 
 ## Current Status
 
-The project is in the public agenda UI phase. The app currently uses mock activity data and focuses on the visual shell, responsive agenda feed, activity cards, and detail view.
+The project has a controlled MVP surface: public agenda, filters, accounts, private-by-default attendance, business publishing, admin tools, privacy pages, deployment foundations, and mobile-ready public API contracts.
 
 Sprint queue:
 
@@ -37,6 +37,8 @@ http://localhost:3088
 ```bash
 npm run lint
 npm run typecheck
+npm run test
+npm run test:e2e
 npm run build
 ```
 
@@ -68,9 +70,15 @@ http://localhost:3088
 
 PostgreSQL is included now so database sprints have a stable local target. It is available to Compose services as `postgres:5432` and on the host as `localhost:55432`, avoiding conflicts with an existing local database on `5432`.
 
-## Tailscale Linux Deployment
+## Production Deployment
 
-Repeatable deployment notes live in:
+Production traffic is expected to reach the app through the reverse proxy on the production server. Launch readiness notes live in:
+
+```text
+docs/mvp-launch-readiness.md
+```
+
+Deployment notes live in:
 
 ```text
 docs/deployment-tailscale.md
@@ -84,6 +92,7 @@ docker compose up --build -d
 env DATABASE_URL=postgresql://zuidlaren:zuidlaren@localhost:55432/zuidlaren_agenda?schema=public npm run db:push
 env DATABASE_URL=postgresql://zuidlaren:zuidlaren@localhost:55432/zuidlaren_agenda?schema=public npm run db:seed
 curl -fsS http://127.0.0.1:3088/api/health/ready
+curl -fsS http://127.0.0.1:3088/api/health/release
 ```
 
 Backups:

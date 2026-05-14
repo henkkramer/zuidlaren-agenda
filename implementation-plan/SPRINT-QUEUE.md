@@ -23,8 +23,9 @@ This queue is the single execution sequence for the existing implementation plan
 | 14 | Done | Analytics and Observability | `16`, `17`, `18`, `19` |
 | 15 | Done | Payments and Billing Foundations | `13`, `14`, `17`, `18` |
 | 16 | Done | Tailscale Linux Deployment Hardening | `19`, `02`, `18` |
-| 17 | Next | MVP Release Hardening | `17`, `18`, `21` |
-| 18 | Future | Mobile App Readiness | `20`, `05`, `08`, `12` |
+| 17 | Done | MVP Release Hardening | `17`, `18`, `21` |
+| 18 | Done | Mobile App Readiness | `20`, `05`, `08`, `12` |
+| 19 | Done | MVP Launch Readiness | `21`, `18`, `17` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -418,7 +419,7 @@ Acceptance:
 
 ## Sprint 18 - Mobile App Readiness
 
-Status: Next
+Status: Done
 
 Goal:
 
@@ -434,3 +435,23 @@ Scope:
 Acceptance:
 
 - Native app work can start without rewriting core backend behavior.
+
+## Sprint 19 - MVP Launch Readiness
+
+Status: Done
+
+Goal:
+
+Prepare the controlled MVP release gate.
+
+Scope:
+
+- Launch readiness documentation.
+- Release health endpoint.
+- Deterministic launch smoke command.
+- Reverse-proxy production assumption documented.
+
+Acceptance:
+
+- Release checks can run without database edits.
+- Operator has one checklist for controlled MVP rollout.
