@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - continued-development
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NODE_ENV: test
+      PORT: "3088"
+      APP_PORT: "3088"
+      CONTAINER_PORT: "3000"
+      APP_BASE_URL: http://localhost:3088
+      NEXT_PUBLIC_APP_BASE_URL: http://localhost:3088
+      DATABASE_URL: postgresql://zuidlaren:zuidlaren@localhost:55432/zuidlaren_agenda?schema=public
+      DOCKER_DATABASE_URL: postgresql://zuidlaren:zuidlaren@postgres:5432/zuidlaren_agenda?schema=public
+      NEXTAUTH_URL: http://localhost:3088
+      NEXTAUTH_SECRET: ci-only-nextauth-secret
+      EMAIL_FROM: Zuidlaren Agenda <noreply@example.local>
+      ADMIN_EMAIL: owner@example.nl
+      ADMIN_DISPLAY_NAME: Zuidlaren Agenda beheerder
+      MOLLIE_WEBHOOK_SECRET: ""
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Launch smoke
+        run: npm run test:e2e
+
+      - name: Production build
+        run: npm run build

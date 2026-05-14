@@ -29,6 +29,8 @@ const requiredFiles = [
   "app/api/health/release/route.ts",
   "app/api/public/activities/route.ts",
   "app/api/mobile/capabilities/route.ts",
+  ".github/workflows/ci.yml",
+  "docs/ci-release-gate.md",
   "docs/mvp-launch-readiness.md",
   "docs/mobile-api-readiness.md",
   "docs/operator-handoff.md",
@@ -55,6 +57,11 @@ for (const key of ["DATABASE_URL", "NEXTAUTH_URL", "NEXTAUTH_SECRET", "EMAIL_FRO
 
 const dockerCompose = read("docker-compose.yml");
 assert(dockerCompose.includes('cpuset: "0-1"'), 'docker-compose.yml must pin the web service with cpuset: "0-1"');
+
+const ciWorkflow = read(".github/workflows/ci.yml");
+for (const command of ["npm run lint", "npm run typecheck", "npm run test", "npm run test:e2e", "npm run build"]) {
+  assert(ciWorkflow.includes(command), `CI workflow must run ${command}`);
+}
 
 const capabilities = buildMobileCapabilities();
 assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/public/activities"), "Mobile capabilities must expose public activities");
