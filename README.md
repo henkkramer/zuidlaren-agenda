@@ -68,6 +68,31 @@ http://localhost:3088
 
 PostgreSQL is included now so database sprints have a stable local target. It is available to Compose services as `postgres:5432` and on the host as `localhost:55432`, avoiding conflicts with an existing local database on `5432`.
 
+## Tailscale Linux Deployment
+
+Repeatable deployment notes live in:
+
+```text
+docs/deployment-tailscale.md
+```
+
+Short path:
+
+```bash
+cp .env.example .env
+docker compose up --build -d
+env DATABASE_URL=postgresql://zuidlaren:zuidlaren@localhost:55432/zuidlaren_agenda?schema=public npm run db:push
+env DATABASE_URL=postgresql://zuidlaren:zuidlaren@localhost:55432/zuidlaren_agenda?schema=public npm run db:seed
+curl -fsS http://127.0.0.1:3088/api/health/ready
+```
+
+Backups:
+
+```bash
+scripts/backup-local.sh
+scripts/restore-local.sh backups/YYYYMMDDTHHMMSSZ
+```
+
 ## Important Product Constraints
 
 - Public agenda first.

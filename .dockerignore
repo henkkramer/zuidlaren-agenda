@@ -2,8 +2,13 @@ node_modules
 .next
 .env
 .env*.local
+.git
 npm-debug.log*
 coverage
 implementation-plan/example-UI.png
 data
+backups
+logs
+uploads
+public/uploads
 *.tsbuildinfo
