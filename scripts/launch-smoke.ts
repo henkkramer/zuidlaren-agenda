@@ -31,6 +31,8 @@ const requiredFiles = [
   "app/api/mobile/capabilities/route.ts",
   "docs/mvp-launch-readiness.md",
   "docs/mobile-api-readiness.md",
+  "docs/operator-handoff.md",
+  "scripts/ensure-admin.ts",
   ".env.example",
   "docker-compose.yml",
 ];
@@ -40,14 +42,14 @@ for (const file of requiredFiles) {
 }
 
 const packageJson = JSON.parse(read("package.json")) as { scripts: Record<string, string> };
-const requiredScripts = ["lint", "typecheck", "test", "test:e2e", "build", "dev:3088", "start:3088", "health", "db:seed"];
+const requiredScripts = ["lint", "typecheck", "test", "test:e2e", "build", "dev:3088", "start:3088", "health", "admin:ensure", "db:seed"];
 
 for (const script of requiredScripts) {
   assert(packageJson.scripts[script], `Missing package script: ${script}`);
 }
 
 const envExample = read(".env.example");
-for (const key of ["DATABASE_URL", "NEXTAUTH_URL", "NEXTAUTH_SECRET", "EMAIL_FROM", "PORT=3088"]) {
+for (const key of ["DATABASE_URL", "NEXTAUTH_URL", "NEXTAUTH_SECRET", "EMAIL_FROM", "ADMIN_EMAIL", "PORT=3088"]) {
   assert(envExample.includes(key), `.env.example is missing ${key}`);
 }
 

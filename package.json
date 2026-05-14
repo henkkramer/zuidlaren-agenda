@@ -13,6 +13,7 @@
     "test": "tsx --test tests/**/*.test.ts",
     "test:e2e": "tsx scripts/launch-smoke.ts",
     "health": "curl -fsS http://127.0.0.1:${PORT:-3088}/api/health",
+    "admin:ensure": "tsx scripts/ensure-admin.ts",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts"
