@@ -10,7 +10,7 @@
     "start:3088": "next start --port 3088",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "echo \"No automated tests yet\"",
+    "test": "tsx --test tests/**/*.test.ts",
     "health": "curl -fsS http://127.0.0.1:${PORT:-3088}/api/health",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",

@@ -95,7 +95,7 @@ export function ZuidlarenAgendaShell({
   }
 
   return (
-    <main className="app-page">
+    <main className="app-page" id="main-content">
       <BrandHeader />
       <div className="app-container">
         <section className="agenda-surface">

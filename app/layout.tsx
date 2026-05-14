@@ -13,7 +13,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="nl">
-      <body>{children}</body>
+      <body>
+        <a className="skip-link" href="#main-content">
+          Direct naar inhoud
+        </a>
+        {children}
+      </body>
     </html>
   );
 }

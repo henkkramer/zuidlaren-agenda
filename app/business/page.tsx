@@ -12,7 +12,7 @@ export default async function BusinessIndexPage() {
   }
 
   return (
-    <main className="account-page">
+    <main className="account-page" id="main-content">
       <section className="account-shell">
         <Link className="account-back" href="/">
           Terug naar agenda

@@ -87,11 +87,15 @@ export function AccountPanel(props: AccountPanelProps) {
   }
 
   return (
-    <main className="account-page">
+    <main className="account-page" id="main-content">
       <section className="account-shell">
-        <Link className="account-back" href="/">
-          Terug naar agenda
-        </Link>
+        <nav className="account-utility-nav" aria-label="Account navigatie">
+          <Link className="account-back" href="/">
+            Terug naar agenda
+          </Link>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/voorwaarden">Voorwaarden</Link>
+        </nav>
         <p className="account-kicker">Mijn Zuidlaren Agenda</p>
         <h1>Account</h1>
 
@@ -142,6 +146,9 @@ export function AccountPanel(props: AccountPanelProps) {
                 />
                 Verwijdering van mijn account aanvragen
               </label>
+              <a className="outline-button" href="/api/me/export">
+                Mijn gegevens downloaden
+              </a>
               <button className="primary-button" onClick={saveProfile} type="button">
                 Profiel opslaan
               </button>
@@ -206,7 +213,11 @@ export function AccountPanel(props: AccountPanelProps) {
           </div>
         )}
 
-        {status ? <p className="account-status">{status}</p> : null}
+        {status ? (
+          <p className="account-status" role="status" aria-live="polite">
+            {status}
+          </p>
+        ) : null}
       </section>
     </main>
   );

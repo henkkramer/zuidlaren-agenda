@@ -47,6 +47,23 @@ a {
   text-decoration: none;
 }
 
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: 12px;
+  left: 12px;
+  transform: translateY(-140%);
+  border-radius: 999px;
+  background: var(--color-green-deep);
+  color: white;
+  padding: 10px 14px;
+  font-weight: 850;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 .app-page {
   min-height: 100vh;
   padding: 24px;
@@ -917,9 +934,21 @@ a {
 
 .account-back {
   display: inline-flex;
-  margin-bottom: 24px;
   color: var(--color-green-deep);
   font-weight: 800;
+}
+
+.account-utility-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 24px;
+  color: var(--color-muted-text);
+  font-weight: 800;
+}
+
+.account-utility-nav .account-back {
+  margin-right: auto;
 }
 
 .account-kicker {
@@ -976,6 +1005,75 @@ a {
 .account-status {
   margin-top: 18px;
   font-weight: 800;
+}
+
+.legal-page .account-shell {
+  width: min(100%, 920px);
+}
+
+.legal-content {
+  display: grid;
+  gap: 16px;
+}
+
+.legal-content section {
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.58);
+  padding: 18px;
+}
+
+.legal-content h2 {
+  margin: 0 0 8px;
+  color: var(--color-green-deep);
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 1.45rem;
+}
+
+.legal-content p,
+.legal-content ul {
+  margin: 0;
+  color: var(--color-muted-text);
+  line-height: 1.6;
+}
+
+.legal-content ul {
+  padding-left: 20px;
+}
+
+.state-action-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.state-single-action {
+  margin-top: 16px;
+}
+
+.loading-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.loading-stack span {
+  display: block;
+  height: 58px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.52));
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.2s ease-in-out infinite;
+}
+
+@keyframes loading-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
 }
 
 .action-status {
@@ -1480,6 +1578,10 @@ a {
 
   .business-editor-preview {
     position: static;
+  }
+
+  .state-action-row {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { recordAnalyticsMetric } from "@/lib/analytics";
 import { getCurrentSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 type AttendanceRouteContext = {
   params: Promise<{
@@ -69,6 +70,12 @@ export async function POST(request: Request, context: AttendanceRouteContext) {
     return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
   }
 
+  const rateLimit = checkRateLimit({ key: `attendance:${userId}`, limit: 40, windowMs: 60_000 });
+  if (rateLimit.limited) {
+    const response = rateLimitResponse(rateLimit.resetAt);
+    return NextResponse.json(response.body, response.init);
+  }
+
   const { activityId } = await context.params;
   const activity = await getPublishedActivity(activityId);
 
@@ -119,6 +126,12 @@ export async function PATCH(request: Request, context: AttendanceRouteContext) {
     return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
   }
 
+  const rateLimit = checkRateLimit({ key: `attendance:${userId}`, limit: 40, windowMs: 60_000 });
+  if (rateLimit.limited) {
+    const response = rateLimitResponse(rateLimit.resetAt);
+    return NextResponse.json(response.body, response.init);
+  }
+
   const { activityId } = await context.params;
   const activity = await getPublishedActivity(activityId);
 
@@ -155,6 +168,12 @@ export async function DELETE(_request: Request, context: AttendanceRouteContext)
 
   if (!userId) {
     return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
+  }
+
+  const rateLimit = checkRateLimit({ key: `attendance:${userId}`, limit: 40, windowMs: 60_000 });
+  if (rateLimit.limited) {
+    const response = rateLimitResponse(rateLimit.resetAt);
+    return NextResponse.json(response.body, response.init);
   }
 
   const { activityId } = await context.params;
