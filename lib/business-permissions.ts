@@ -2,9 +2,8 @@ import "server-only";
 
 import type { Business, BusinessMember } from "@prisma/client";
 import { getCurrentSession } from "@/lib/auth";
+import { evaluateBusinessPermission, type BusinessPermission } from "@/lib/business-permission-rules";
 import { prisma } from "@/lib/prisma";
-
-export type BusinessPermission = "view" | "manageMembers" | "publishActivities";
 
 type BusinessAccess =
   | {
@@ -56,20 +55,18 @@ export async function requireBusinessPermission(
     return { ok: false, status: 403, error: "Geen toegang tot dit bedrijf" };
   }
 
-  if (permission === "manageMembers" && membership.role !== "OWNER") {
-    return { ok: false, status: 403, error: "Alleen eigenaren kunnen medewerkers beheren" };
-  }
+  const permissionResult = evaluateBusinessPermission(
+    {
+      businessStatus: business.status,
+      canPublishActivities: membership.canPublishActivities,
+      membershipActive: membership.active,
+      role: membership.role,
+    },
+    permission,
+  );
 
-  if (permission === "publishActivities") {
-    const canPublish = membership.role === "OWNER" || membership.canPublishActivities;
-
-    if (!canPublish) {
-      return { ok: false, status: 403, error: "Geen publicatierecht" };
-    }
-
-    if (business.status !== "APPROVED") {
-      return { ok: false, status: 403, error: "Bedrijf moet eerst zijn goedgekeurd" };
-    }
+  if (!permissionResult.ok) {
+    return permissionResult;
   }
 
   return { ok: true, userId: session.user.id, business, membership };

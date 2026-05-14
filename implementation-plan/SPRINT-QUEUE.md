@@ -27,6 +27,7 @@ This queue is the single execution sequence for the existing implementation plan
 | 18 | Done | Mobile App Readiness | `20`, `05`, `08`, `12` |
 | 19 | Done | MVP Launch Readiness | `21`, `18`, `17` |
 | 20 | Done | Operator Handoff and Admin Bootstrap | `21`, `14`, `17` |
+| 21 | Done | Permission and Validation Test Coverage | `18`, `10`, `17` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -476,3 +477,24 @@ Acceptance:
 
 - Owner can create or promote the first admin without manual database edits.
 - Launch smoke fails if the operator bootstrap path is removed.
+
+## Sprint 21 - Permission and Validation Test Coverage
+
+Status: Done
+
+Goal:
+
+Cover critical MVP permission, validation, filter, and throttling behavior with fast automated tests.
+
+Scope:
+
+- Pure business permission rule helper.
+- Owner/employee publish and member-management tests.
+- Business activity input validation tests.
+- Public filter/query helper tests.
+- Rate-limit helper tests.
+
+Acceptance:
+
+- `npm run test` covers critical permission and validation behavior without a live database.
+- Route permission code uses the same tested rule helper.
