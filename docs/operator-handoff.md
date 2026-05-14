@@ -37,9 +37,7 @@ npm run admin:ensure
 After deploy:
 
 ```bash
-curl -fsS https://<production-host>/api/health
-curl -fsS https://<production-host>/api/health/ready
-curl -fsS https://<production-host>/api/health/release
+RELEASE_BASE_URL=https://<production-host> npm run release:check
 ```
 
 Resolve release-health warnings before adding new testers.
