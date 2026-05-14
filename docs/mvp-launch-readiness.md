@@ -24,12 +24,10 @@ Pull requests run the same gate in GitHub Actions. See `docs/ci-release-gate.md`
 Run against the deployed app:
 
 ```bash
-curl -fsS https://<production-host>/api/health
-curl -fsS https://<production-host>/api/health/ready
-curl -fsS https://<production-host>/api/health/release
-curl -fsS https://<production-host>/api/mobile/capabilities
-curl -fsS https://<production-host>/api/public/activities?limit=3
+RELEASE_BASE_URL=https://<production-host> npm run release:check
 ```
+
+The command checks `/api/health`, `/api/health/ready`, `/api/health/release`, `/api/mobile/capabilities`, and `/api/public/activities?limit=3`.
 
 `/api/health/release` checks:
 

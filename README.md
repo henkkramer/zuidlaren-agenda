@@ -56,6 +56,12 @@ npm run admin:ensure
 
 Set `ADMIN_EMAIL` in `.env` before running it.
 
+Check a deployed release:
+
+```bash
+RELEASE_BASE_URL=https://example.nl npm run release:check
+```
+
 Health endpoint:
 
 ```bash

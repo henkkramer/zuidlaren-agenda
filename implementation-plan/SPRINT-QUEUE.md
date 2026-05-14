@@ -30,6 +30,7 @@ This queue is the single execution sequence for the existing implementation plan
 | 21 | Done | Permission and Validation Test Coverage | `18`, `10`, `17` |
 | 22 | Done | Structured Logging Redaction | `16`, `17`, `18` |
 | 23 | Done | GitHub CI Release Gate | `18`, `21` |
+| 24 | Done | Runtime Release Check Command | `21`, `16`, `18` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -540,3 +541,23 @@ Acceptance:
 
 - Pull requests run the same validation commands used locally.
 - Launch smoke fails if the CI workflow is removed or stops running required commands.
+
+## Sprint 24 - Runtime Release Check Command
+
+Status: Done
+
+Goal:
+
+Make deployed-host release verification repeatable for the operator.
+
+Scope:
+
+- `npm run release:check` command driven by `RELEASE_BASE_URL`.
+- Shared release-check endpoint plan with tests.
+- Launch smoke guard for the runtime check path.
+- Release and operator docs updated.
+
+Acceptance:
+
+- Operator can validate the deployed reverse-proxy URL with one command.
+- Automated tests cover the required runtime endpoint list.
