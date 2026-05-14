@@ -28,7 +28,7 @@ export default async function NewBusinessActivityPage({ params }: NewActivityPag
   }
 
   return (
-    <main className="account-page">
+    <main className="account-page" id="main-content">
       <section className="account-shell business-editor-shell">
         <Link className="account-back" href={`/business/${access.business.slug}`}>
           Terug naar dashboard

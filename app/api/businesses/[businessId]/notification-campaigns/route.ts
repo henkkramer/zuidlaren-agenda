@@ -3,6 +3,7 @@ import { requireBusinessPermission } from "@/lib/business-permissions";
 import { createNotificationRequestAuditLog } from "@/lib/notification-audit";
 import { findCampaignRecipients, hasRecentBusinessCampaign } from "@/lib/notification-campaigns";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 type BusinessNotificationCampaignContext = {
   params: Promise<{
@@ -26,6 +27,12 @@ export async function POST(request: Request, context: BusinessNotificationCampai
 
   if (!access.ok) {
     return NextResponse.json({ error: access.error }, { status: access.status });
+  }
+
+  const rateLimit = checkRateLimit({ key: `notification:${access.userId}:${access.business.id}`, limit: 5, windowMs: 60 * 60_000 });
+  if (rateLimit.limited) {
+    const response = rateLimitResponse(rateLimit.resetAt);
+    return NextResponse.json(response.body, response.init);
   }
 
   const payload = (await request.json().catch(() => null)) as CampaignPayload | null;

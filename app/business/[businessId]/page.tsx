@@ -57,7 +57,7 @@ export default async function BusinessDashboardPage({ params }: BusinessDashboar
   const canPublish = access.membership.role === "OWNER" || access.membership.canPublishActivities;
 
   return (
-    <main className="account-page">
+    <main className="account-page" id="main-content">
       <section className="account-shell business-dashboard-shell">
         <Link className="account-back" href="/business">
           Terug naar bedrijven

@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function CheckEmailPage() {
   return (
-    <main className="account-page">
+    <main className="account-page" id="main-content">
       <section className="account-shell">
         <p className="account-kicker">Inloggen</p>
         <h1>Check je e-mail</h1>

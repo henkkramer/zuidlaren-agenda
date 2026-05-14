@@ -397,7 +397,7 @@ Acceptance:
 
 ## Sprint 17 - MVP Release Hardening
 
-Status: Next
+Status: Done
 
 Goal:
 
@@ -418,7 +418,7 @@ Acceptance:
 
 ## Sprint 18 - Mobile App Readiness
 
-Status: Future
+Status: Next
 
 Goal:
 

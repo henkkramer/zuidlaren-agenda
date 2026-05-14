@@ -3,6 +3,7 @@ import { isAiActivityAction, type AiActivityInput, type AiActivitySuggestion } f
 import { estimateTokens, localAiCardAssistantProvider } from "@/lib/ai-card-assistant";
 import { requireBusinessPermission } from "@/lib/business-permissions";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 type AiActivityAssistContext = {
   params: Promise<{
@@ -88,6 +89,12 @@ export async function POST(request: Request, context: AiActivityAssistContext) {
 
   if (!access.ok) {
     return NextResponse.json({ error: access.error }, { status: access.status });
+  }
+
+  const rateLimit = checkRateLimit({ key: `ai:${access.userId}:${access.business.id}`, limit: 20, windowMs: 60 * 60_000 });
+  if (rateLimit.limited) {
+    const response = rateLimitResponse(rateLimit.resetAt);
+    return NextResponse.json(response.body, response.init);
   }
 
   let payload: AiActivityAssistPayload;

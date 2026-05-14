@@ -3,12 +3,19 @@ import { getCurrentSession } from "@/lib/auth";
 import { requireBusinessPermission } from "@/lib/business-permissions";
 import { storeLocalMedia } from "@/lib/media-storage";
 import { prisma } from "@/lib/prisma";
+import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   const session = await getCurrentSession();
 
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
+  }
+
+  const rateLimit = checkRateLimit({ key: `media:${session.user.id}`, limit: 20, windowMs: 60 * 60_000 });
+  if (rateLimit.limited) {
+    const response = rateLimitResponse(rateLimit.resetAt);
+    return NextResponse.json(response.body, response.init);
   }
 
   const formData = await request.formData();
