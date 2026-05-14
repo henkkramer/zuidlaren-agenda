@@ -17,6 +17,8 @@ npm run admin:ensure
 
 `npm run test:e2e` is a deterministic launch smoke check. It verifies the critical source routes, documentation, environment template, mobile contracts, and package scripts are present. It does not require a live database.
 
+Pull requests run the same gate in GitHub Actions. See `docs/ci-release-gate.md`.
+
 ## Runtime Checks
 
 Run against the deployed app:

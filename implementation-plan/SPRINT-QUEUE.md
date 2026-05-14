@@ -29,6 +29,7 @@ This queue is the single execution sequence for the existing implementation plan
 | 20 | Done | Operator Handoff and Admin Bootstrap | `21`, `14`, `17` |
 | 21 | Done | Permission and Validation Test Coverage | `18`, `10`, `17` |
 | 22 | Done | Structured Logging Redaction | `16`, `17`, `18` |
+| 23 | Done | GitHub CI Release Gate | `18`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -519,3 +520,23 @@ Acceptance:
 
 - Sensitive values are redacted or masked in tested log records.
 - Login URLs and email bodies are no longer written to logs.
+
+## Sprint 23 - GitHub CI Release Gate
+
+Status: Done
+
+Goal:
+
+Run the MVP release validation automatically on GitHub pull requests.
+
+Scope:
+
+- GitHub Actions workflow for lint, typecheck, tests, launch smoke, and build.
+- CI-only environment values for build-time validation.
+- Launch smoke guard that keeps the workflow present.
+- CI release gate documentation.
+
+Acceptance:
+
+- Pull requests run the same validation commands used locally.
+- Launch smoke fails if the CI workflow is removed or stops running required commands.

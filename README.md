@@ -42,6 +42,12 @@ npm run test:e2e
 npm run build
 ```
 
+Pull requests run the same checks in GitHub Actions. See:
+
+```text
+docs/ci-release-gate.md
+```
+
 Create or promote the first admin account:
 
 ```bash
