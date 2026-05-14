@@ -12,6 +12,7 @@ npm run typecheck
 npm run test
 npm run test:e2e
 npm run build
+npm run admin:ensure
 ```
 
 `npm run test:e2e` is a deterministic launch smoke check. It verifies the critical source routes, documentation, environment template, mobile contracts, and package scripts are present. It does not require a live database.
@@ -38,6 +39,8 @@ curl -fsS https://<production-host>/api/public/activities?limit=3
 - Active admin user count.
 
 Warnings for empty content or missing admin users should be resolved before inviting testers.
+
+Admin bootstrap and operator handoff are documented in `docs/operator-handoff.md`.
 
 ## Manual Release Gate
 

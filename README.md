@@ -42,6 +42,14 @@ npm run test:e2e
 npm run build
 ```
 
+Create or promote the first admin account:
+
+```bash
+npm run admin:ensure
+```
+
+Set `ADMIN_EMAIL` in `.env` before running it.
+
 Health endpoint:
 
 ```bash
@@ -109,3 +117,11 @@ scripts/restore-local.sh backups/YYYYMMDDTHHMMSSZ
 - Dutch UI copy.
 - No comments, likes, followers, chat, or social feed.
 - `Ik ga` is private by default and is not a formal reservation.
+
+## Operator Handoff
+
+Controlled MVP operations are documented in:
+
+```text
+docs/operator-handoff.md
+```

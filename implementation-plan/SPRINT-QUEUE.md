@@ -26,6 +26,7 @@ This queue is the single execution sequence for the existing implementation plan
 | 17 | Done | MVP Release Hardening | `17`, `18`, `21` |
 | 18 | Done | Mobile App Readiness | `20`, `05`, `08`, `12` |
 | 19 | Done | MVP Launch Readiness | `21`, `18`, `17` |
+| 20 | Done | Operator Handoff and Admin Bootstrap | `21`, `14`, `17` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -455,3 +456,23 @@ Acceptance:
 
 - Release checks can run without database edits.
 - Operator has one checklist for controlled MVP rollout.
+
+## Sprint 20 - Operator Handoff and Admin Bootstrap
+
+Status: Done
+
+Goal:
+
+Make first-admin setup and controlled MVP operation repeatable.
+
+Scope:
+
+- Idempotent admin bootstrap command.
+- Operator handoff runbook.
+- Launch smoke guard for the admin bootstrap path.
+- Release documentation updated.
+
+Acceptance:
+
+- Owner can create or promote the first admin without manual database edits.
+- Launch smoke fails if the operator bootstrap path is removed.
