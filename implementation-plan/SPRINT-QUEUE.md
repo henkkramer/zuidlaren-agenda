@@ -40,6 +40,7 @@ This queue is the single execution sequence for the existing implementation plan
 | 31 | Done | Media Upload Validation Coverage | `15`, `17`, `18` |
 | 32 | Done | Account GDPR Request Validation | `17`, `18`, `21` |
 | 33 | Done | Public Report Intake Foundation | `17`, `14`, `21` |
+| 34 | Done | Notification Preference Validation | `12`, `17`, `18` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -752,3 +753,24 @@ Acceptance:
 
 - Report intake validates and trims user input before database writes.
 - Report submissions are throttled and can be reviewed through the existing admin reports flow.
+
+## Sprint 34 - Notification Preference Validation
+
+Status: Done
+
+Goal:
+
+Keep opt-in notification settings explicit, sanitized, and testable.
+
+Scope:
+
+- Shared notification preference input parser.
+- Tests for explicit boolean opt-ins.
+- Tests for slug trimming, validation, deduplication, and caps.
+- Route wiring through the shared parser while preserving database filtering for known categories and locations.
+- Launch smoke guard for parser usage.
+
+Acceptance:
+
+- Notification opt-ins are only enabled by explicit boolean values.
+- Category and location preference lists are sanitized before database filtering and persistence.
