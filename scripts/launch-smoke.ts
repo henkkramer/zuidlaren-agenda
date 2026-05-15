@@ -33,6 +33,7 @@ const requiredFiles = [
   "lib/csrf.ts",
   "lib/audit-actions.ts",
   "lib/media-validation.ts",
+  "lib/notification-preferences-input.ts",
   "lib/payment-webhooks.ts",
   "lib/profile-input.ts",
   "lib/privacy-processors.ts",
@@ -76,6 +77,12 @@ assert(nextConfig.includes("securityHeadersForNext"), "next.config.ts must apply
 const profileRoute = read("app/api/me/profile/route.ts");
 assert(profileRoute.includes("rejectCrossOriginMutation"), "profile mutation route must apply CSRF origin guard");
 assert(profileRoute.includes("parseProfileInput"), "profile mutation route must use shared profile input parsing");
+
+const notificationPreferencesRoute = read("app/api/me/notification-preferences/route.ts");
+assert(
+  notificationPreferencesRoute.includes("parseNotificationPreferencesInput"),
+  "notification preferences route must use shared input parsing",
+);
 
 const businessActivityRoute = read("app/api/businesses/[businessId]/activities/route.ts");
 assert(businessActivityRoute.includes("rejectCrossOriginMutation"), "business activity mutation route must apply CSRF origin guard");

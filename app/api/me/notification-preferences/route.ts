@@ -1,15 +1,8 @@
 import { NextResponse } from "next/server";
 import { getCurrentSession } from "@/lib/auth";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
+import { parseNotificationPreferencesInput } from "@/lib/notification-preferences-input";
 import { prisma } from "@/lib/prisma";
-
-type PreferencesPayload = {
-  activityReminders?: unknown;
-  weeklyDigest?: unknown;
-  businessUpdates?: unknown;
-  categorySlugs?: unknown;
-  locationSlugs?: unknown;
-};
 
 function serializePreferences(preferences: {
   activityReminders: boolean;
@@ -25,21 +18,6 @@ function serializePreferences(preferences: {
     categorySlugs: preferences.categorySlugs,
     locationSlugs: preferences.locationSlugs,
   };
-}
-
-function parseSlugList(value: unknown) {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  return Array.from(
-    new Set(
-      value
-        .filter((item): item is string => typeof item === "string")
-        .map((item) => item.trim())
-        .filter((item) => /^[a-z0-9_-]{1,60}$/.test(item)),
-    ),
-  ).slice(0, 20);
 }
 
 async function filterAllowedSlugs(input: string[], model: "category" | "location") {
@@ -88,25 +66,25 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
   }
 
-  const payload = (await request.json()) as PreferencesPayload;
+  const input = parseNotificationPreferencesInput((await request.json().catch(() => null)) ?? {});
   const [categorySlugs, locationSlugs] = await Promise.all([
-    filterAllowedSlugs(parseSlugList(payload.categorySlugs), "category"),
-    filterAllowedSlugs(parseSlugList(payload.locationSlugs), "location"),
+    filterAllowedSlugs(input.categorySlugs, "category"),
+    filterAllowedSlugs(input.locationSlugs, "location"),
   ]);
   const preferences = await prisma.notificationPreference.upsert({
     where: { userId: session.user.id },
     update: {
-      activityReminders: payload.activityReminders === true,
-      weeklyDigest: payload.weeklyDigest === true,
-      businessUpdates: payload.businessUpdates === true,
+      activityReminders: input.activityReminders,
+      weeklyDigest: input.weeklyDigest,
+      businessUpdates: input.businessUpdates,
       categorySlugs,
       locationSlugs,
     },
     create: {
       userId: session.user.id,
-      activityReminders: payload.activityReminders === true,
-      weeklyDigest: payload.weeklyDigest === true,
-      businessUpdates: payload.businessUpdates === true,
+      activityReminders: input.activityReminders,
+      weeklyDigest: input.weeklyDigest,
+      businessUpdates: input.businessUpdates,
       categorySlugs,
       locationSlugs,
     },
