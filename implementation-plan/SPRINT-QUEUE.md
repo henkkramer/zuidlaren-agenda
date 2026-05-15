@@ -41,6 +41,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 32 | Done | Account GDPR Request Validation | `17`, `18`, `21` |
 | 33 | Done | Public Report Intake Foundation | `17`, `14`, `21` |
 | 34 | Done | Notification Preference Validation | `12`, `17`, `18` |
+| 35 | Done | Notification Campaign Request Validation | `12`, `17`, `18` |
+| 36 | Done | Admin Status Validation Coverage | `14`, `17`, `18` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -774,3 +776,45 @@ Acceptance:
 
 - Notification opt-ins are only enabled by explicit boolean values.
 - Category and location preference lists are sanitized before database filtering and persistence.
+
+## Sprint 35 - Notification Campaign Request Validation
+
+Status: Done
+
+Goal:
+
+Make business notification campaign request input explicit and testable before admin approval.
+
+Scope:
+
+- Shared notification campaign input parser.
+- Tests for title, message, and optional activity input trimming and caps.
+- Tests for minimum title and message requirements.
+- Route wiring through the shared parser.
+- Launch smoke guard for campaign parser usage.
+
+Acceptance:
+
+- Campaign requests validate and trim text before database writes.
+- Business notification requests remain review-first and rate-limited.
+
+## Sprint 36 - Admin Status Validation Coverage
+
+Status: Done
+
+Goal:
+
+Keep admin moderation/status transitions constrained by shared, tested parsers.
+
+Scope:
+
+- Shared admin status parsers for activity, business, and report moderation.
+- Shared report resolution trimming helper.
+- Tests for allowed and rejected admin status values.
+- Admin routes wired to the shared parsers.
+- Launch smoke guard for admin activity parser usage.
+
+Acceptance:
+
+- Admin status routes only accept explicit allowlisted status values.
+- Moderation validation behavior is covered without database dependencies.

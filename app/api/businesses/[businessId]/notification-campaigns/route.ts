@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireBusinessPermission } from "@/lib/business-permissions";
 import { createNotificationRequestAuditLog } from "@/lib/notification-audit";
 import { findCampaignRecipients, hasRecentBusinessCampaign } from "@/lib/notification-campaigns";
+import { parseNotificationCampaignInput } from "@/lib/notification-campaign-input";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
@@ -11,16 +12,6 @@ type BusinessNotificationCampaignContext = {
     businessId: string;
   }>;
 };
-
-type CampaignPayload = {
-  title?: unknown;
-  message?: unknown;
-  activityId?: unknown;
-};
-
-function text(value: unknown, maxLength: number) {
-  return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
-}
 
 export async function POST(request: Request, context: BusinessNotificationCampaignContext) {
   const csrfResponse = rejectCrossOriginMutation(request);
@@ -39,13 +30,12 @@ export async function POST(request: Request, context: BusinessNotificationCampai
     return NextResponse.json(response.body, response.init);
   }
 
-  const payload = (await request.json().catch(() => null)) as CampaignPayload | null;
-  const title = text(payload?.title, 120);
-  const message = text(payload?.message, 1000);
-  const activityId = text(payload?.activityId, 80);
+  let input;
 
-  if (title.length < 5 || message.length < 20) {
-    return NextResponse.json({ error: "Titel en bericht zijn verplicht" }, { status: 400 });
+  try {
+    input = parseNotificationCampaignInput(((await request.json().catch(() => null)) ?? {}) as Record<string, unknown>);
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Ongeldige notificatie-aanvraag" }, { status: 400 });
   }
 
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
@@ -55,10 +45,10 @@ export async function POST(request: Request, context: BusinessNotificationCampai
     return NextResponse.json({ error: "Er staat al een recente notificatie-aanvraag voor dit bedrijf open" }, { status: 429 });
   }
 
-  const activity = activityId
+  const activity = input.activityId
     ? await prisma.activity.findFirst({
         where: {
-          id: activityId,
+          id: input.activityId,
           businessId: access.business.id,
         },
         include: {
@@ -68,15 +58,15 @@ export async function POST(request: Request, context: BusinessNotificationCampai
       })
     : null;
 
-  if (activityId && !activity) {
+  if (input.activityId && !activity) {
     return NextResponse.json({ error: "Activiteit niet gevonden voor dit bedrijf" }, { status: 404 });
   }
 
   const recipients = await findCampaignRecipients(activity);
   const campaign = await prisma.notificationCampaign.create({
     data: {
-      title,
-      message,
+      title: input.title,
+      message: input.message,
       status: "PENDING",
       targetCategory: activity?.category.slug,
       targetLocation: activity?.location.slug,
