@@ -1,11 +1,12 @@
 import "dotenv/config";
 
-import { buildReleaseCheckUrls } from "@/lib/release-checks";
+import { buildReleaseCheckUrls, releaseHealthWarnings } from "@/lib/release-checks";
 
 type CheckResult = {
   ok: boolean;
   status: number;
   url: string;
+  warnings: string[];
 };
 
 async function checkUrl(url: string): Promise<CheckResult> {
@@ -15,17 +16,20 @@ async function checkUrl(url: string): Promise<CheckResult> {
         Accept: "application/json",
       },
     });
+    const payload = (await response.json().catch(() => null)) as unknown;
 
     return {
       ok: response.ok,
       status: response.status,
       url,
+      warnings: releaseHealthWarnings(payload),
     };
   } catch {
     return {
       ok: false,
       status: 0,
       url,
+      warnings: [],
     };
   }
 }
@@ -40,13 +44,19 @@ async function main() {
   const checks = buildReleaseCheckUrls(releaseBaseUrl);
   const results = await Promise.all(checks.map((check) => checkUrl(check.url)));
   const failures = results.filter((result) => !result.ok);
+  const warnings = results.filter((result) => result.warnings.length > 0);
 
   for (const result of results) {
-    console.info(`${result.ok ? "ok" : "fail"} ${result.status} ${result.url}`);
+    const warningText = result.warnings.length > 0 ? ` warnings=${result.warnings.join(",")}` : "";
+    console.info(`${result.ok ? "ok" : "fail"} ${result.status} ${result.url}${warningText}`);
   }
 
   if (failures.length > 0) {
     throw new Error(`${failures.length} release check(s) failed`);
+  }
+
+  if (warnings.length > 0) {
+    throw new Error(`${warnings.length} release check(s) returned warnings`);
   }
 }
 

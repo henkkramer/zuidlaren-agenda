@@ -47,6 +47,10 @@ This queue is the single execution sequence for the existing implementation plan
 | 38 | Done | Admin Report Handling UX | `14`, `17`, `21` |
 | 39 | Done | Admin Business Approval UX | `14`, `10`, `21` |
 | 40 | Done | Admin Activity Moderation UX | `14`, `06`, `21` |
+| 41 | Done | PR Release Handoff | `18`, `21` |
+| 42 | Done | Runtime Warning Release Gate | `16`, `19`, `21` |
+| 43 | Done | Admin Event Import Preview | `05`, `14`, `18` |
+| 44 | Done | Content Maintenance Queue | `05`, `14`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -906,3 +910,84 @@ Acceptance:
 
 - Admins can publish, hide, or expire activities from `/admin`.
 - Activity status changes continue to use `PATCH /api/admin/activities/[activityId]` and existing audit logging.
+
+## Sprint 41 - PR Release Handoff
+
+Status: Done
+
+Goal:
+
+Keep continued-development release work tied to one explicit GitHub pull request and one queue.
+
+Scope:
+
+- Add PR release handoff documentation.
+- Link the handoff from launch readiness docs.
+- Include the active pull request as the current handoff target.
+- Add the handoff document to launch smoke required files.
+
+Acceptance:
+
+- The branch has a documented PR handoff rule before merge.
+- The sprint queue remains the single implementation sequence.
+
+## Sprint 42 - Runtime Warning Release Gate
+
+Status: Done
+
+Goal:
+
+Make deployed release checks fail when release-health warnings would otherwise be easy to overlook.
+
+Scope:
+
+- Extract release-health warning parsing into the release check helper.
+- Make `npm run release:check` fail on `/api/health/release` warnings.
+- Add test coverage for warning extraction.
+- Document that warnings block tester invitations.
+- Add launch smoke coverage for warning-gate wiring.
+
+Acceptance:
+
+- Runtime release verification fails on empty content/admin warning states.
+- Operators get the warning names in release-check output.
+
+## Sprint 43 - Admin Event Import Preview
+
+Status: Done
+
+Goal:
+
+Give admins a review-first workflow for preparing bulk or copied agenda entries without direct database writes.
+
+Scope:
+
+- Shared import preview parser for delimited activity rows.
+- Admin dashboard import preview panel.
+- Row-level draft/invalid status, errors, and warnings.
+- Tests for valid imports and invalid date ordering.
+- Launch smoke guard for import preview wiring.
+
+Acceptance:
+
+- Admins can paste tabular event data and see normalized draft readiness.
+- Import preview does not bypass existing manual review and publication controls.
+
+## Sprint 44 - Content Maintenance Queue
+
+Status: Done
+
+Goal:
+
+Keep known monitor and follow-up activity topics visible to admins.
+
+Scope:
+
+- Structured content maintenance queue for source follow-ups.
+- Admin dashboard panel for high- and medium-priority maintenance items.
+- Test coverage for Zuidlaardermarkt and Open Muziek Podium follow-ups.
+- Launch smoke guard for the queue.
+
+Acceptance:
+
+- Admins can see follow-up items for Zuidlaardermarktweek, Muzieknacht, Open Muziek Podium, and short-cycle horeca/culture sources.

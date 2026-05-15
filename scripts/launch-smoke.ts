@@ -42,12 +42,15 @@ const requiredFiles = [
   "lib/report-input.ts",
   "lib/security-headers.ts",
   "lib/release-checks.ts",
+  "lib/admin-activity-import.ts",
+  "lib/content-maintenance-queue.ts",
   ".github/workflows/ci.yml",
   "docs/ci-release-gate.md",
   "docs/audit-log-coverage.md",
   "docs/mvp-launch-readiness.md",
   "docs/mobile-api-readiness.md",
   "docs/operator-handoff.md",
+  "docs/pr-release-handoff.md",
   "scripts/ensure-admin.ts",
   "scripts/release-check.ts",
   ".env.example",
@@ -113,6 +116,13 @@ for (const status of ["published", "unpublished", "expired"]) {
   assert(adminActivities.includes(status), `admin activities UI must expose ${status} handling`);
 }
 
+const adminActivityImport = read("components/admin-activity-import.tsx");
+assert(adminActivityImport.includes("parseActivityImportPreview"), "admin import UI must use shared import preview parsing");
+
+const maintenanceQueue = read("lib/content-maintenance-queue.ts");
+assert(maintenanceQueue.includes("Zuidlaardermarktweek"), "content maintenance queue must track Zuidlaardermarkt follow-up");
+assert(maintenanceQueue.includes("Open Muziek Podium"), "content maintenance queue must track Open Muziek Podium follow-up");
+
 const reportsRoute = read("app/api/reports/route.ts");
 assert(reportsRoute.includes("parseReportInput"), "public report route must use shared report input parsing");
 assert(reportsRoute.includes("checkRateLimit"), "public report route must apply rate limiting");
@@ -152,6 +162,9 @@ for (const command of ["npm run lint", "npm run typecheck", "npm run test", "npm
 const capabilities = buildMobileCapabilities();
 assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/public/activities"), "Mobile capabilities must expose public activities");
 assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/me/agenda"), "Mobile capabilities must expose personal agenda");
+
+const releaseCheckScript = read("scripts/release-check.ts");
+assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");
 
 const queue = read("implementation-plan/SPRINT-QUEUE.md");
 assert(queue.includes("## Sprint 19 - MVP Launch Readiness"), "Sprint 19 must be listed in the queue");

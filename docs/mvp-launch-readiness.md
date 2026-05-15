@@ -41,8 +41,10 @@ All routes are served with the shared security header policy from `lib/security-
 - Active admin user count.
 
 Warnings for empty content or missing admin users should be resolved before inviting testers.
+`npm run release:check` fails when `/api/health/release` returns warnings, so missing published activities, categories, locations, or admin users cannot be ignored during release verification.
 
 Admin bootstrap and operator handoff are documented in `docs/operator-handoff.md`.
+Pull request handoff rules are documented in `docs/pr-release-handoff.md`.
 
 ## Manual Release Gate
 
