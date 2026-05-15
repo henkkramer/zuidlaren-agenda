@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminAuditLog, requireAdmin } from "@/lib/admin-auth";
+import { parseAdminReportResolution, parseAdminReportStatus } from "@/lib/admin-status-input";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 
@@ -14,13 +15,6 @@ type ReportPatchPayload = {
   status?: unknown;
 };
 
-function toReportStatus(value: unknown) {
-  if (value === "open") return "OPEN" as const;
-  if (value === "reviewed") return "REVIEWED" as const;
-  if (value === "dismissed") return "DISMISSED" as const;
-  return null;
-}
-
 export async function PATCH(request: Request, context: ReportContext) {
   const csrfResponse = rejectCrossOriginMutation(request);
   if (csrfResponse) return csrfResponse;
@@ -32,8 +26,8 @@ export async function PATCH(request: Request, context: ReportContext) {
   }
 
   const { reportId } = await context.params;
-  const payload = (await request.json()) as ReportPatchPayload;
-  const status = toReportStatus(payload.status);
+  const payload = ((await request.json().catch(() => null)) ?? {}) as ReportPatchPayload;
+  const status = parseAdminReportStatus(payload.status);
 
   if (!status) {
     return NextResponse.json({ error: "Ongeldige rapportstatus" }, { status: 400 });
@@ -43,7 +37,7 @@ export async function PATCH(request: Request, context: ReportContext) {
     where: { id: reportId },
     data: {
       status,
-      resolution: typeof payload.resolution === "string" ? payload.resolution.trim() : undefined,
+      resolution: parseAdminReportResolution(payload.resolution),
     },
   });
 

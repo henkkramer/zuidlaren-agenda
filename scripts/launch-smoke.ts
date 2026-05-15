@@ -31,9 +31,11 @@ const requiredFiles = [
   "app/api/reports/route.ts",
   "app/api/mobile/capabilities/route.ts",
   "lib/csrf.ts",
+  "lib/admin-status-input.ts",
   "lib/audit-actions.ts",
   "lib/media-validation.ts",
   "lib/notification-preferences-input.ts",
+  "lib/notification-campaign-input.ts",
   "lib/payment-webhooks.ts",
   "lib/profile-input.ts",
   "lib/privacy-processors.ts",
@@ -87,8 +89,17 @@ assert(
 const businessActivityRoute = read("app/api/businesses/[businessId]/activities/route.ts");
 assert(businessActivityRoute.includes("rejectCrossOriginMutation"), "business activity mutation route must apply CSRF origin guard");
 
+const notificationCampaignRoute = read("app/api/businesses/[businessId]/notification-campaigns/route.ts");
+assert(
+  notificationCampaignRoute.includes("parseNotificationCampaignInput"),
+  "notification campaign route must use shared campaign input parsing",
+);
+
 const adminUserRoute = read("app/api/admin/users/[userId]/route.ts");
 assert(adminUserRoute.includes("rejectCrossOriginMutation"), "admin user mutation route must apply CSRF origin guard");
+
+const adminActivityRoute = read("app/api/admin/activities/[activityId]/route.ts");
+assert(adminActivityRoute.includes("parseAdminActivityStatus"), "admin activity route must use shared status parsing");
 
 const reportsRoute = read("app/api/reports/route.ts");
 assert(reportsRoute.includes("parseReportInput"), "public report route must use shared report input parsing");

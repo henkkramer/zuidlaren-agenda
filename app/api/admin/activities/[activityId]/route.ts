@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminAuditLog, requireAdmin } from "@/lib/admin-auth";
+import { parseAdminActivityStatus } from "@/lib/admin-status-input";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 
@@ -13,15 +14,6 @@ type ActivityPatchPayload = {
   status?: unknown;
 };
 
-function toActivityStatus(value: unknown) {
-  if (value === "draft") return "DRAFT" as const;
-  if (value === "scheduled") return "SCHEDULED" as const;
-  if (value === "published") return "PUBLISHED" as const;
-  if (value === "unpublished") return "UNPUBLISHED" as const;
-  if (value === "expired") return "EXPIRED" as const;
-  return null;
-}
-
 export async function PATCH(request: Request, context: ActivityContext) {
   const csrfResponse = rejectCrossOriginMutation(request);
   if (csrfResponse) return csrfResponse;
@@ -33,8 +25,8 @@ export async function PATCH(request: Request, context: ActivityContext) {
   }
 
   const { activityId } = await context.params;
-  const payload = (await request.json()) as ActivityPatchPayload;
-  const status = toActivityStatus(payload.status);
+  const payload = ((await request.json().catch(() => null)) ?? {}) as ActivityPatchPayload;
+  const status = parseAdminActivityStatus(payload.status);
 
   if (!status) {
     return NextResponse.json({ error: "Ongeldige activiteitstatus" }, { status: 400 });
