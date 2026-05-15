@@ -28,6 +28,7 @@ const requiredFiles = [
   "app/api/health/ready/route.ts",
   "app/api/health/release/route.ts",
   "app/api/public/activities/route.ts",
+  "app/api/reports/route.ts",
   "app/api/mobile/capabilities/route.ts",
   "lib/csrf.ts",
   "lib/audit-actions.ts",
@@ -35,6 +36,7 @@ const requiredFiles = [
   "lib/payment-webhooks.ts",
   "lib/profile-input.ts",
   "lib/privacy-processors.ts",
+  "lib/report-input.ts",
   "lib/security-headers.ts",
   "lib/release-checks.ts",
   ".github/workflows/ci.yml",
@@ -80,6 +82,10 @@ assert(businessActivityRoute.includes("rejectCrossOriginMutation"), "business ac
 
 const adminUserRoute = read("app/api/admin/users/[userId]/route.ts");
 assert(adminUserRoute.includes("rejectCrossOriginMutation"), "admin user mutation route must apply CSRF origin guard");
+
+const reportsRoute = read("app/api/reports/route.ts");
+assert(reportsRoute.includes("parseReportInput"), "public report route must use shared report input parsing");
+assert(reportsRoute.includes("checkRateLimit"), "public report route must apply rate limiting");
 
 const auditCoverage = read("docs/audit-log-coverage.md");
 assert(auditCoverage.includes("business.activity.publish"), "audit coverage docs must include publishing actions");

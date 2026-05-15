@@ -39,6 +39,7 @@ This queue is the single execution sequence for the existing implementation plan
 | 30 | Done | Privacy Processor Register | `17`, `21`, `16` |
 | 31 | Done | Media Upload Validation Coverage | `15`, `17`, `18` |
 | 32 | Done | Account GDPR Request Validation | `17`, `18`, `21` |
+| 33 | Done | Public Report Intake Foundation | `17`, `14`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -730,3 +731,24 @@ Acceptance:
 
 - Deletion requests are only recorded for explicit user intent.
 - Account profile validation behavior is covered without database dependencies.
+
+## Sprint 33 - Public Report Intake Foundation
+
+Status: Done
+
+Goal:
+
+Allow residents to submit constrained abuse/problem reports without opening an unrestricted spam path.
+
+Scope:
+
+- Public report submission route.
+- Same-origin mutation guard and rate limit for report intake.
+- Shared report input parser for reason, details, and optional activity slug.
+- Tests for report input validation.
+- Launch smoke guard for report parsing and throttling.
+
+Acceptance:
+
+- Report intake validates and trims user input before database writes.
+- Report submissions are throttled and can be reviewed through the existing admin reports flow.
