@@ -1,6 +1,5 @@
 import Link from "next/link";
-
-const processors = ["Hosting en database", "E-mail voor loginlinks en notificaties", "AI-hulp voor kaartteksten", "Mollie zodra betalingen live gaan"];
+import { privacyProcessors } from "@/lib/privacy-processors";
 
 export default function PrivacyPage() {
   return (
@@ -40,8 +39,11 @@ export default function PrivacyPage() {
           <section>
             <h2>Verwerkers</h2>
             <ul>
-              {processors.map((processor) => (
-                <li key={processor}>{processor}</li>
+              {privacyProcessors.map((processor) => (
+                <li key={processor.name}>
+                  {processor.name}: {processor.purpose}
+                  {processor.mvpStatus === "prepared" ? " Nog niet live in de MVP." : null}
+                </li>
               ))}
             </ul>
           </section>

@@ -35,6 +35,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 26 | Done | Same-Origin Mutation Guard | `17`, `18` |
 | 27 | Done | Protected Mutation Coverage Expansion | `17`, `18`, `10` |
 | 28 | Done | Audit Log Coverage Hardening | `17`, `14`, `21` |
+| 29 | Done | Payment Webhook Contract Hardening | `13`, `17`, `18` |
+| 30 | Done | Privacy Processor Register | `17`, `21`, `16` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -646,3 +648,43 @@ Acceptance:
 
 - Sensitive owner/admin/publish/moderation/notification/bootstrap actions are listed in one registry.
 - `npm run test` fails if a registered audit action disappears from its source file.
+
+## Sprint 29 - Payment Webhook Contract Hardening
+
+Status: Done
+
+Goal:
+
+Keep the Mollie foundation testable without enabling live payments.
+
+Scope:
+
+- Deterministic Mollie webhook event normalization.
+- Signature verification tests for raw and prefixed HMAC signatures.
+- Payload summary truncation tests for provider-controlled webhook fields.
+- Launch smoke guard for payment webhook helper coverage.
+
+Acceptance:
+
+- Invalid or missing webhook signatures stay rejected.
+- Webhook parsing remains deterministic and safe to log before live payment processing is enabled.
+
+## Sprint 30 - Privacy Processor Register
+
+Status: Done
+
+Goal:
+
+Make the GDPR processor list explicit and reusable across public privacy copy and operational checks.
+
+Scope:
+
+- Shared privacy processor registry.
+- Privacy page renders from the shared registry.
+- Tests for required processor categories and active/prepared MVP status.
+- Operator handoff updated with the registry maintenance rule.
+
+Acceptance:
+
+- Hosting/database, email, AI, analytics, and prepared Mollie processing are tracked in one source.
+- Public privacy copy cannot silently drift from the maintained processor register.

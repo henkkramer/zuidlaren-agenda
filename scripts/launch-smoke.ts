@@ -31,6 +31,8 @@ const requiredFiles = [
   "app/api/mobile/capabilities/route.ts",
   "lib/csrf.ts",
   "lib/audit-actions.ts",
+  "lib/payment-webhooks.ts",
+  "lib/privacy-processors.ts",
   "lib/security-headers.ts",
   "lib/release-checks.ts",
   ".github/workflows/ci.yml",
@@ -80,6 +82,14 @@ const auditCoverage = read("docs/audit-log-coverage.md");
 assert(auditCoverage.includes("business.activity.publish"), "audit coverage docs must include publishing actions");
 assert(auditCoverage.includes("admin.user.update"), "audit coverage docs must include admin user actions");
 assert(auditCoverage.includes("notification_campaign.approve"), "audit coverage docs must include campaign approval actions");
+
+const paymentWebhooks = read("lib/payment-webhooks.ts");
+assert(paymentWebhooks.includes("verifyMollieWebhookSignature"), "payment webhook signature verification must remain implemented");
+assert(paymentWebhooks.includes("normalizeMollieWebhookEvent"), "payment webhook event normalization must remain implemented");
+
+const privacyProcessors = read("lib/privacy-processors.ts");
+assert(privacyProcessors.includes("Mollie"), "privacy processor register must include prepared payment provider");
+assert(privacyProcessors.includes("Analytics"), "privacy processor register must include analytics processor");
 
 const ciWorkflow = read(".github/workflows/ci.yml");
 for (const command of ["npm run lint", "npm run typecheck", "npm run test", "npm run test:e2e", "npm run build"]) {

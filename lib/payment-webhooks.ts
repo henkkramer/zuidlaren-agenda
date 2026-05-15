@@ -1,5 +1,3 @@
-import "server-only";
-
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 export function summarizeWebhookPayload(payload: unknown) {
@@ -12,6 +10,26 @@ export function summarizeWebhookPayload(payload: unknown) {
     id: typeof record.id === "string" ? record.id.slice(0, 120) : null,
     type: typeof record.type === "string" ? record.type.slice(0, 120) : null,
     resource: typeof record.resource === "string" ? record.resource.slice(0, 120) : null,
+  };
+}
+
+export function normalizeMollieWebhookEvent(body: string, fallbackId: string) {
+  let payload: Record<string, unknown>;
+
+  try {
+    payload = JSON.parse(body || "{}") as Record<string, unknown>;
+  } catch {
+    payload = { id: fallbackId, type: "invalid_json" };
+  }
+
+  const eventId = typeof payload.id === "string" && payload.id.trim() ? payload.id.slice(0, 160) : fallbackId;
+  const eventType = typeof payload.type === "string" && payload.type.trim() ? payload.type.slice(0, 120) : "unknown";
+
+  return {
+    eventId,
+    eventType,
+    payload,
+    payloadSummary: summarizeWebhookPayload(payload),
   };
 }
 
