@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { isAiActivityAction, type AiActivityInput, type AiActivitySuggestion } from "@/lib/ai-card-assistant-types";
 import { estimateTokens, localAiCardAssistantProvider } from "@/lib/ai-card-assistant";
 import { requireBusinessPermission } from "@/lib/business-permissions";
+import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
@@ -84,6 +85,9 @@ async function getPromptTemplate(action: string) {
 }
 
 export async function POST(request: Request, context: AiActivityAssistContext) {
+  const csrfResponse = rejectCrossOriginMutation(request);
+  if (csrfResponse) return csrfResponse;
+
   const { businessId } = await context.params;
   const access = await requireBusinessPermission(businessId);
 

@@ -33,6 +33,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 24 | Done | Runtime Release Check Command | `21`, `16`, `18` |
 | 25 | Done | HTTP Security Headers | `17`, `18`, `21` |
 | 26 | Done | Same-Origin Mutation Guard | `17`, `18` |
+| 27 | Done | Protected Mutation Coverage Expansion | `17`, `18`, `10` |
+| 28 | Done | Audit Log Coverage Hardening | `17`, `14`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -603,3 +605,44 @@ Acceptance:
 
 - Cross-site browser mutations are rejected before session-backed state changes.
 - Same-origin and configured app-origin mutations continue to work.
+
+## Sprint 27 - Protected Mutation Coverage Expansion
+
+Status: Done
+
+Goal:
+
+Apply same-origin mutation protection consistently to remaining protected MVP mutation routes.
+
+Scope:
+
+- Business activity create/edit/publish/unpublish mutations.
+- Business member mutations.
+- Business AI and notification-campaign mutations.
+- Admin moderation, user, feature flag, category, report, business, and notification approval mutations.
+- Launch smoke guard for business mutation coverage.
+
+Acceptance:
+
+- Browser-authenticated business and admin mutations reject cross-site requests before state changes.
+- Public analytics and external webhook endpoints remain explicit exceptions.
+
+## Sprint 28 - Audit Log Coverage Hardening
+
+Status: Done
+
+Goal:
+
+Make sensitive audit-log coverage explicit and testable.
+
+Scope:
+
+- Canonical sensitive audit action registry.
+- Audit coverage documentation.
+- Tests that expected audit actions remain present in source files.
+- Operator handoff updated with audit coverage reference.
+
+Acceptance:
+
+- Sensitive owner/admin/publish/moderation/notification/bootstrap actions are listed in one registry.
+- `npm run test` fails if a registered audit action disappears from its source file.

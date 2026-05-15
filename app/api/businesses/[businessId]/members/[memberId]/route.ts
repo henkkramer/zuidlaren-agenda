@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireBusinessPermission } from "@/lib/business-permissions";
+import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 
 type MemberRouteContext = {
@@ -33,6 +34,9 @@ function serializeMember(member: {
 }
 
 export async function PATCH(request: Request, context: MemberRouteContext) {
+  const csrfResponse = rejectCrossOriginMutation(request);
+  if (csrfResponse) return csrfResponse;
+
   const { businessId, memberId } = await context.params;
   const access = await requireBusinessPermission(businessId, "manageMembers");
 
@@ -76,7 +80,10 @@ export async function PATCH(request: Request, context: MemberRouteContext) {
   return NextResponse.json({ member: serializeMember(member) });
 }
 
-export async function DELETE(_request: Request, context: MemberRouteContext) {
+export async function DELETE(request: Request, context: MemberRouteContext) {
+  const csrfResponse = rejectCrossOriginMutation(request);
+  if (csrfResponse) return csrfResponse;
+
   const { businessId, memberId } = await context.params;
   const access = await requireBusinessPermission(businessId, "manageMembers");
 

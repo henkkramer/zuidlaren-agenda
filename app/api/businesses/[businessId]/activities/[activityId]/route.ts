@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireBusinessPermission } from "@/lib/business-permissions";
 import { parseBusinessActivityPayload, type BusinessActivityPayload } from "@/lib/business-activity-input";
 import { mapActivityRecord } from "@/lib/activity-mapper";
+import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slugify";
 
@@ -13,6 +14,9 @@ type BusinessActivityContext = {
 };
 
 export async function PATCH(request: Request, context: BusinessActivityContext) {
+  const csrfResponse = rejectCrossOriginMutation(request);
+  if (csrfResponse) return csrfResponse;
+
   const { businessId, activityId } = await context.params;
   const access = await requireBusinessPermission(businessId);
 

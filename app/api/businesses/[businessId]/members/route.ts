@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireBusinessPermission } from "@/lib/business-permissions";
+import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 
 type BusinessRouteContext = {
@@ -49,6 +50,9 @@ export async function GET(_request: Request, context: BusinessRouteContext) {
 }
 
 export async function POST(request: Request, context: BusinessRouteContext) {
+  const csrfResponse = rejectCrossOriginMutation(request);
+  if (csrfResponse) return csrfResponse;
+
   const { businessId } = await context.params;
   const access = await requireBusinessPermission(businessId, "manageMembers");
 
