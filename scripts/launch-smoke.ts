@@ -28,12 +28,15 @@ const requiredFiles = [
   "app/api/health/ready/route.ts",
   "app/api/health/release/route.ts",
   "app/api/public/activities/route.ts",
+  "app/api/reports/route.ts",
   "app/api/mobile/capabilities/route.ts",
   "lib/csrf.ts",
   "lib/audit-actions.ts",
   "lib/media-validation.ts",
   "lib/payment-webhooks.ts",
+  "lib/profile-input.ts",
   "lib/privacy-processors.ts",
+  "lib/report-input.ts",
   "lib/security-headers.ts",
   "lib/release-checks.ts",
   ".github/workflows/ci.yml",
@@ -72,12 +75,17 @@ assert(nextConfig.includes("securityHeadersForNext"), "next.config.ts must apply
 
 const profileRoute = read("app/api/me/profile/route.ts");
 assert(profileRoute.includes("rejectCrossOriginMutation"), "profile mutation route must apply CSRF origin guard");
+assert(profileRoute.includes("parseProfileInput"), "profile mutation route must use shared profile input parsing");
 
 const businessActivityRoute = read("app/api/businesses/[businessId]/activities/route.ts");
 assert(businessActivityRoute.includes("rejectCrossOriginMutation"), "business activity mutation route must apply CSRF origin guard");
 
 const adminUserRoute = read("app/api/admin/users/[userId]/route.ts");
 assert(adminUserRoute.includes("rejectCrossOriginMutation"), "admin user mutation route must apply CSRF origin guard");
+
+const reportsRoute = read("app/api/reports/route.ts");
+assert(reportsRoute.includes("parseReportInput"), "public report route must use shared report input parsing");
+assert(reportsRoute.includes("checkRateLimit"), "public report route must apply rate limiting");
 
 const auditCoverage = read("docs/audit-log-coverage.md");
 assert(auditCoverage.includes("business.activity.publish"), "audit coverage docs must include publishing actions");
