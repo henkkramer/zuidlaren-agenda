@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminAuditLog, requireAdmin } from "@/lib/admin-auth";
+import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { getEmailProvider } from "@/lib/email-provider";
 import { prisma } from "@/lib/prisma";
 
@@ -9,7 +10,10 @@ type AdminNotificationCampaignContext = {
   }>;
 };
 
-export async function POST(_request: Request, context: AdminNotificationCampaignContext) {
+export async function POST(request: Request, context: AdminNotificationCampaignContext) {
+  const csrfResponse = rejectCrossOriginMutation(request);
+  if (csrfResponse) return csrfResponse;
+
   const admin = await requireAdmin();
 
   if (!admin.ok) {

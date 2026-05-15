@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireBusinessPermission } from "@/lib/business-permissions";
 import { createNotificationRequestAuditLog } from "@/lib/notification-audit";
 import { findCampaignRecipients, hasRecentBusinessCampaign } from "@/lib/notification-campaigns";
+import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
@@ -22,6 +23,9 @@ function text(value: unknown, maxLength: number) {
 }
 
 export async function POST(request: Request, context: BusinessNotificationCampaignContext) {
+  const csrfResponse = rejectCrossOriginMutation(request);
+  if (csrfResponse) return csrfResponse;
+
   const { businessId } = await context.params;
   const access = await requireBusinessPermission(businessId, "publishActivities");
 

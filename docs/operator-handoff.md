@@ -45,6 +45,7 @@ Resolve release-health warnings before adding new testers.
 ## Normal Operations
 
 - Use `/admin` for users, businesses, activities, categories, reports, feature flags, billing placeholders, campaigns, analytics, and audit logs.
+- Review audit coverage in `docs/audit-log-coverage.md` before expanding sensitive owner/admin actions.
 - Use backup and restore scripts from `README.md` before risky production changes.
 - Keep live payments disabled until the billing foundation is promoted to production payment handling.
 - Keep native mobile apps out of MVP operations; mobile API contracts are documentation and future-proofing only.

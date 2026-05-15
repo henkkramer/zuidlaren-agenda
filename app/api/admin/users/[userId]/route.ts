@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminAuditLog, requireAdmin } from "@/lib/admin-auth";
+import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 
 type UserContext = {
@@ -14,6 +15,9 @@ type UserPatchPayload = {
 };
 
 export async function PATCH(request: Request, context: UserContext) {
+  const csrfResponse = rejectCrossOriginMutation(request);
+  if (csrfResponse) return csrfResponse;
+
   const admin = await requireAdmin();
 
   if (!admin.ok) {

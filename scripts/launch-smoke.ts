@@ -30,10 +30,12 @@ const requiredFiles = [
   "app/api/public/activities/route.ts",
   "app/api/mobile/capabilities/route.ts",
   "lib/csrf.ts",
+  "lib/audit-actions.ts",
   "lib/security-headers.ts",
   "lib/release-checks.ts",
   ".github/workflows/ci.yml",
   "docs/ci-release-gate.md",
+  "docs/audit-log-coverage.md",
   "docs/mvp-launch-readiness.md",
   "docs/mobile-api-readiness.md",
   "docs/operator-handoff.md",
@@ -67,6 +69,17 @@ assert(nextConfig.includes("securityHeadersForNext"), "next.config.ts must apply
 
 const profileRoute = read("app/api/me/profile/route.ts");
 assert(profileRoute.includes("rejectCrossOriginMutation"), "profile mutation route must apply CSRF origin guard");
+
+const businessActivityRoute = read("app/api/businesses/[businessId]/activities/route.ts");
+assert(businessActivityRoute.includes("rejectCrossOriginMutation"), "business activity mutation route must apply CSRF origin guard");
+
+const adminUserRoute = read("app/api/admin/users/[userId]/route.ts");
+assert(adminUserRoute.includes("rejectCrossOriginMutation"), "admin user mutation route must apply CSRF origin guard");
+
+const auditCoverage = read("docs/audit-log-coverage.md");
+assert(auditCoverage.includes("business.activity.publish"), "audit coverage docs must include publishing actions");
+assert(auditCoverage.includes("admin.user.update"), "audit coverage docs must include admin user actions");
+assert(auditCoverage.includes("notification_campaign.approve"), "audit coverage docs must include campaign approval actions");
 
 const ciWorkflow = read(".github/workflows/ci.yml");
 for (const command of ["npm run lint", "npm run typecheck", "npm run test", "npm run test:e2e", "npm run build"]) {

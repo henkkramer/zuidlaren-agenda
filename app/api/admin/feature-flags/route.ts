@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminAuditLog, requireAdmin } from "@/lib/admin-auth";
+import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 
 type FeatureFlagPayload = {
@@ -22,6 +23,9 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
+  const csrfResponse = rejectCrossOriginMutation(request);
+  if (csrfResponse) return csrfResponse;
+
   const admin = await requireAdmin();
 
   if (!admin.ok) {
