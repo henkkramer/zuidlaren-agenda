@@ -6,6 +6,29 @@ import { prisma } from "@/lib/prisma";
 import { activityDateParts } from "@/lib/date-format";
 import { BusinessNotificationCampaignForm } from "@/components/business-notification-campaign-form";
 
+type BusinessActivityRow = Parameters<typeof mapActivityRecord>[0] & {
+  id: string;
+  status: string;
+  title: string;
+};
+
+type BusinessMemberRow = {
+  id: string;
+  role: string;
+  user: {
+    displayName: string | null;
+    email: string;
+    name: string | null;
+  };
+};
+
+type BusinessCampaignRow = {
+  _count: { deliveries: number };
+  id: string;
+  status: string;
+  title: string;
+};
+
 type BusinessDashboardPageProps = {
   params: Promise<{
     businessId: string;
@@ -86,7 +109,7 @@ export default async function BusinessDashboardPage({ params }: BusinessDashboar
               <p className="account-muted">Nog geen activiteiten voor dit bedrijf.</p>
             ) : (
               <div className="business-activity-list">
-                {activities.slice(0, 12).map((activity) => {
+                {(activities as BusinessActivityRow[]).slice(0, 12).map((activity) => {
                   const mappedActivity = mapActivityRecord(activity);
                   const parts = activityDateParts(mappedActivity);
                   return (
@@ -113,7 +136,7 @@ export default async function BusinessDashboardPage({ params }: BusinessDashboar
           <section className="account-card">
             <h2>Team</h2>
             <div className="business-member-list">
-              {members.map((member) => (
+              {(members as BusinessMemberRow[]).map((member) => (
                 <div className="business-member-row" key={member.id}>
                   <span>
                     <strong>{member.user.displayName ?? member.user.name ?? member.user.email}</strong>
@@ -132,14 +155,14 @@ export default async function BusinessDashboardPage({ params }: BusinessDashboar
             </p>
             {canPublish && activities.length > 0 ? (
               <BusinessNotificationCampaignForm
-                activities={activities.map((activity) => ({ id: activity.id, title: activity.title }))}
+                activities={(activities as BusinessActivityRow[]).map((activity) => ({ id: activity.id, title: activity.title }))}
                 businessSlug={access.business.slug}
               />
             ) : (
               <p className="account-muted">Maak eerst een activiteit aan en publicatierechten zijn vereist.</p>
             )}
             <div className="business-member-list">
-              {campaigns.map((campaign) => (
+              {(campaigns as BusinessCampaignRow[]).map((campaign) => (
                 <div className="business-member-row" key={campaign.id}>
                   <span>
                     <strong>{campaign.title}</strong>

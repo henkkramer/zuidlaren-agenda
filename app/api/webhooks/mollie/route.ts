@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { normalizeMollieWebhookEvent, verifyMollieWebhookSignature } from "@/lib/payment-webhooks";
+import { mollieWebhookAuditMetadata, normalizeMollieWebhookEvent, verifyMollieWebhookSignature } from "@/lib/payment-webhooks";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
   const { eventId, eventType, payloadSummary } = normalizeMollieWebhookEvent(body, `unidentified-${Date.now().toString(36)}`);
 
   if (!secret || !signatureValid) {
-    await prisma.webhookEventLog.upsert({
+    const log = await prisma.webhookEventLog.upsert({
       where: {
         provider_eventId: {
           provider: "mollie",
@@ -33,6 +33,14 @@ export async function POST(request: Request) {
         payloadSummary,
       },
     });
+    await prisma.auditLog.create({
+      data: {
+        action: "payment.webhook.receive",
+        targetType: "WebhookEventLog",
+        targetId: log.id,
+        metadata: mollieWebhookAuditMetadata({ eventId, eventType, signatureValid: false, status: "REJECTED" }),
+      },
+    });
 
     return NextResponse.json({ error: "Webhook signature invalid" }, { status: 401 });
   }
@@ -47,14 +55,22 @@ export async function POST(request: Request) {
   });
 
   if (existing) {
-    await prisma.webhookEventLog.update({
+    const log = await prisma.webhookEventLog.update({
       where: { id: existing.id },
       data: { status: "DUPLICATE", signatureValid: true },
+    });
+    await prisma.auditLog.create({
+      data: {
+        action: "payment.webhook.receive",
+        targetType: "WebhookEventLog",
+        targetId: log.id,
+        metadata: mollieWebhookAuditMetadata({ eventId, eventType, signatureValid: true, status: "DUPLICATE" }),
+      },
     });
     return NextResponse.json({ ok: true, duplicate: true });
   }
 
-  await prisma.webhookEventLog.create({
+  const log = await prisma.webhookEventLog.create({
     data: {
       provider: "mollie",
       eventId,
@@ -62,6 +78,14 @@ export async function POST(request: Request) {
       status: "RECEIVED",
       signatureValid: true,
       payloadSummary,
+    },
+  });
+  await prisma.auditLog.create({
+    data: {
+      action: "payment.webhook.receive",
+      targetType: "WebhookEventLog",
+      targetId: log.id,
+      metadata: mollieWebhookAuditMetadata({ eventId, eventType, signatureValid: true, status: "RECEIVED" }),
     },
   });
 

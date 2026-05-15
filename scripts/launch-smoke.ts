@@ -36,6 +36,7 @@ const requiredFiles = [
   "lib/media-validation.ts",
   "lib/notification-preferences-input.ts",
   "lib/notification-campaign-input.ts",
+  "lib/notification-delivery.ts",
   "lib/payment-webhooks.ts",
   "lib/profile-input.ts",
   "lib/privacy-processors.ts",
@@ -98,6 +99,10 @@ assert(
   "notification campaign route must use shared campaign input parsing",
 );
 
+const notificationApprovalRoute = read("app/api/admin/notification-campaigns/[campaignId]/approve/route.ts");
+assert(notificationApprovalRoute.includes("buildCampaignEmailMessage"), "notification approval route must build campaign email messages");
+assert(notificationApprovalRoute.includes('status: "SENT"'), "notification approval route must mark successful deliveries as sent");
+
 const adminUserRoute = read("app/api/admin/users/[userId]/route.ts");
 assert(adminUserRoute.includes("rejectCrossOriginMutation"), "admin user mutation route must apply CSRF origin guard");
 
@@ -145,6 +150,7 @@ assert(auditCoverage.includes("notification_campaign.approve"), "audit coverage 
 const paymentWebhooks = read("lib/payment-webhooks.ts");
 assert(paymentWebhooks.includes("verifyMollieWebhookSignature"), "payment webhook signature verification must remain implemented");
 assert(paymentWebhooks.includes("normalizeMollieWebhookEvent"), "payment webhook event normalization must remain implemented");
+assert(paymentWebhooks.includes("mollieWebhookAuditMetadata"), "payment webhook audit metadata must remain implemented");
 
 const mediaValidation = read("lib/media-validation.ts");
 assert(mediaValidation.includes("validateMediaUploadSize"), "media upload size validation must remain implemented");

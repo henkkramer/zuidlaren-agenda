@@ -4,6 +4,10 @@ import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { parseNotificationPreferencesInput } from "@/lib/notification-preferences-input";
 import { prisma } from "@/lib/prisma";
 
+type SlugRecord = {
+  slug: string;
+};
+
 function serializePreferences(preferences: {
   activityReminders: boolean;
   weeklyDigest: boolean;
@@ -30,14 +34,14 @@ async function filterAllowedSlugs(input: string[], model: "category" | "location
       where: { slug: { in: input } },
       select: { slug: true },
     });
-    return records.map((record) => record.slug);
+    return (records as SlugRecord[]).map((record) => record.slug);
   }
 
   const records = await prisma.location.findMany({
     where: { slug: { in: input } },
     select: { slug: true },
   });
-  return records.map((record) => record.slug);
+  return (records as SlugRecord[]).map((record) => record.slug);
 }
 
 export async function GET() {

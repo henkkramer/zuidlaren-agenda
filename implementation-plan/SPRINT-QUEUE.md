@@ -51,6 +51,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 42 | Done | Runtime Warning Release Gate | `16`, `19`, `21` |
 | 43 | Done | Admin Event Import Preview | `05`, `14`, `18` |
 | 44 | Done | Content Maintenance Queue | `05`, `14`, `21` |
+| 45 | Done | Email Campaign Delivery Controls | `12`, `14`, `17` |
+| 46 | Done | Mollie Webhook Audit Hardening | `13`, `17`, `18` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -991,3 +993,45 @@ Scope:
 Acceptance:
 
 - Admins can see follow-up items for Zuidlaardermarktweek, Muzieknacht, Open Muziek Podium, and short-cycle horeca/culture sources.
+
+## Sprint 45 - Email Campaign Delivery Controls
+
+Status: Done
+
+Goal:
+
+Move approved notification campaigns from intent-only records to controlled, auditable email delivery attempts.
+
+Scope:
+
+- Shared campaign email message builder.
+- Delivery attempt summary helper with tests.
+- Admin approval route sends pending email deliveries through the configured provider.
+- Delivery rows record provider, provider id, attempted time, delivered time, and failed attempts.
+- Launch smoke guard for campaign email delivery wiring.
+
+Acceptance:
+
+- Admin-approved campaigns attempt delivery only to precomputed opt-in recipients.
+- Successful campaigns are marked sent and delivery counts are returned.
+
+## Sprint 46 - Mollie Webhook Audit Hardening
+
+Status: Done
+
+Goal:
+
+Make Mollie sandbox webhook handling auditable before any production payment status mutation is enabled.
+
+Scope:
+
+- Shared Mollie webhook audit metadata helper.
+- Audit log rows for received, duplicate, and rejected Mollie webhooks.
+- Audit action registry and coverage documentation updated.
+- Tests for constrained webhook audit metadata.
+- Launch smoke guard for payment webhook audit metadata.
+
+Acceptance:
+
+- Mollie webhook events are represented in both webhook logs and audit logs.
+- Live payment mutation remains disabled while sandbox/audit readiness improves.

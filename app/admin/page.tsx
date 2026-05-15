@@ -13,6 +13,62 @@ import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
 
+type AdminBusinessRow = {
+  _count: { activities: number; members: number };
+  id: string;
+  name: string;
+  status: string;
+};
+
+type AdminActivityRow = {
+  business: { name: string } | null;
+  id: string;
+  organizerName: string;
+  status: string;
+  title: string;
+};
+
+type AdminUserRow = {
+  disabledAt: Date | null;
+  displayName: string | null;
+  email: string;
+  id: string;
+  isAdmin: boolean;
+};
+
+type AdminReportRow = {
+  activity: { title: string } | null;
+  createdAt: Date;
+  details: string | null;
+  id: string;
+  reason: string;
+  reporter: { displayName: string | null; email: string } | null;
+  resolution: string | null;
+  status: string;
+};
+
+type AdminCampaignRow = {
+  _count: { deliveries: number };
+  business: { name: string };
+  id: string;
+  status: string;
+  title: string;
+};
+
+type AdminFeatureFlagRow = {
+  description: string | null;
+  enabled: boolean;
+  id: string;
+  key: string;
+};
+
+type AdminAuditLogRow = {
+  action: string;
+  createdAt: Date;
+  id: string;
+  targetType: string;
+};
+
 export default async function AdminPage() {
   const admin = await requireAdmin();
 
@@ -71,7 +127,7 @@ export default async function AdminPage() {
           <section className="account-card">
             <h2>Bedrijven</h2>
             <AdminBusinesses
-              businesses={businesses.map((business) => ({
+              businesses={(businesses as AdminBusinessRow[]).map((business) => ({
                 activityCount: business._count.activities,
                 id: business.id,
                 memberCount: business._count.members,
@@ -84,7 +140,7 @@ export default async function AdminPage() {
           <section className="account-card">
             <h2>Activiteiten</h2>
             <AdminActivities
-              activities={activities.map((activity) => ({
+              activities={(activities as AdminActivityRow[]).map((activity) => ({
                 id: activity.id,
                 organizerName: activity.business?.name ?? activity.organizerName,
                 status: activity.status.toLowerCase() as "draft" | "scheduled" | "published" | "unpublished" | "expired",
@@ -96,7 +152,7 @@ export default async function AdminPage() {
           <section className="account-card">
             <h2>Gebruikers</h2>
             <div className="admin-table">
-              {users.map((user) => (
+              {(users as AdminUserRow[]).map((user) => (
                 <div className="admin-row" key={user.id}>
                   <span>
                     <strong>{user.displayName ?? user.email}</strong>
@@ -111,7 +167,7 @@ export default async function AdminPage() {
           <section className="account-card">
             <h2>Meldingen</h2>
             <AdminReports
-              reports={reports.map((report) => ({
+              reports={(reports as AdminReportRow[]).map((report) => ({
                 id: report.id,
                 activityTitle: report.activity?.title ?? "Algemeen",
                 createdAt: report.createdAt.toLocaleDateString("nl-NL"),
@@ -127,7 +183,7 @@ export default async function AdminPage() {
           <section className="account-card">
             <h2>Notificatiecampagnes</h2>
             <AdminNotificationCampaigns
-              campaigns={notificationCampaigns.map((campaign) => ({
+              campaigns={(notificationCampaigns as AdminCampaignRow[]).map((campaign) => ({
                 id: campaign.id,
                 title: campaign.title,
                 status: campaign.status.toLowerCase(),
@@ -202,7 +258,7 @@ export default async function AdminPage() {
           <section className="account-card">
             <h2>Feature flags</h2>
             <div className="admin-table">
-              {featureFlags.map((flag) => (
+              {(featureFlags as AdminFeatureFlagRow[]).map((flag) => (
                 <div className="admin-row" key={flag.id}>
                   <span>
                     <strong>{flag.key}</strong>
@@ -217,7 +273,7 @@ export default async function AdminPage() {
           <section className="account-card">
             <h2>Audit logs</h2>
             <div className="admin-table">
-              {auditLogs.map((log) => (
+              {(auditLogs as AdminAuditLogRow[]).map((log) => (
                 <div className="admin-row" key={log.id}>
                   <span>
                     <strong>{log.action}</strong>

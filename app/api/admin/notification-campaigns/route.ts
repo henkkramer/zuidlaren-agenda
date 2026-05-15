@@ -2,6 +2,20 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
 
+type AdminNotificationCampaignRow = {
+  _count: { deliveries: number };
+  activity: { id: string; title: string } | null;
+  approvedAt: Date | null;
+  approvedBy: { id: string; email: string; displayName: string | null } | null;
+  business: { id: string; name: string; slug: string };
+  id: string;
+  message: string;
+  requestedAt: Date;
+  requestedBy: { id: string; email: string; displayName: string | null };
+  status: string;
+  title: string;
+};
+
 export async function GET() {
   const admin = await requireAdmin();
 
@@ -22,7 +36,7 @@ export async function GET() {
   });
 
   return NextResponse.json({
-    campaigns: campaigns.map((campaign) => ({
+    campaigns: (campaigns as AdminNotificationCampaignRow[]).map((campaign) => ({
       id: campaign.id,
       title: campaign.title,
       message: campaign.message,

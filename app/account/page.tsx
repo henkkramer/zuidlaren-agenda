@@ -2,6 +2,16 @@ import { AccountPanel } from "@/components/account-panel";
 import { getCurrentSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+type PreferenceCategory = {
+  name: string;
+  slug: string;
+};
+
+type PreferenceLocation = {
+  name: string;
+  slug: string;
+};
+
 export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
@@ -47,8 +57,8 @@ export default async function AccountPage() {
         locationSlugs: preferences.locationSlugs,
       }}
       preferenceOptions={{
-        categories: categories.map((category) => ({ slug: category.slug, name: category.name })),
-        locations: locations.map((location) => ({ slug: location.slug, name: location.name })),
+        categories: (categories as PreferenceCategory[]).map((category) => ({ slug: category.slug, name: category.name })),
+        locations: (locations as PreferenceLocation[]).map((location) => ({ slug: location.slug, name: location.name })),
       }}
     />
   );

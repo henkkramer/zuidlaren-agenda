@@ -17,7 +17,8 @@ Covered actions:
 | `business.activity.publish` | Business user publishes an activity. |
 | `business.activity.unpublish` | Business user unpublishes an activity. |
 | `notification_campaign.request` | Business user requests a notification campaign. |
-| `notification_campaign.approve` | Admin approves a notification campaign. |
+| `notification_campaign.approve` | Admin approves and sends a notification campaign. |
+| `payment.webhook.receive` | Mollie webhook receipt, duplicate, and rejection handling. |
 | `admin.business.status.update` | Admin approves, suspends, or resets a business. |
 | `admin.activity.status.update` | Admin moderates an activity status. |
 | `admin.user.update` | Admin disables users or changes admin rights. |

@@ -5,6 +5,12 @@ import { getCurrentSession } from "@/lib/auth";
 import { mapActivityRecord } from "@/lib/activity-mapper";
 import { prisma } from "@/lib/prisma";
 
+type PersonalAgendaAttendanceRow = {
+  activity: Parameters<typeof mapActivityRecord>[0];
+  status: string;
+  visibility: string;
+};
+
 export const dynamic = "force-dynamic";
 
 export default async function MyAgendaPage() {
@@ -46,7 +52,7 @@ export default async function MyAgendaPage() {
         <p className="account-kicker">Mijn Zuidlaren Agenda</p>
         <h1>Mijn agenda</h1>
         <PersonalAgendaShell
-          items={attendances.map((attendance) => ({
+          items={(attendances as PersonalAgendaAttendanceRow[]).map((attendance) => ({
             activity: mapActivityRecord(attendance.activity),
             attendance: {
               status: attendance.status.toLowerCase() as "going" | "maybe",
