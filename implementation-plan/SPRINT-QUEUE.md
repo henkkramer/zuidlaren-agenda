@@ -45,6 +45,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 36 | Done | Admin Status Validation Coverage | `14`, `17`, `18` |
 | 37 | Done | Public Report UI Entry Points | `06`, `17`, `21` |
 | 38 | Done | Admin Report Handling UX | `14`, `17`, `21` |
+| 39 | Done | Admin Business Approval UX | `14`, `10`, `21` |
+| 40 | Done | Admin Activity Moderation UX | `14`, `06`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -864,3 +866,43 @@ Acceptance:
 - Admins can mark reports as handled, dismiss them, or reopen them from `/admin`.
 - Report moderation continues to use `PATCH /api/admin/reports/[reportId]` and existing audit logging.
 - The admin dashboard remains responsive on narrow screens.
+
+## Sprint 39 - Admin Business Approval UX
+
+Status: Done
+
+Goal:
+
+Close the remaining admin operation gap for approving and suspending businesses from the dashboard.
+
+Scope:
+
+- Replace the static business status list with an actionable admin component.
+- Add approve, suspend, and reset-to-pending actions.
+- Wire actions to the existing audited admin business status endpoint.
+- Add a launch smoke guard for admin business UI endpoint wiring.
+
+Acceptance:
+
+- Admins can approve, suspend, or reset businesses from `/admin`.
+- Business status changes continue to use `PATCH /api/admin/businesses/[businessId]` and existing audit logging.
+
+## Sprint 40 - Admin Activity Moderation UX
+
+Status: Done
+
+Goal:
+
+Close the remaining admin operation gap for publishing, hiding, and expiring activities from the dashboard.
+
+Scope:
+
+- Replace the static activity status list with an actionable admin component.
+- Add publish, hide, and expire actions.
+- Wire actions to the existing audited admin activity status endpoint.
+- Add a launch smoke guard for admin activity UI endpoint wiring.
+
+Acceptance:
+
+- Admins can publish, hide, or expire activities from `/admin`.
+- Activity status changes continue to use `PATCH /api/admin/activities/[activityId]` and existing audit logging.

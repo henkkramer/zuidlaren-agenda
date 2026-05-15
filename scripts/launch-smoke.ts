@@ -101,6 +101,18 @@ assert(adminUserRoute.includes("rejectCrossOriginMutation"), "admin user mutatio
 const adminActivityRoute = read("app/api/admin/activities/[activityId]/route.ts");
 assert(adminActivityRoute.includes("parseAdminActivityStatus"), "admin activity route must use shared status parsing");
 
+const adminBusinesses = read("components/admin-businesses.tsx");
+assert(adminBusinesses.includes("/api/admin/businesses/"), "admin businesses UI must use the admin business moderation endpoint");
+for (const status of ["approved", "suspended", "pending"]) {
+  assert(adminBusinesses.includes(status), `admin businesses UI must expose ${status} handling`);
+}
+
+const adminActivities = read("components/admin-activities.tsx");
+assert(adminActivities.includes("/api/admin/activities/"), "admin activities UI must use the admin activity moderation endpoint");
+for (const status of ["published", "unpublished", "expired"]) {
+  assert(adminActivities.includes(status), `admin activities UI must expose ${status} handling`);
+}
+
 const reportsRoute = read("app/api/reports/route.ts");
 assert(reportsRoute.includes("parseReportInput"), "public report route must use shared report input parsing");
 assert(reportsRoute.includes("checkRateLimit"), "public report route must apply rate limiting");

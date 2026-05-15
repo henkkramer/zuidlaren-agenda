@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { AdminActivities } from "@/components/admin-activities";
+import { AdminBusinesses } from "@/components/admin-businesses";
 import { AdminNotificationCampaigns } from "@/components/admin-notification-campaigns";
 import { AdminReports } from "@/components/admin-reports";
 import { requireAdmin } from "@/lib/admin-auth";
@@ -66,34 +68,27 @@ export default async function AdminPage() {
         <div className="admin-grid">
           <section className="account-card">
             <h2>Bedrijven</h2>
-            <div className="admin-table">
-              {businesses.map((business) => (
-                <div className="admin-row" key={business.id}>
-                  <span>
-                    <strong>{business.name}</strong>
-                    <small>
-                      {business._count.members} leden · {business._count.activities} activiteiten
-                    </small>
-                  </span>
-                  <span className="status-pill">{business.status.toLowerCase()}</span>
-                </div>
-              ))}
-            </div>
+            <AdminBusinesses
+              businesses={businesses.map((business) => ({
+                activityCount: business._count.activities,
+                id: business.id,
+                memberCount: business._count.members,
+                name: business.name,
+                status: business.status.toLowerCase() as "pending" | "approved" | "suspended",
+              }))}
+            />
           </section>
 
           <section className="account-card">
             <h2>Activiteiten</h2>
-            <div className="admin-table">
-              {activities.map((activity) => (
-                <div className="admin-row" key={activity.id}>
-                  <span>
-                    <strong>{activity.title}</strong>
-                    <small>{activity.business?.name ?? activity.organizerName}</small>
-                  </span>
-                  <span className="status-pill">{activity.status.toLowerCase()}</span>
-                </div>
-              ))}
-            </div>
+            <AdminActivities
+              activities={activities.map((activity) => ({
+                id: activity.id,
+                organizerName: activity.business?.name ?? activity.organizerName,
+                status: activity.status.toLowerCase() as "draft" | "scheduled" | "published" | "unpublished" | "expired",
+                title: activity.title,
+              }))}
+            />
           </section>
 
           <section className="account-card">
