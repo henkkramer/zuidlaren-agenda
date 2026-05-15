@@ -37,6 +37,7 @@ This queue is the single execution sequence for the existing implementation plan
 | 28 | Done | Audit Log Coverage Hardening | `17`, `14`, `21` |
 | 29 | Done | Payment Webhook Contract Hardening | `13`, `17`, `18` |
 | 30 | Done | Privacy Processor Register | `17`, `21`, `16` |
+| 31 | Done | Media Upload Validation Coverage | `15`, `17`, `18` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -688,3 +689,23 @@ Acceptance:
 
 - Hosting/database, email, AI, analytics, and prepared Mollie processing are tracked in one source.
 - Public privacy copy cannot silently drift from the maintained processor register.
+
+## Sprint 31 - Media Upload Validation Coverage
+
+Status: Done
+
+Goal:
+
+Make image upload safety rules directly testable without filesystem or database dependencies.
+
+Scope:
+
+- Extract pure media validation from local storage.
+- Tests for supported JPEG, PNG, and WebP headers and dimensions.
+- Tests for unsupported MIME types, extension mismatches, content mismatches, oversized files, and excessive dimensions.
+- Launch smoke guard for the media validation helper.
+
+Acceptance:
+
+- Invalid or oversized image uploads are covered by fast automated tests.
+- Local media storage still uses the same validation before writing files.
