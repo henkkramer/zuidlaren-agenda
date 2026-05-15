@@ -34,3 +34,18 @@ export function buildReleaseCheckUrls(baseUrl: string) {
     url: `${normalizedBaseUrl}${endpoint.path}`,
   }));
 }
+
+export function releaseHealthWarnings(payload: unknown) {
+  if (!payload || typeof payload !== "object" || !("checks" in payload)) {
+    return [];
+  }
+
+  const checks = (payload as { checks?: unknown }).checks;
+  if (!checks || typeof checks !== "object") {
+    return [];
+  }
+
+  return Object.entries(checks)
+    .filter(([, value]) => value === "warning")
+    .map(([name]) => name);
+}

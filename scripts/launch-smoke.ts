@@ -48,6 +48,7 @@ const requiredFiles = [
   "docs/mvp-launch-readiness.md",
   "docs/mobile-api-readiness.md",
   "docs/operator-handoff.md",
+  "docs/pr-release-handoff.md",
   "scripts/ensure-admin.ts",
   "scripts/release-check.ts",
   ".env.example",
@@ -152,6 +153,9 @@ for (const command of ["npm run lint", "npm run typecheck", "npm run test", "npm
 const capabilities = buildMobileCapabilities();
 assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/public/activities"), "Mobile capabilities must expose public activities");
 assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/me/agenda"), "Mobile capabilities must expose personal agenda");
+
+const releaseCheckScript = read("scripts/release-check.ts");
+assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");
 
 const queue = read("implementation-plan/SPRINT-QUEUE.md");
 assert(queue.includes("## Sprint 19 - MVP Launch Readiness"), "Sprint 19 must be listed in the queue");

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { buildReleaseCheckUrls, normalizeReleaseBaseUrl, releaseCheckEndpoints } from "@/lib/release-checks";
+import { buildReleaseCheckUrls, normalizeReleaseBaseUrl, releaseCheckEndpoints, releaseHealthWarnings } from "@/lib/release-checks";
 
 test("release base URL is required and normalized", () => {
   assert.throws(() => normalizeReleaseBaseUrl(""), /RELEASE_BASE_URL is required/);
@@ -22,4 +22,20 @@ test("release check URL plan includes required runtime endpoints", () => {
       "https://agenda.example.nl/api/public/activities?limit=3",
     ],
   );
+});
+
+test("release health warnings are extracted from release check payloads", () => {
+  assert.deepEqual(
+    releaseHealthWarnings({
+      checks: {
+        adminUsers: "warning",
+        categories: 8,
+        database: "ok",
+        locations: "warning",
+      },
+    }),
+    ["adminUsers", "locations"],
+  );
+  assert.deepEqual(releaseHealthWarnings({ ok: true }), []);
+  assert.deepEqual(releaseHealthWarnings(null), []);
 });
