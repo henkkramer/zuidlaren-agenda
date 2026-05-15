@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { summarizeWebhookPayload, verifyMollieWebhookSignature } from "@/lib/payment-webhooks";
+import { normalizeMollieWebhookEvent, verifyMollieWebhookSignature } from "@/lib/payment-webhooks";
 import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
@@ -7,15 +7,7 @@ export async function POST(request: Request) {
   const secret = process.env.MOLLIE_WEBHOOK_SECRET;
   const signature = request.headers.get("x-mollie-signature");
   const signatureValid = verifyMollieWebhookSignature({ body, signature, secret });
-  let payload: Record<string, unknown>;
-
-  try {
-    payload = JSON.parse(body || "{}") as Record<string, unknown>;
-  } catch {
-    payload = { id: `invalid-json-${Date.now().toString(36)}`, type: "invalid_json" };
-  }
-  const eventId = typeof payload.id === "string" ? payload.id : `unidentified-${Date.now().toString(36)}`;
-  const eventType = typeof payload.type === "string" ? payload.type : "unknown";
+  const { eventId, eventType, payloadSummary } = normalizeMollieWebhookEvent(body, `unidentified-${Date.now().toString(36)}`);
 
   if (!secret || !signatureValid) {
     await prisma.webhookEventLog.upsert({
@@ -29,7 +21,7 @@ export async function POST(request: Request) {
         status: "REJECTED",
         signatureValid: false,
         error: "Mollie webhook signature missing or invalid",
-        payloadSummary: summarizeWebhookPayload(payload),
+        payloadSummary,
       },
       create: {
         provider: "mollie",
@@ -38,7 +30,7 @@ export async function POST(request: Request) {
         status: "REJECTED",
         signatureValid: false,
         error: "Mollie webhook signature missing or invalid",
-        payloadSummary: summarizeWebhookPayload(payload),
+        payloadSummary,
       },
     });
 
@@ -69,7 +61,7 @@ export async function POST(request: Request) {
       eventType,
       status: "RECEIVED",
       signatureValid: true,
-      payloadSummary: summarizeWebhookPayload(payload),
+      payloadSummary,
     },
   });
 

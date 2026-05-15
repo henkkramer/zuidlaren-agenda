@@ -30,5 +30,5 @@ Covered actions:
 
 Notes:
 
-- Payment and billing operations are still MVP foundation screens only. Live payment mutations need audit coverage before production payment handling is enabled.
+- Payment and billing operations are still MVP foundation screens only. The Mollie webhook foundation verifies signatures and logs webhook events, but live payment status mutations need audit coverage before production payment handling is enabled.
 - AI activity assistance usage is recorded in `AiUsageLog`; it is not part of the operator audit log because it does not directly publish, moderate, or change access.
