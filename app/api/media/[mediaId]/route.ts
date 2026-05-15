@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getCurrentSession } from "@/lib/auth";
 import { requireBusinessPermission } from "@/lib/business-permissions";
+import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { deleteLocalMedia } from "@/lib/media-storage";
 import { prisma } from "@/lib/prisma";
 
@@ -23,7 +24,10 @@ export async function GET(_request: Request, context: MediaContext) {
   return NextResponse.json({ media });
 }
 
-export async function DELETE(_request: Request, context: MediaContext) {
+export async function DELETE(request: Request, context: MediaContext) {
+  const csrfResponse = rejectCrossOriginMutation(request);
+  if (csrfResponse) return csrfResponse;
+
   const session = await getCurrentSession();
 
   if (!session?.user?.id) {

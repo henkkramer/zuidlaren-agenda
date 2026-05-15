@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getCurrentSession } from "@/lib/auth";
+import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 
 type ProfilePayload = {
@@ -9,6 +10,9 @@ type ProfilePayload = {
 };
 
 export async function PATCH(request: Request) {
+  const csrfResponse = rejectCrossOriginMutation(request);
+  if (csrfResponse) return csrfResponse;
+
   const session = await getCurrentSession();
 
   if (!session?.user?.id) {

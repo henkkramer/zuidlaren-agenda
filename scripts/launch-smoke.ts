@@ -29,6 +29,7 @@ const requiredFiles = [
   "app/api/health/release/route.ts",
   "app/api/public/activities/route.ts",
   "app/api/mobile/capabilities/route.ts",
+  "lib/csrf.ts",
   "lib/security-headers.ts",
   "lib/release-checks.ts",
   ".github/workflows/ci.yml",
@@ -63,6 +64,9 @@ assert(dockerCompose.includes('cpuset: "0-1"'), 'docker-compose.yml must pin the
 
 const nextConfig = read("next.config.ts");
 assert(nextConfig.includes("securityHeadersForNext"), "next.config.ts must apply shared security headers");
+
+const profileRoute = read("app/api/me/profile/route.ts");
+assert(profileRoute.includes("rejectCrossOriginMutation"), "profile mutation route must apply CSRF origin guard");
 
 const ciWorkflow = read(".github/workflows/ci.yml");
 for (const command of ["npm run lint", "npm run typecheck", "npm run test", "npm run test:e2e", "npm run build"]) {

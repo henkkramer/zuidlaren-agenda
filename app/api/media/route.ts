@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { getCurrentSession } from "@/lib/auth";
 import { requireBusinessPermission } from "@/lib/business-permissions";
+import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { storeLocalMedia } from "@/lib/media-storage";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
+  const csrfResponse = rejectCrossOriginMutation(request);
+  if (csrfResponse) return csrfResponse;
+
   const session = await getCurrentSession();
 
   if (!session?.user?.id) {
