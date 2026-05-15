@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { recordAnalyticsMetric } from "@/lib/analytics";
 import { getCurrentSession } from "@/lib/auth";
+import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
@@ -64,6 +65,9 @@ function serializeAttendance(attendance: { status: string; visibility: string })
 }
 
 export async function POST(request: Request, context: AttendanceRouteContext) {
+  const csrfResponse = rejectCrossOriginMutation(request);
+  if (csrfResponse) return csrfResponse;
+
   const userId = await requireSessionUser();
 
   if (!userId) {
@@ -120,6 +124,9 @@ export async function POST(request: Request, context: AttendanceRouteContext) {
 }
 
 export async function PATCH(request: Request, context: AttendanceRouteContext) {
+  const csrfResponse = rejectCrossOriginMutation(request);
+  if (csrfResponse) return csrfResponse;
+
   const userId = await requireSessionUser();
 
   if (!userId) {
@@ -163,7 +170,10 @@ export async function PATCH(request: Request, context: AttendanceRouteContext) {
   return NextResponse.json({ attendance: serializeAttendance(attendance) });
 }
 
-export async function DELETE(_request: Request, context: AttendanceRouteContext) {
+export async function DELETE(request: Request, context: AttendanceRouteContext) {
+  const csrfResponse = rejectCrossOriginMutation(request);
+  if (csrfResponse) return csrfResponse;
+
   const userId = await requireSessionUser();
 
   if (!userId) {

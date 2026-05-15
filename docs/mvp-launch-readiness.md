@@ -29,6 +29,8 @@ RELEASE_BASE_URL=https://<production-host> npm run release:check
 
 The command checks `/api/health`, `/api/health/ready`, `/api/health/release`, `/api/mobile/capabilities`, and `/api/public/activities?limit=3`.
 
+All routes are served with the shared security header policy from `lib/security-headers.ts`.
+
 `/api/health/release` checks:
 
 - Database connectivity.
