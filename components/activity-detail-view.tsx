@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ArrowLeft, Bookmark, CalendarDays, ExternalLink, Lock, MapPin, Share2, Users, UserRound } from "lucide-react";
+import { ActivityReportForm } from "@/components/activity-report-form";
 import { ActivityDateBadge } from "@/components/activity-date-badge";
 import { categoryLabels, type Activity } from "@/lib/activity-types";
 import { activityDateParts, formatActivityEndTime } from "@/lib/date-format";
@@ -128,6 +129,7 @@ export function ActivityDetailView({ activity, onBack }: { activity: Activity; o
         <a className="outline-button" href={activity.sourceUrl} onClick={trackSourceClick}>
           Open originele website <ExternalLink size={17} />
         </a>
+        <ActivityReportForm activity={activity} />
       </div>
     </>
   );

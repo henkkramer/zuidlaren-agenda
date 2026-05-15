@@ -658,6 +658,73 @@ a {
   color: var(--color-charcoal);
 }
 
+.report-panel {
+  margin-top: 14px;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.68);
+  overflow: hidden;
+}
+
+.report-toggle {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  border: 0;
+  background: transparent;
+  color: var(--color-charcoal);
+  padding: 0 14px;
+  font-weight: 800;
+  text-align: left;
+}
+
+.report-toggle span {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.report-toggle .rotated {
+  transform: rotate(180deg);
+}
+
+.report-form {
+  display: grid;
+  gap: 12px;
+  border-top: 1px solid var(--color-border);
+  padding: 14px;
+}
+
+.report-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--color-muted-text);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.report-form select,
+.report-form textarea {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: white;
+  color: var(--color-charcoal);
+  font: inherit;
+  padding: 10px 11px;
+}
+
+.report-form textarea {
+  resize: vertical;
+}
+
+.action-status.error {
+  color: #9f2f2f;
+}
+
 .side-stack {
   display: none;
 }

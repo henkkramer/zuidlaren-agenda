@@ -43,6 +43,7 @@ This queue is the single execution sequence for the existing implementation plan
 | 34 | Done | Notification Preference Validation | `12`, `17`, `18` |
 | 35 | Done | Notification Campaign Request Validation | `12`, `17`, `18` |
 | 36 | Done | Admin Status Validation Coverage | `14`, `17`, `18` |
+| 37 | Done | Public Report UI Entry Points | `06`, `17`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -818,3 +819,25 @@ Acceptance:
 
 - Admin status routes only accept explicit allowlisted status values.
 - Moderation validation behavior is covered without database dependencies.
+
+## Sprint 37 - Public Report UI Entry Points
+
+Status: Done
+
+Goal:
+
+Let residents report incorrect or problematic activity information from the public agenda without adding social or comment mechanics.
+
+Scope:
+
+- Compact report action in the public activity detail view.
+- Reason selector and optional explanation field.
+- Submission to the existing rate-limited public report intake endpoint.
+- Success and error states with calm resident-facing wording.
+- Launch smoke guard that keeps the public UI wired to report intake.
+
+Acceptance:
+
+- Residents can report a published activity from the public detail view.
+- Report submissions include the activity slug and use the existing `POST /api/reports` route.
+- The card grid and mobile-first agenda layout remain unchanged.

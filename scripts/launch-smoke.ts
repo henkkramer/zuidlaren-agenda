@@ -105,6 +105,10 @@ const reportsRoute = read("app/api/reports/route.ts");
 assert(reportsRoute.includes("parseReportInput"), "public report route must use shared report input parsing");
 assert(reportsRoute.includes("checkRateLimit"), "public report route must apply rate limiting");
 
+const reportForm = read("components/activity-report-form.tsx");
+assert(reportForm.includes("/api/reports"), "public activity detail must submit reports to the report intake endpoint");
+assert(reportForm.includes("activityId: activity.id"), "public activity reports must include the activity slug");
+
 const auditCoverage = read("docs/audit-log-coverage.md");
 assert(auditCoverage.includes("business.activity.publish"), "audit coverage docs must include publishing actions");
 assert(auditCoverage.includes("admin.user.update"), "audit coverage docs must include admin user actions");
