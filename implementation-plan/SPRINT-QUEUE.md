@@ -38,6 +38,7 @@ This queue is the single execution sequence for the existing implementation plan
 | 29 | Done | Payment Webhook Contract Hardening | `13`, `17`, `18` |
 | 30 | Done | Privacy Processor Register | `17`, `21`, `16` |
 | 31 | Done | Media Upload Validation Coverage | `15`, `17`, `18` |
+| 32 | Done | Account GDPR Request Validation | `17`, `18`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -709,3 +710,23 @@ Acceptance:
 
 - Invalid or oversized image uploads are covered by fast automated tests.
 - Local media storage still uses the same validation before writing files.
+
+## Sprint 32 - Account GDPR Request Validation
+
+Status: Done
+
+Goal:
+
+Make the account profile update path for GDPR deletion requests directly testable.
+
+Scope:
+
+- Shared profile input parser for display name, locale, and deletion request state.
+- Tests for explicit deletion request handling, locale fallback, and display-name validation.
+- Privacy export assertion for deletion request visibility.
+- Launch smoke guard that keeps the profile route wired to the shared parser.
+
+Acceptance:
+
+- Deletion requests are only recorded for explicit user intent.
+- Account profile validation behavior is covered without database dependencies.

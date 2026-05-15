@@ -50,6 +50,7 @@ test("privacy export contains user-owned fields without auth internals", () => {
   });
 
   assert.equal(exported.profile.email, "tester@example.nl");
+  assert.equal(exported.profile.deletionRequestedAt, null);
   assert.equal(exported.attendances[0].visibility, "private");
   assert.equal(exported.businessMemberships[0].role, "owner");
   assert.equal("sessions" in exported, false);

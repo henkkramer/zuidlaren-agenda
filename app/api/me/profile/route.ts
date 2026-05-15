@@ -1,13 +1,8 @@
 import { NextResponse } from "next/server";
 import { getCurrentSession } from "@/lib/auth";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
+import { parseProfileInput } from "@/lib/profile-input";
 import { prisma } from "@/lib/prisma";
-
-type ProfilePayload = {
-  displayName?: unknown;
-  locale?: unknown;
-  deletionRequested?: unknown;
-};
 
 export async function PATCH(request: Request) {
   const csrfResponse = rejectCrossOriginMutation(request);
@@ -19,20 +14,20 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Niet ingelogd" }, { status: 401 });
   }
 
-  const payload = (await request.json()) as ProfilePayload;
-  const displayName = typeof payload.displayName === "string" ? payload.displayName.trim() : "";
-  const locale = payload.locale === "en-US" ? "en-US" : "nl-NL";
+  let input;
 
-  if (displayName.length < 2 || displayName.length > 80) {
-    return NextResponse.json({ error: "Naam moet 2 tot 80 tekens zijn" }, { status: 400 });
+  try {
+    input = parseProfileInput((await request.json()) as Record<string, unknown>);
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Ongeldig profiel" }, { status: 400 });
   }
 
   const user = await prisma.user.update({
     where: { id: session.user.id },
     data: {
-      displayName,
-      locale,
-      deletionRequestedAt: payload.deletionRequested === true ? new Date() : null,
+      displayName: input.displayName,
+      locale: input.locale,
+      deletionRequestedAt: input.deletionRequested ? new Date() : null,
     },
   });
 
