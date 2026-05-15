@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AdminActivities } from "@/components/admin-activities";
+import { AdminActivityImport } from "@/components/admin-activity-import";
 import { AdminBusinesses } from "@/components/admin-businesses";
 import { AdminNotificationCampaigns } from "@/components/admin-notification-campaigns";
 import { AdminReports } from "@/components/admin-reports";
+import { ContentMaintenancePanel } from "@/components/content-maintenance-panel";
 import { requireAdmin } from "@/lib/admin-auth";
 import { getAnalyticsSnapshot } from "@/lib/analytics-snapshot";
 import { getBillingSummary } from "@/lib/billing-summary";
@@ -225,6 +227,17 @@ export default async function AdminPage() {
                 </div>
               ))}
             </div>
+          </section>
+
+          <section className="account-card">
+            <h2>Import preview</h2>
+            <p className="account-muted">Plak activiteiten als tabel; import blijft review-first en schrijft niet direct naar de database.</p>
+            <AdminActivityImport />
+          </section>
+
+          <section className="account-card">
+            <h2>Content onderhoud</h2>
+            <ContentMaintenancePanel />
           </section>
         </div>
       </section>

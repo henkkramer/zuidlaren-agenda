@@ -42,6 +42,8 @@ const requiredFiles = [
   "lib/report-input.ts",
   "lib/security-headers.ts",
   "lib/release-checks.ts",
+  "lib/admin-activity-import.ts",
+  "lib/content-maintenance-queue.ts",
   ".github/workflows/ci.yml",
   "docs/ci-release-gate.md",
   "docs/audit-log-coverage.md",
@@ -113,6 +115,13 @@ assert(adminActivities.includes("/api/admin/activities/"), "admin activities UI 
 for (const status of ["published", "unpublished", "expired"]) {
   assert(adminActivities.includes(status), `admin activities UI must expose ${status} handling`);
 }
+
+const adminActivityImport = read("components/admin-activity-import.tsx");
+assert(adminActivityImport.includes("parseActivityImportPreview"), "admin import UI must use shared import preview parsing");
+
+const maintenanceQueue = read("lib/content-maintenance-queue.ts");
+assert(maintenanceQueue.includes("Zuidlaardermarktweek"), "content maintenance queue must track Zuidlaardermarkt follow-up");
+assert(maintenanceQueue.includes("Open Muziek Podium"), "content maintenance queue must track Open Muziek Podium follow-up");
 
 const reportsRoute = read("app/api/reports/route.ts");
 assert(reportsRoute.includes("parseReportInput"), "public report route must use shared report input parsing");
