@@ -101,6 +101,18 @@ assert(adminUserRoute.includes("rejectCrossOriginMutation"), "admin user mutatio
 const adminActivityRoute = read("app/api/admin/activities/[activityId]/route.ts");
 assert(adminActivityRoute.includes("parseAdminActivityStatus"), "admin activity route must use shared status parsing");
 
+const adminBusinesses = read("components/admin-businesses.tsx");
+assert(adminBusinesses.includes("/api/admin/businesses/"), "admin businesses UI must use the admin business moderation endpoint");
+for (const status of ["approved", "suspended", "pending"]) {
+  assert(adminBusinesses.includes(status), `admin businesses UI must expose ${status} handling`);
+}
+
+const adminActivities = read("components/admin-activities.tsx");
+assert(adminActivities.includes("/api/admin/activities/"), "admin activities UI must use the admin activity moderation endpoint");
+for (const status of ["published", "unpublished", "expired"]) {
+  assert(adminActivities.includes(status), `admin activities UI must expose ${status} handling`);
+}
+
 const reportsRoute = read("app/api/reports/route.ts");
 assert(reportsRoute.includes("parseReportInput"), "public report route must use shared report input parsing");
 assert(reportsRoute.includes("checkRateLimit"), "public report route must apply rate limiting");
@@ -108,6 +120,12 @@ assert(reportsRoute.includes("checkRateLimit"), "public report route must apply 
 const reportForm = read("components/activity-report-form.tsx");
 assert(reportForm.includes("/api/reports"), "public activity detail must submit reports to the report intake endpoint");
 assert(reportForm.includes("activityId: activity.id"), "public activity reports must include the activity slug");
+
+const adminReports = read("components/admin-reports.tsx");
+assert(adminReports.includes("/api/admin/reports/"), "admin reports UI must use the admin report moderation endpoint");
+for (const status of ["reviewed", "dismissed", "open"]) {
+  assert(adminReports.includes(status), `admin reports UI must expose ${status} handling`);
+}
 
 const auditCoverage = read("docs/audit-log-coverage.md");
 assert(auditCoverage.includes("business.activity.publish"), "audit coverage docs must include publishing actions");

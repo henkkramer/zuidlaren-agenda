@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { AdminActivities } from "@/components/admin-activities";
+import { AdminBusinesses } from "@/components/admin-businesses";
 import { AdminNotificationCampaigns } from "@/components/admin-notification-campaigns";
+import { AdminReports } from "@/components/admin-reports";
 import { requireAdmin } from "@/lib/admin-auth";
 import { getAnalyticsSnapshot } from "@/lib/analytics-snapshot";
 import { getBillingSummary } from "@/lib/billing-summary";
@@ -32,7 +35,10 @@ export default async function AdminPage() {
       take: 8,
     }),
     prisma.report.findMany({
-      include: { activity: { select: { title: true } } },
+      include: {
+        activity: { select: { title: true } },
+        reporter: { select: { displayName: true, email: true } },
+      },
       orderBy: [{ status: "asc" }, { createdAt: "desc" }],
       take: 8,
     }),
@@ -62,34 +68,27 @@ export default async function AdminPage() {
         <div className="admin-grid">
           <section className="account-card">
             <h2>Bedrijven</h2>
-            <div className="admin-table">
-              {businesses.map((business) => (
-                <div className="admin-row" key={business.id}>
-                  <span>
-                    <strong>{business.name}</strong>
-                    <small>
-                      {business._count.members} leden · {business._count.activities} activiteiten
-                    </small>
-                  </span>
-                  <span className="status-pill">{business.status.toLowerCase()}</span>
-                </div>
-              ))}
-            </div>
+            <AdminBusinesses
+              businesses={businesses.map((business) => ({
+                activityCount: business._count.activities,
+                id: business.id,
+                memberCount: business._count.members,
+                name: business.name,
+                status: business.status.toLowerCase() as "pending" | "approved" | "suspended",
+              }))}
+            />
           </section>
 
           <section className="account-card">
             <h2>Activiteiten</h2>
-            <div className="admin-table">
-              {activities.map((activity) => (
-                <div className="admin-row" key={activity.id}>
-                  <span>
-                    <strong>{activity.title}</strong>
-                    <small>{activity.business?.name ?? activity.organizerName}</small>
-                  </span>
-                  <span className="status-pill">{activity.status.toLowerCase()}</span>
-                </div>
-              ))}
-            </div>
+            <AdminActivities
+              activities={activities.map((activity) => ({
+                id: activity.id,
+                organizerName: activity.business?.name ?? activity.organizerName,
+                status: activity.status.toLowerCase() as "draft" | "scheduled" | "published" | "unpublished" | "expired",
+                title: activity.title,
+              }))}
+            />
           </section>
 
           <section className="account-card">
@@ -109,18 +108,18 @@ export default async function AdminPage() {
 
           <section className="account-card">
             <h2>Meldingen</h2>
-            <div className="admin-table">
-              {reports.length === 0 ? <p className="account-muted">Geen meldingen.</p> : null}
-              {reports.map((report) => (
-                <div className="admin-row" key={report.id}>
-                  <span>
-                    <strong>{report.reason}</strong>
-                    <small>{report.activity?.title ?? "Algemeen"}</small>
-                  </span>
-                  <span className="status-pill">{report.status.toLowerCase()}</span>
-                </div>
-              ))}
-            </div>
+            <AdminReports
+              reports={reports.map((report) => ({
+                id: report.id,
+                activityTitle: report.activity?.title ?? "Algemeen",
+                createdAt: report.createdAt.toLocaleDateString("nl-NL"),
+                details: report.details,
+                reason: report.reason,
+                reporterLabel: report.reporter?.displayName ?? report.reporter?.email ?? "Anoniem",
+                resolution: report.resolution,
+                status: report.status.toLowerCase() as "open" | "reviewed" | "dismissed",
+              }))}
+            />
           </section>
 
           <section className="account-card">
