@@ -31,6 +31,7 @@ const requiredFiles = [
   "app/api/mobile/capabilities/route.ts",
   "lib/csrf.ts",
   "lib/audit-actions.ts",
+  "lib/media-validation.ts",
   "lib/payment-webhooks.ts",
   "lib/privacy-processors.ts",
   "lib/security-headers.ts",
@@ -86,6 +87,10 @@ assert(auditCoverage.includes("notification_campaign.approve"), "audit coverage 
 const paymentWebhooks = read("lib/payment-webhooks.ts");
 assert(paymentWebhooks.includes("verifyMollieWebhookSignature"), "payment webhook signature verification must remain implemented");
 assert(paymentWebhooks.includes("normalizeMollieWebhookEvent"), "payment webhook event normalization must remain implemented");
+
+const mediaValidation = read("lib/media-validation.ts");
+assert(mediaValidation.includes("validateMediaUploadSize"), "media upload size validation must remain implemented");
+assert(mediaValidation.includes("inspectImage"), "media image content validation must remain implemented");
 
 const privacyProcessors = read("lib/privacy-processors.ts");
 assert(privacyProcessors.includes("Mollie"), "privacy processor register must include prepared payment provider");
