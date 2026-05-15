@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AdminNotificationCampaigns } from "@/components/admin-notification-campaigns";
+import { AdminReports } from "@/components/admin-reports";
 import { requireAdmin } from "@/lib/admin-auth";
 import { getAnalyticsSnapshot } from "@/lib/analytics-snapshot";
 import { getBillingSummary } from "@/lib/billing-summary";
@@ -32,7 +33,10 @@ export default async function AdminPage() {
       take: 8,
     }),
     prisma.report.findMany({
-      include: { activity: { select: { title: true } } },
+      include: {
+        activity: { select: { title: true } },
+        reporter: { select: { displayName: true, email: true } },
+      },
       orderBy: [{ status: "asc" }, { createdAt: "desc" }],
       take: 8,
     }),
@@ -109,18 +113,18 @@ export default async function AdminPage() {
 
           <section className="account-card">
             <h2>Meldingen</h2>
-            <div className="admin-table">
-              {reports.length === 0 ? <p className="account-muted">Geen meldingen.</p> : null}
-              {reports.map((report) => (
-                <div className="admin-row" key={report.id}>
-                  <span>
-                    <strong>{report.reason}</strong>
-                    <small>{report.activity?.title ?? "Algemeen"}</small>
-                  </span>
-                  <span className="status-pill">{report.status.toLowerCase()}</span>
-                </div>
-              ))}
-            </div>
+            <AdminReports
+              reports={reports.map((report) => ({
+                id: report.id,
+                activityTitle: report.activity?.title ?? "Algemeen",
+                createdAt: report.createdAt.toLocaleDateString("nl-NL"),
+                details: report.details,
+                reason: report.reason,
+                reporterLabel: report.reporter?.displayName ?? report.reporter?.email ?? "Anoniem",
+                resolution: report.resolution,
+                status: report.status.toLowerCase() as "open" | "reviewed" | "dismissed",
+              }))}
+            />
           </section>
 
           <section className="account-card">

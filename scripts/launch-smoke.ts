@@ -109,6 +109,12 @@ const reportForm = read("components/activity-report-form.tsx");
 assert(reportForm.includes("/api/reports"), "public activity detail must submit reports to the report intake endpoint");
 assert(reportForm.includes("activityId: activity.id"), "public activity reports must include the activity slug");
 
+const adminReports = read("components/admin-reports.tsx");
+assert(adminReports.includes("/api/admin/reports/"), "admin reports UI must use the admin report moderation endpoint");
+for (const status of ["reviewed", "dismissed", "open"]) {
+  assert(adminReports.includes(status), `admin reports UI must expose ${status} handling`);
+}
+
 const auditCoverage = read("docs/audit-log-coverage.md");
 assert(auditCoverage.includes("business.activity.publish"), "audit coverage docs must include publishing actions");
 assert(auditCoverage.includes("admin.user.update"), "audit coverage docs must include admin user actions");

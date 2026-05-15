@@ -44,6 +44,7 @@ This queue is the single execution sequence for the existing implementation plan
 | 35 | Done | Notification Campaign Request Validation | `12`, `17`, `18` |
 | 36 | Done | Admin Status Validation Coverage | `14`, `17`, `18` |
 | 37 | Done | Public Report UI Entry Points | `06`, `17`, `21` |
+| 38 | Done | Admin Report Handling UX | `14`, `17`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -841,3 +842,25 @@ Acceptance:
 - Residents can report a published activity from the public detail view.
 - Report submissions include the activity slug and use the existing `POST /api/reports` route.
 - The card grid and mobile-first agenda layout remain unchanged.
+
+## Sprint 38 - Admin Report Handling UX
+
+Status: Done
+
+Goal:
+
+Make submitted activity reports actionable from the platform admin screen without requiring manual database edits.
+
+Scope:
+
+- Replace the static admin report list with a client-side moderation panel.
+- Show report reason, details, activity, reporter label, creation date, status, and resolution.
+- Add reviewed, dismissed, and reopen actions wired to the existing audited admin report endpoint.
+- Keep success/error feedback local to the admin card.
+- Add a launch smoke guard for admin report UI endpoint wiring.
+
+Acceptance:
+
+- Admins can mark reports as handled, dismiss them, or reopen them from `/admin`.
+- Report moderation continues to use `PATCH /api/admin/reports/[reportId]` and existing audit logging.
+- The admin dashboard remains responsive on narrow screens.
