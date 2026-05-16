@@ -14,5 +14,6 @@ test("session API headers expose version and disable shared caching", () => {
   assert.deepEqual(sessionApiHeaders("2026-05-14"), {
     "Cache-Control": "private, no-store",
     "X-Zuidlaren-Api-Version": "2026-05-14",
+    "X-Robots-Tag": "noindex, nofollow, noarchive",
   });
 });

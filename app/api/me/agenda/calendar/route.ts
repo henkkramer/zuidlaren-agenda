@@ -1,4 +1,5 @@
 import { sessionApiHeaders } from "@/lib/api-response";
+import { recordAnalyticsMetric } from "@/lib/analytics";
 import { getCurrentSession } from "@/lib/auth";
 import { mapActivityRecord } from "@/lib/activity-mapper";
 import { buildPublicCalendarFeed } from "@/lib/calendar-feed";
@@ -40,6 +41,13 @@ export async function GET() {
   });
 
   const activities = (attendances as PersonalAgendaCalendarRow[]).map((attendance) => mapActivityRecord(attendance.activity));
+
+  await recordAnalyticsMetric({
+    metric: "calendar_export",
+    dimensions: {
+      kind: "personal_agenda",
+    },
+  });
 
   return new Response(
     buildPublicCalendarFeed(activities, new Date(), {

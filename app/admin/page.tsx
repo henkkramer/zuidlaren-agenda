@@ -213,6 +213,10 @@ export default async function AdminPage() {
                 <small>ik-ga kliks</small>
               </span>
               <span>
+                <strong>{analytics.calendarExports}</strong>
+                <small>agenda exports</small>
+              </span>
+              <span>
                 <strong>{analytics.notificationOptIns}</strong>
                 <small>notificatie opt-ins</small>
               </span>

@@ -1,4 +1,5 @@
 import { publicApiHeaders } from "@/lib/api-response";
+import { recordAnalyticsMetric } from "@/lib/analytics";
 import { buildPublicCalendarFeed } from "@/lib/calendar-feed";
 import { mobileApiVersion } from "@/lib/mobile-contracts";
 import { getPublicActivityDetail } from "@/lib/public-activities";
@@ -16,6 +17,16 @@ export async function GET(_request: Request, context: PublicActivityCalendarCont
   if (!activity) {
     return Response.json({ apiVersion: mobileApiVersion, error: "Activiteit niet gevonden" }, { headers: publicApiHeaders(mobileApiVersion), status: 404 });
   }
+
+  await recordAnalyticsMetric({
+    metric: "calendar_export",
+    activityId: activity.id,
+    category: activity.category,
+    location: activity.locationName,
+    dimensions: {
+      kind: "single_activity",
+    },
+  });
 
   return new Response(buildPublicCalendarFeed([activity]), {
     headers: {

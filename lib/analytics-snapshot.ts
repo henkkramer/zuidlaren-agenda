@@ -20,6 +20,7 @@ export async function getAnalyticsSnapshot() {
     sourceClicks,
     attendanceClicks,
     filterUses,
+    calendarExports,
     attendanceCount,
     notificationOptIns,
     aiUsage,
@@ -40,6 +41,10 @@ export async function getAnalyticsSnapshot() {
     }),
     prisma.analyticsDailyMetric.aggregate({
       where: { metric: "filter_use", day: { gte: last30Days } },
+      _sum: { count: true },
+    }),
+    prisma.analyticsDailyMetric.aggregate({
+      where: { metric: "calendar_export", day: { gte: last30Days } },
       _sum: { count: true },
     }),
     prisma.attendance.count(),
@@ -76,6 +81,7 @@ export async function getAnalyticsSnapshot() {
     sourceClicks: sourceClicks._sum.count ?? 0,
     attendanceClicks: attendanceClicks._sum.count ?? 0,
     filterUses: filterUses._sum.count ?? 0,
+    calendarExports: calendarExports._sum.count ?? 0,
     attendanceCount,
     notificationOptIns,
     aiUsageCount: aiUsage._count,
