@@ -90,6 +90,7 @@ This queue is the single execution sequence for the existing implementation plan
 | 81 | Done | Public Agenda Button Filters | `05`, `07`, `18` |
 | 82 | Done | Real Public Filter Data Wiring | `05`, `07`, `18` |
 | 83 | Done | Full Regression Verification | `17`, `18`, `21` |
+| 84 | Done | Compact Public Filter Dropdowns | `05`, `06`, `07` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1820,3 +1821,26 @@ Acceptance:
 - Automated regression commands pass.
 - Runtime release checks pass with no warnings.
 - The regression result and local environment fix are documented.
+
+## Sprint 84 - Compact Public Filter Dropdowns
+
+Status: Done
+
+Goal:
+
+Reduce public agenda filter clutter while keeping filter choices visible and URL-driven.
+
+Scope:
+
+- Replace the long category, location, type, indoor/outdoor, organizer, and start-date button groups with compact dropdown buttons.
+- Keep the primary period, family, and price chips unchanged.
+- Keep all dropdown buttons on one horizontal filter row with overflow scrolling on narrow screens.
+- Preserve active filter chips and clear-filter behavior.
+- Raise the default public activity limit from 24 to 50.
+- Update smoke checks and query tests for the compact filter controls and new default limit.
+
+Acceptance:
+
+- The public agenda no longer renders large secondary button groups.
+- Categorie, Locatie, Type, Binnen/Buiten, Organisator, and Vanaf are dropdown buttons.
+- The default public feed returns up to 50 activities.

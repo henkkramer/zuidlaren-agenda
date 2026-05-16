@@ -57,7 +57,7 @@ test("activity filters clamp limit and build stable query state", () => {
 
   const where = buildActivityWhere(filters);
   assert.ok(Array.isArray(where.AND));
-  assert.equal(toQueryString(filters, { limit: 24 }), "family=1&period=week&price=free&q=muziek&type=Concert");
+  assert.equal(toQueryString(filters, { limit: 50 }), "family=1&period=week&price=free&q=muziek&type=Concert");
 });
 
 test("activity filters default to upcoming events and allow explicit past date ranges", () => {
