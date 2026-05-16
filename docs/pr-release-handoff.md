@@ -14,6 +14,7 @@ This handoff keeps release work tied to one GitHub pull request instead of paral
 
 - The PR body must list the completed sprint numbers.
 - `implementation-plan/SPRINT-QUEUE.md` must be updated in the same branch.
+- Public API or calendar export changes must update `docs/public-api-release-notes.md`.
 - Runtime release warnings from `/api/health/release` must be fixed before inviting testers.
 - Payment, native mobile, scraping, and advanced notification work stay out of release PRs until explicitly promoted.
 

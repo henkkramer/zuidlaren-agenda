@@ -61,8 +61,10 @@ const requiredFiles = [
   "docs/calendar-abuse-response.md",
   "docs/calendar-client-troubleshooting.md",
   "docs/calendar-metrics.md",
+  "docs/calendar-runbook-drill.md",
   "docs/operator-handoff.md",
   "docs/pr-release-handoff.md",
+  "docs/public-api-release-notes.md",
   "scripts/ensure-admin.ts",
   "scripts/release-check.ts",
   ".env.example",
@@ -248,6 +250,20 @@ assert(operatorHandoff.includes("/api/public/calendar"), "Operator handoff must 
 assert(operatorHandoff.includes("Retry-After"), "Operator handoff must mention rate-limit retry handling");
 assert(operatorHandoff.includes("If-None-Match"), "Operator handoff must mention conditional calendar requests");
 assert(operatorHandoff.includes("noindex, nofollow, noarchive"), "Operator handoff must mention personal feed indexing controls");
+assert(operatorHandoff.includes("calendar-runbook-drill"), "Operator handoff must link the calendar runbook drill");
+
+const calendarRunbookDrill = read("docs/calendar-runbook-drill.md");
+assert(calendarRunbookDrill.includes("public calendar feed"), "Calendar runbook drill must check release calendar output");
+assert(calendarRunbookDrill.includes("BEGIN:VCALENDAR"), "Calendar runbook drill must check iCalendar body shape");
+assert(calendarRunbookDrill.includes("private, no-store"), "Calendar runbook drill must check personal export privacy");
+assert(calendarRunbookDrill.includes("If-None-Match"), "Calendar runbook drill must check conditional request behavior");
+
+const publicApiReleaseNotes = read("docs/public-api-release-notes.md");
+assert(publicApiReleaseNotes.includes("X-Zuidlaren-Api-Version"), "Public API release notes must document the API version header");
+assert(publicApiReleaseNotes.includes("/api/public/activities"), "Public API release notes must document public activities");
+assert(publicApiReleaseNotes.includes("/api/public/calendar"), "Public API release notes must document public calendar export");
+assert(publicApiReleaseNotes.includes("/api/me/agenda/calendar"), "Public API release notes must document personal calendar export");
+assert(publicApiReleaseNotes.includes("public calendar feed"), "Public API release notes must document release-check calendar label");
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");

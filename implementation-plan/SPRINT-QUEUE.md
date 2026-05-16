@@ -77,6 +77,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 68 | Done | Public API Calendar Contract Freeze | `18`, `20`, `21` |
 | 69 | Done | Calendar Client Troubleshooting Notes | `20`, `19`, `21` |
 | 70 | Done | Calendar Export Release Check Result Detail | `19`, `20`, `21` |
+| 71 | Done | Calendar Export Runbook Drill | `19`, `20`, `21` |
+| 72 | Done | Public API Release Notes Snapshot | `20`, `18`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1534,3 +1536,43 @@ Acceptance:
 
 - `public calendar feed` appears in release-check output for `/api/public/calendar?limit=3`.
 - Calendar release check failures are distinguishable from JSON API failures.
+
+## Sprint 71 - Calendar Export Runbook Drill
+
+Status: Done
+
+Goal:
+
+Give operators a repeatable drill for validating calendar export behavior before tester invitations or calendar changes.
+
+Scope:
+
+- Add `docs/calendar-runbook-drill.md`.
+- Cover local validation, deployed release check, public feed, single-activity export, personal export privacy, conditional requests, analytics, and abuse-response handoff.
+- Link the drill from operator handoff.
+- Add launch-smoke guards for the drill.
+
+Acceptance:
+
+- Operators have a single calendar export drill covering release, privacy, cache, and abuse-response behavior.
+- The operator handoff points to the drill before calendar changes.
+
+## Sprint 72 - Public API Release Notes Snapshot
+
+Status: Done
+
+Goal:
+
+Keep a release-facing snapshot of the public and mobile-safe API surface.
+
+Scope:
+
+- Add `docs/public-api-release-notes.md`.
+- Summarize API version, public endpoints, session endpoints, calendar contract, and release validation commands.
+- Link release notes from mobile API readiness, MVP launch readiness, and PR handoff.
+- Add launch-smoke guards for the release notes.
+
+Acceptance:
+
+- Public API changes have a documented release-note target.
+- The controlled MVP API surface can be reviewed without reading route code.

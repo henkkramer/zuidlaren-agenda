@@ -65,6 +65,8 @@ Repeat calendar clients should send `If-None-Match`; matching feeds return `304 
 
 Admin analytics show aggregate calendar export volume only. Personal exports do not include user ids or selected activity ids in analytics dimensions.
 
+Run `docs/calendar-runbook-drill.md` before inviting a new tester group or after changing calendar export behavior.
+
 ## When Something Breaks
 
 - Check `/api/health` first for process health.
