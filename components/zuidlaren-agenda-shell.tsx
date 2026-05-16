@@ -7,6 +7,7 @@ import { BottomNavigation } from "@/components/bottom-navigation";
 import { ChurchMark } from "@/components/church-mark";
 import { FilterControls } from "@/components/filter-controls";
 import { MobileHeader } from "@/components/mobile-header";
+import { CalendarPlus } from "lucide-react";
 import type { Activity } from "@/lib/activity-types";
 import { getPublicActivities } from "@/lib/activity-service";
 import { toQueryString, type ActivityFilterOptions, type ActivityFilterState } from "@/lib/public-activity-query";
@@ -39,14 +40,19 @@ function PublicAgenda({
   hasMore: boolean;
   onOpen: (activity: Activity) => void;
 }) {
-  const moreQuery = toQueryString(filters, { limit: filters.limit + 24 });
+  const moreQuery = toQueryString({ ...filters, cursor: undefined }, { limit: filters.limit + 24 });
+  const calendarQuery = toQueryString({ ...filters, cursor: undefined }, { limit: 96 });
+  const calendarHref = calendarQuery ? `/api/public/calendar?${calendarQuery}` : "/api/public/calendar";
 
   return (
     <>
       <MobileHeader />
       <div className="feed-summary">
         <span>{activities.length} activiteiten</span>
-        <span>Mei t/m december 2026</span>
+        <a className="calendar-feed-link" href={calendarHref}>
+          <CalendarPlus size={14} />
+          Abonneer
+        </a>
       </div>
       <FilterControls filters={filters} options={filterOptions} />
       <div className="feed-list">

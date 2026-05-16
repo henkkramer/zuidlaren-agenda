@@ -218,6 +218,15 @@ a {
   font-weight: 750;
 }
 
+.calendar-feed-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-green-deep);
+  font-weight: 850;
+  text-decoration: none;
+}
+
 .chip,
 .filter-chip {
   display: inline-flex;

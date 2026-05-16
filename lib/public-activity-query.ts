@@ -2,6 +2,7 @@ import type { Prisma } from "@prisma/client";
 
 export type ActivityFilterState = {
   category?: string;
+  cursor?: string;
   end?: string;
   family?: boolean;
   indoorOutdoor?: string;
@@ -77,6 +78,7 @@ export function parseActivityFilters(searchParams: Record<string, string | strin
 
   return {
     category: clean(searchParams.category),
+    cursor: clean(searchParams.cursor),
     end: clean(searchParams.end),
     family: clean(searchParams.family) === "1",
     indoorOutdoor: clean(searchParams.indoorOutdoor),

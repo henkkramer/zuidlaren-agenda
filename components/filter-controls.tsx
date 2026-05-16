@@ -32,7 +32,7 @@ export function FilterControls({ filters, options }: FilterControlsProps) {
   const [query, setQuery] = useState(filters.q ?? "");
 
   function go(overrides: Partial<Record<keyof ActivityFilterState, string | number | boolean | undefined>>) {
-    const queryString = toQueryString({ ...filters, limit: 24 }, overrides);
+    const queryString = toQueryString({ ...filters, cursor: undefined, limit: 24 }, overrides);
     router.push(queryString ? `/?${queryString}` : "/");
   }
 

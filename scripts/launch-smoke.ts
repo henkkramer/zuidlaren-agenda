@@ -27,7 +27,10 @@ const requiredFiles = [
   "app/api/health/route.ts",
   "app/api/health/ready/route.ts",
   "app/api/health/release/route.ts",
+  "app/api/public/calendar/route.ts",
   "app/api/public/activities/route.ts",
+  "app/api/public/activities/[activityId]/calendar/route.ts",
+  "app/api/me/agenda/calendar/route.ts",
   "app/api/reports/route.ts",
   "app/api/mobile/capabilities/route.ts",
   "lib/csrf.ts",
@@ -45,6 +48,8 @@ const requiredFiles = [
   "lib/release-checks.ts",
   "lib/admin-activity-import.ts",
   "lib/content-maintenance-queue.ts",
+  "lib/calendar-feed.ts",
+  "lib/public-activity-pagination.ts",
   ".github/workflows/ci.yml",
   "docs/ci-release-gate.md",
   "docs/audit-log-coverage.md",
@@ -68,6 +73,7 @@ const requiredScripts = ["lint", "typecheck", "test", "test:e2e", "build", "dev:
 for (const script of requiredScripts) {
   assert(packageJson.scripts[script], `Missing package script: ${script}`);
 }
+assert(packageJson.scripts.typecheck.includes("prisma generate"), "typecheck must generate Prisma Client before tsc");
 
 const envExample = read(".env.example");
 for (const key of ["DATABASE_URL", "NEXTAUTH_URL", "NEXTAUTH_SECRET", "EMAIL_FROM", "ADMIN_EMAIL", "RELEASE_BASE_URL", "PORT=3088"]) {
@@ -167,7 +173,28 @@ for (const command of ["npm run lint", "npm run typecheck", "npm run test", "npm
 
 const capabilities = buildMobileCapabilities();
 assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/public/activities"), "Mobile capabilities must expose public activities");
+assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/public/calendar"), "Mobile capabilities must expose public calendar feed");
+assert(
+  capabilities.endpoints.some((endpoint) => endpoint.path === "/api/public/activities/{activityId}/calendar"),
+  "Mobile capabilities must expose single-activity calendar export",
+);
 assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/me/agenda"), "Mobile capabilities must expose personal agenda");
+assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/me/agenda/calendar"), "Mobile capabilities must expose personal agenda calendar export");
+
+const publicActivitiesRoute = read("app/api/public/activities/route.ts");
+assert(publicActivitiesRoute.includes("nextCursor"), "Public activities API must expose cursor pagination metadata");
+assert(publicActivitiesRoute.includes("publicApiHeaders"), "Public activities API must use stable public API headers");
+
+const publicCalendarRoute = read("app/api/public/calendar/route.ts");
+assert(publicCalendarRoute.includes("buildPublicCalendarFeed"), "Public calendar route must build an iCalendar feed");
+
+const publicActivityCalendarRoute = read("app/api/public/activities/[activityId]/calendar/route.ts");
+assert(publicActivityCalendarRoute.includes("getPublicActivityDetail"), "Single-activity calendar route must read one public activity");
+assert(publicActivityCalendarRoute.includes("buildPublicCalendarFeed([activity])"), "Single-activity calendar route must build a one-event iCalendar feed");
+
+const personalAgendaCalendarRoute = read("app/api/me/agenda/calendar/route.ts");
+assert(personalAgendaCalendarRoute.includes("getCurrentSession"), "Personal agenda calendar route must require a session");
+assert(personalAgendaCalendarRoute.includes("Mijn Zuidlaren Agenda"), "Personal agenda calendar route must name the personal calendar feed");
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");

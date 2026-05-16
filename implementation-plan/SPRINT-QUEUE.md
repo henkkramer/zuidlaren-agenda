@@ -53,6 +53,12 @@ This queue is the single execution sequence for the existing implementation plan
 | 44 | Done | Content Maintenance Queue | `05`, `14`, `21` |
 | 45 | Done | Email Campaign Delivery Controls | `12`, `14`, `17` |
 | 46 | Done | Mollie Webhook Audit Hardening | `13`, `17`, `18` |
+| 47 | Done | Public Calendar Feed | `08`, `20`, `21` |
+| 48 | Done | Public API Pagination Hardening | `05`, `07`, `20` |
+| 49 | Done | Calendar Subscription UI | `06`, `08`, `20` |
+| 50 | Done | Single Activity Calendar Export | `06`, `08`, `20` |
+| 51 | Done | Personal Agenda Calendar Feed | `08`, `20`, `17` |
+| 52 | Done | Personal Calendar Export UI | `06`, `08`, `20` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1035,3 +1041,120 @@ Acceptance:
 
 - Mollie webhook events are represented in both webhook logs and audit logs.
 - Live payment mutation remains disabled while sandbox/audit readiness improves.
+
+## Sprint 47 - Public Calendar Feed
+
+Status: Done
+
+Goal:
+
+Expose the public agenda in a calendar-client-friendly format without changing the main web feed.
+
+Scope:
+
+- Shared iCalendar feed builder with escaping and stable event identifiers.
+- Public `/api/public/calendar` route using the existing activity filters.
+- Mobile/API readiness documentation updated with the calendar endpoint.
+- Unit and launch-smoke coverage for the calendar feed.
+
+Acceptance:
+
+- Calendar clients can subscribe to published activities through a public ICS endpoint.
+- The route remains filter-compatible with the public agenda.
+
+## Sprint 48 - Public API Pagination Hardening
+
+Status: Done
+
+Goal:
+
+Make the public activity API safer for future mobile clients and external consumers.
+
+Scope:
+
+- Cursor parsing and cursor `where` construction for stable chronological pagination.
+- Public activity API response metadata includes `nextCursor` when more results exist.
+- Public API responses include version and conservative cache headers.
+- Mobile capabilities, documentation, unit tests, and launch-smoke checks updated.
+
+Acceptance:
+
+- Clients can request the next page using a cursor instead of only increasing result limits.
+- Public API consumers can read the active API version from response headers.
+
+## Sprint 49 - Calendar Subscription UI
+
+Status: Done
+
+Goal:
+
+Make the new public calendar feed discoverable from the agenda interface.
+
+Scope:
+
+- Feed-level calendar subscription link using the active public filter state.
+- Compact styling that fits the existing mobile-first agenda header.
+- Launch smoke guard keeps the calendar route and public capability listed.
+
+Acceptance:
+
+- Visitors can subscribe to the public agenda feed without knowing the API URL.
+- Active filters are preserved in the calendar feed link.
+
+## Sprint 50 - Single Activity Calendar Export
+
+Status: Done
+
+Goal:
+
+Allow users to add one published activity to their own calendar.
+
+Scope:
+
+- Public single-activity iCalendar route.
+- Detail-view calendar export action.
+- Mobile contract, docs, test, and launch-smoke coverage for the endpoint.
+
+Acceptance:
+
+- A published activity detail can be downloaded as a one-event ICS file.
+- Missing or unpublished activities return the same versioned public API error shape.
+
+## Sprint 51 - Personal Agenda Calendar Feed
+
+Status: Done
+
+Goal:
+
+Let signed-in users export their saved activities as a private calendar feed.
+
+Scope:
+
+- Authenticated `/api/me/agenda/calendar` iCalendar route.
+- Private no-store response headers and version header.
+- Reuse the shared calendar feed builder with personal calendar metadata.
+- Mobile contract, docs, tests, and launch-smoke coverage.
+
+Acceptance:
+
+- Anonymous users receive a versioned 401 response.
+- Signed-in users receive an ICS feed containing their future published saved activities.
+
+## Sprint 52 - Personal Calendar Export UI
+
+Status: Done
+
+Goal:
+
+Make personal agenda calendar export discoverable from the Mijn agenda screen.
+
+Scope:
+
+- Export action in the personal agenda summary row.
+- Shared calendar link styling reused from the public feed.
+- Queue and readiness documentation updated.
+
+Acceptance:
+
+- Users can reach the personal agenda calendar export without knowing the API URL.
+- The public and personal calendar affordances stay visually consistent.
