@@ -2,6 +2,11 @@ import type { Activity } from "@/lib/activity-types";
 
 const productId = "-//Zuidlaren Agenda//Public Calendar//NL";
 
+type CalendarFeedOptions = {
+  description?: string;
+  name?: string;
+};
+
 function escapeIcsText(value: string) {
   return value.replace(/\\/g, "\\\\").replace(/\n/g, "\\n").replace(/,/g, "\\,").replace(/;/g, "\\;");
 }
@@ -25,15 +30,15 @@ function foldIcsLine(line: string) {
   return lines;
 }
 
-export function buildPublicCalendarFeed(activities: Activity[], now = new Date()) {
+export function buildPublicCalendarFeed(activities: Activity[], now = new Date(), options: CalendarFeedOptions = {}) {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     `PRODID:${productId}`,
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
-    "X-WR-CALNAME:Zuidlaren Agenda",
-    "X-WR-CALDESC:Publieke activiteiten in en rondom Zuidlaren",
+    `X-WR-CALNAME:${escapeIcsText(options.name ?? "Zuidlaren Agenda")}`,
+    `X-WR-CALDESC:${escapeIcsText(options.description ?? "Publieke activiteiten in en rondom Zuidlaren")}`,
   ];
 
   for (const activity of activities) {

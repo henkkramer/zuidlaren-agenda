@@ -57,6 +57,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 48 | Done | Public API Pagination Hardening | `05`, `07`, `20` |
 | 49 | Done | Calendar Subscription UI | `06`, `08`, `20` |
 | 50 | Done | Single Activity Calendar Export | `06`, `08`, `20` |
+| 51 | Done | Personal Agenda Calendar Feed | `08`, `20`, `17` |
+| 52 | Done | Personal Calendar Export UI | `06`, `08`, `20` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1117,3 +1119,42 @@ Acceptance:
 
 - A published activity detail can be downloaded as a one-event ICS file.
 - Missing or unpublished activities return the same versioned public API error shape.
+
+## Sprint 51 - Personal Agenda Calendar Feed
+
+Status: Done
+
+Goal:
+
+Let signed-in users export their saved activities as a private calendar feed.
+
+Scope:
+
+- Authenticated `/api/me/agenda/calendar` iCalendar route.
+- Private no-store response headers and version header.
+- Reuse the shared calendar feed builder with personal calendar metadata.
+- Mobile contract, docs, tests, and launch-smoke coverage.
+
+Acceptance:
+
+- Anonymous users receive a versioned 401 response.
+- Signed-in users receive an ICS feed containing their future published saved activities.
+
+## Sprint 52 - Personal Calendar Export UI
+
+Status: Done
+
+Goal:
+
+Make personal agenda calendar export discoverable from the Mijn agenda screen.
+
+Scope:
+
+- Export action in the personal agenda summary row.
+- Shared calendar link styling reused from the public feed.
+- Queue and readiness documentation updated.
+
+Acceptance:
+
+- Users can reach the personal agenda calendar export without knowing the API URL.
+- The public and personal calendar affordances stay visually consistent.

@@ -31,3 +31,13 @@ test("public calendar feed emits escaped iCalendar events", () => {
   assert.match(feed, /LOCATION:Grand Cafe Zuidlaren\\, Stationsweg 1/);
   assert.match(feed, /\r\nEND:VCALENDAR$/);
 });
+
+test("calendar feed supports custom calendar metadata", () => {
+  const feed = buildPublicCalendarFeed([], new Date("2026-05-16T10:00:00.000Z"), {
+    description: "Mijn opgeslagen activiteiten",
+    name: "Mijn Zuidlaren Agenda",
+  });
+
+  assert.match(feed, /X-WR-CALNAME:Mijn Zuidlaren Agenda/);
+  assert.match(feed, /X-WR-CALDESC:Mijn opgeslagen activiteiten/);
+});

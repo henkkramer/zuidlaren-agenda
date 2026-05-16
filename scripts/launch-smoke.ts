@@ -30,6 +30,7 @@ const requiredFiles = [
   "app/api/public/calendar/route.ts",
   "app/api/public/activities/route.ts",
   "app/api/public/activities/[activityId]/calendar/route.ts",
+  "app/api/me/agenda/calendar/route.ts",
   "app/api/reports/route.ts",
   "app/api/mobile/capabilities/route.ts",
   "lib/csrf.ts",
@@ -178,6 +179,7 @@ assert(
   "Mobile capabilities must expose single-activity calendar export",
 );
 assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/me/agenda"), "Mobile capabilities must expose personal agenda");
+assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/me/agenda/calendar"), "Mobile capabilities must expose personal agenda calendar export");
 
 const publicActivitiesRoute = read("app/api/public/activities/route.ts");
 assert(publicActivitiesRoute.includes("nextCursor"), "Public activities API must expose cursor pagination metadata");
@@ -189,6 +191,10 @@ assert(publicCalendarRoute.includes("buildPublicCalendarFeed"), "Public calendar
 const publicActivityCalendarRoute = read("app/api/public/activities/[activityId]/calendar/route.ts");
 assert(publicActivityCalendarRoute.includes("getPublicActivityDetail"), "Single-activity calendar route must read one public activity");
 assert(publicActivityCalendarRoute.includes("buildPublicCalendarFeed([activity])"), "Single-activity calendar route must build a one-event iCalendar feed");
+
+const personalAgendaCalendarRoute = read("app/api/me/agenda/calendar/route.ts");
+assert(personalAgendaCalendarRoute.includes("getCurrentSession"), "Personal agenda calendar route must require a session");
+assert(personalAgendaCalendarRoute.includes("Mijn Zuidlaren Agenda"), "Personal agenda calendar route must name the personal calendar feed");
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");

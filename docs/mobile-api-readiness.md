@@ -13,12 +13,13 @@ Public mobile-safe endpoints:
 - `GET /api/public/activities/{activityId}/calendar`
 - `GET /api/me`
 - `GET /api/me/agenda`
+- `GET /api/me/agenda/calendar`
 - `PATCH /api/me/notification-preferences`
 - `POST /api/activities/{activityId}/attendance`
 - `PATCH /api/activities/{activityId}/attendance`
 - `DELETE /api/activities/{activityId}/attendance`
 
-Public list/detail responses include an `apiVersion` field and `X-Zuidlaren-Api-Version` header. `GET /api/public/activities` includes `meta.nextCursor` when another page is available. Public responses use short-lived cache headers for conservative reverse-proxy and native-client reuse. Calendar clients can use the full-feed ICS endpoint or the single-activity ICS endpoint.
+Public list/detail responses include an `apiVersion` field and `X-Zuidlaren-Api-Version` header. `GET /api/public/activities` includes `meta.nextCursor` when another page is available. Public responses use short-lived cache headers for conservative reverse-proxy and native-client reuse. Calendar clients can use the full-feed ICS endpoint, the single-activity ICS endpoint, or the signed-in personal agenda ICS endpoint.
 
 Activity objects use the existing web shape so mobile clients can reuse the same display terminology:
 

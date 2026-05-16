@@ -51,6 +51,12 @@ export const mobileEndpointContracts: MobileEndpointContract[] = [
     purpose: "Read the signed-in user's private agenda.",
   },
   {
+    method: "GET",
+    path: "/api/me/agenda/calendar",
+    auth: "session",
+    purpose: "Export the signed-in user's saved agenda as an iCalendar feed.",
+  },
+  {
     method: "PATCH",
     path: "/api/me/notification-preferences",
     auth: "session",

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CalendarPlus } from "lucide-react";
 import { ActivityCard } from "@/components/activity-card";
 import { ActivityDetailView } from "@/components/activity-detail-view";
 import type { Activity } from "@/lib/activity-types";
@@ -58,7 +59,10 @@ export function PersonalAgendaShell({ items }: { items: PersonalAgendaItem[] }) 
     <>
       <div className="feed-summary personal-summary">
         <span>{agendaItems.length} gekozen activiteiten</span>
-        <span>Privé standaard</span>
+        <a className="calendar-feed-link" href="/api/me/agenda/calendar">
+          <CalendarPlus size={14} />
+          Exporteer
+        </a>
       </div>
       <div className="feed-list personal-feed-list">
         {agendaItems.map((item) => (

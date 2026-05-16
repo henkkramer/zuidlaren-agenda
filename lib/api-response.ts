@@ -6,3 +6,10 @@ export function publicApiHeaders(apiVersion: string) {
     "X-Zuidlaren-Api-Version": apiVersion,
   };
 }
+
+export function sessionApiHeaders(apiVersion: string) {
+  return {
+    "Cache-Control": "private, no-store",
+    "X-Zuidlaren-Api-Version": apiVersion,
+  };
+}
