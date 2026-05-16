@@ -12,6 +12,7 @@ test("mobile capabilities expose stable versioned contracts", () => {
   assert.deepEqual(capabilities.push.plannedProviders, ["apns", "fcm"]);
   assert.ok(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/public/activities" && endpoint.auth === "public"));
   assert.ok(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/public/calendar" && endpoint.auth === "public"));
+  assert.ok(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/public/activities/{activityId}/calendar" && endpoint.auth === "public"));
   assert.ok(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/me/agenda" && endpoint.auth === "session"));
 });
 

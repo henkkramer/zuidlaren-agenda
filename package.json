@@ -9,7 +9,7 @@
     "start": "next start",
     "start:3088": "next start --port 3088",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "prisma generate && tsc --noEmit",
     "test": "tsx --test tests/**/*.test.ts",
     "test:e2e": "tsx scripts/launch-smoke.ts",
     "health": "curl -fsS http://127.0.0.1:${PORT:-3088}/api/health",

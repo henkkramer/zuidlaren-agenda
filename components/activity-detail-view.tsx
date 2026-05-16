@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Bookmark, CalendarDays, ExternalLink, Lock, MapPin, Share2, Users, UserRound } from "lucide-react";
+import { ArrowLeft, Bookmark, CalendarDays, CalendarPlus, ExternalLink, Lock, MapPin, Share2, Users, UserRound } from "lucide-react";
 import { ActivityReportForm } from "@/components/activity-report-form";
 import { ActivityDateBadge } from "@/components/activity-date-badge";
 import { categoryLabels, type Activity } from "@/lib/activity-types";
@@ -126,6 +126,10 @@ export function ActivityDetailView({ activity, onBack }: { activity: Activity; o
         </button>
         {status ? <p className="action-status">{status}</p> : null}
         <div style={{ height: 12 }} />
+        <a className="outline-button" href={`/api/public/activities/${encodeURIComponent(activity.id)}/calendar`}>
+          Zet in agenda <CalendarPlus size={17} />
+        </a>
+        <div style={{ height: 10 }} />
         <a className="outline-button" href={activity.sourceUrl} onClick={trackSourceClick}>
           Open originele website <ExternalLink size={17} />
         </a>

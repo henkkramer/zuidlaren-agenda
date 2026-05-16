@@ -55,6 +55,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 46 | Done | Mollie Webhook Audit Hardening | `13`, `17`, `18` |
 | 47 | Done | Public Calendar Feed | `08`, `20`, `21` |
 | 48 | Done | Public API Pagination Hardening | `05`, `07`, `20` |
+| 49 | Done | Calendar Subscription UI | `06`, `08`, `20` |
+| 50 | Done | Single Activity Calendar Export | `06`, `08`, `20` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1077,3 +1079,41 @@ Acceptance:
 
 - Clients can request the next page using a cursor instead of only increasing result limits.
 - Public API consumers can read the active API version from response headers.
+
+## Sprint 49 - Calendar Subscription UI
+
+Status: Done
+
+Goal:
+
+Make the new public calendar feed discoverable from the agenda interface.
+
+Scope:
+
+- Feed-level calendar subscription link using the active public filter state.
+- Compact styling that fits the existing mobile-first agenda header.
+- Launch smoke guard keeps the calendar route and public capability listed.
+
+Acceptance:
+
+- Visitors can subscribe to the public agenda feed without knowing the API URL.
+- Active filters are preserved in the calendar feed link.
+
+## Sprint 50 - Single Activity Calendar Export
+
+Status: Done
+
+Goal:
+
+Allow users to add one published activity to their own calendar.
+
+Scope:
+
+- Public single-activity iCalendar route.
+- Detail-view calendar export action.
+- Mobile contract, docs, test, and launch-smoke coverage for the endpoint.
+
+Acceptance:
+
+- A published activity detail can be downloaded as a one-event ICS file.
+- Missing or unpublished activities return the same versioned public API error shape.

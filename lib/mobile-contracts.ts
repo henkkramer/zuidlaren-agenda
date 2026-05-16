@@ -28,6 +28,12 @@ export const mobileEndpointContracts: MobileEndpointContract[] = [
   },
   {
     method: "GET",
+    path: "/api/public/activities/{activityId}/calendar",
+    auth: "public",
+    purpose: "Download a single published activity as an iCalendar event.",
+  },
+  {
+    method: "GET",
     path: "/api/public/activities/{activityId}",
     auth: "public",
     purpose: "Read one published activity by slug.",
