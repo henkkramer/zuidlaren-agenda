@@ -87,7 +87,7 @@ export function ZuidlarenAgendaShell({
 }) {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const activities = initialActivities ?? [];
-  const activeFilters = filters ?? { limit: 24 };
+  const activeFilters = filters ?? { limit: 50 };
   const options = filterOptions ?? { categories: [], indoorOutdoor: [], locations: [], organizers: [], types: [] };
 
   function openActivity(activity: Activity) {

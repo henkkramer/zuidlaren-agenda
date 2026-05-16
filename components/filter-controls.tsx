@@ -39,7 +39,7 @@ export function FilterControls({ filters, options }: FilterControlsProps) {
   const [query, setQuery] = useState(filters.q ?? "");
 
   function go(overrides: Partial<Record<keyof ActivityFilterState, string | number | boolean | undefined>>) {
-    const queryString = toQueryString({ ...filters, cursor: undefined, limit: 24 }, overrides);
+    const queryString = toQueryString({ ...filters, cursor: undefined, limit: 50 }, overrides);
     router.push(queryString ? `/?${queryString}` : "/");
   }
 
@@ -69,31 +69,32 @@ export function FilterControls({ filters, options }: FilterControlsProps) {
     return labelForFilter(key, value);
   }
 
-  function renderButtonFilters(title: string, icon: ReactNode, filterKey: ButtonFilterKey, filterOptions: FilterOption[]) {
+  function renderFilterSelect(title: string, icon: ReactNode, filterKey: ButtonFilterKey, filterOptions: FilterOption[]) {
     if (!filterOptions.length) return null;
 
     return (
-      <section className="filter-button-section">
-        <div className="filter-button-title">
-          {icon}
-          <span>{title}</span>
-        </div>
-        <div className="filter-button-row">
-          {filterOptions.map((option) => {
-            const isActive = filters[filterKey] === option.value;
-            return (
-              <button
-                className={`chip filter-button-chip ${isActive ? "active" : ""}`}
-                key={option.value}
-                onClick={() => go({ [filterKey]: isActive ? undefined : option.value } as Partial<Record<keyof ActivityFilterState, string | number | boolean | undefined>>)}
-                type="button"
-              >
+      <label className={`filter-select-menu ${filters[filterKey] ? "active" : ""}`}>
+        {icon}
+        <span>{title}</span>
+        <select onChange={(event) => go({ [filterKey]: event.target.value || undefined } as Partial<Record<keyof ActivityFilterState, string | number | boolean | undefined>>)} value={filters[filterKey] ?? ""}>
+          <option value="">{title}</option>
+          {filterOptions.map((option) => (
+            <option key={option.value} value={option.value}>
                 {option.label}
-              </button>
-            );
-          })}
-        </div>
-      </section>
+            </option>
+          ))}
+        </select>
+      </label>
+    );
+  }
+
+  function renderDateSelect() {
+    return (
+      <label className={`filter-select-menu date-select-menu ${filters.start ? "active" : ""}`}>
+        <CalendarDays size={14} />
+        <span>Vanaf</span>
+        <input onChange={(event) => go({ period: undefined, start: event.target.value || undefined })} type="date" value={filters.start ?? ""} />
+      </label>
     );
   }
 
@@ -127,22 +128,13 @@ export function FilterControls({ filters, options }: FilterControlsProps) {
           Betaald
         </button>
       </div>
-      <div className="filter-button-groups">
-        {renderButtonFilters("Categorie", <Filter size={14} />, "category", options.categories)}
-        {renderButtonFilters("Locatie", <MapPin size={14} />, "location", locationOptions)}
-        {renderButtonFilters("Type", <Store size={14} />, "type", typeOptions)}
-        {renderButtonFilters("Binnen/buiten", <CalendarDays size={14} />, "indoorOutdoor", indoorOutdoorOptions)}
-        {renderButtonFilters("Organisator", <Store size={14} />, "organizer", organizerOptions)}
-      </div>
-      <div className="date-filter-row">
-        <label>
-          Vanaf
-          <input onChange={(event) => go({ period: undefined, start: event.target.value || undefined })} type="date" value={filters.start ?? ""} />
-        </label>
-        <label>
-          Tot
-          <input onChange={(event) => go({ period: undefined, end: event.target.value || undefined })} type="date" value={filters.end ?? ""} />
-        </label>
+      <div className="filter-menu-row">
+        {renderFilterSelect("Categorie", <Filter size={14} />, "category", options.categories)}
+        {renderFilterSelect("Locatie", <MapPin size={14} />, "location", locationOptions)}
+        {renderFilterSelect("Type", <Store size={14} />, "type", typeOptions)}
+        {renderFilterSelect("Binnen/Buiten", <CalendarDays size={14} />, "indoorOutdoor", indoorOutdoorOptions)}
+        {renderFilterSelect("Organisator", <Store size={14} />, "organizer", organizerOptions)}
+        {renderDateSelect()}
       </div>
       {activeFilters.length ? (
         <div className="active-filter-row">

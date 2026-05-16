@@ -338,8 +338,9 @@ assert(publicApiGovernanceRequiredDocs.includes("docs/calendar-documentation-map
 assert(publicApiGovernanceRequiredChecks.includes("release-check"), "Public API governance fixture must include release-check review");
 
 const filterControls = read("components/filter-controls.tsx");
-assert(!filterControls.includes("<select"), "Public agenda filters must use buttons instead of dropdown selects");
-assert(filterControls.includes("filter-button-groups"), "Public agenda filters must render grouped button controls");
+assert(filterControls.includes("filter-menu-row"), "Public agenda filters must render one compact dropdown row");
+assert(filterControls.includes("renderFilterSelect"), "Public agenda filters must expose compact dropdown controls");
+assert(filterControls.includes("<select"), "Public agenda secondary filters must use dropdown controls");
 assert(filterControls.includes("options.categories"), "Public agenda category filters must use available event categories");
 
 const agendaShell = read("components/zuidlaren-agenda-shell.tsx");
@@ -351,6 +352,7 @@ assert(activityCard.includes("tag-link"), "Activity card tags must be usable as 
 assert(activityCard.includes("filterHref(\"category\""), "Activity card category tags must link to category filters");
 
 const publicActivityQuery = read("lib/public-activity-query.ts");
+assert(publicActivityQuery.includes("const defaultLimit = 50"), "Public activity queries must default to 50 activities");
 assert(publicActivityQuery.includes("defaultFrom"), "Public activity queries must default to today and later");
 assert(publicActivityQuery.includes("hasCustomDateFilter"), "Public activity queries must allow explicit past date ranges");
 assert(publicActivityQuery.includes("hasSome: tagVariants"), "Public activity search must match visible tag labels case-insensitively");

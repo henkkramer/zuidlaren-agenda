@@ -24,7 +24,7 @@ export type ActivityFilterOptions = {
   types: string[];
 };
 
-const defaultLimit = 24;
+const defaultLimit = 50;
 const maxLimit = 96;
 
 function readParam(value: string | string[] | undefined) {
