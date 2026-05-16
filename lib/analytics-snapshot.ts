@@ -1,5 +1,6 @@
 import "server-only";
 
+import { summarizeCalendarExportBreakdown, type AnalyticsMetricGroupRow } from "@/lib/analytics-breakdown";
 import { prisma } from "@/lib/prisma";
 
 type NotificationDeliveryStatusRow = {
@@ -21,6 +22,7 @@ export async function getAnalyticsSnapshot() {
     attendanceClicks,
     filterUses,
     calendarExports,
+    calendarExportBreakdown,
     attendanceCount,
     notificationOptIns,
     aiUsage,
@@ -44,6 +46,11 @@ export async function getAnalyticsSnapshot() {
       _sum: { count: true },
     }),
     prisma.analyticsDailyMetric.aggregate({
+      where: { metric: "calendar_export", day: { gte: last30Days } },
+      _sum: { count: true },
+    }),
+    prisma.analyticsDailyMetric.groupBy({
+      by: ["dimensionsKey"],
       where: { metric: "calendar_export", day: { gte: last30Days } },
       _sum: { count: true },
     }),
@@ -82,6 +89,7 @@ export async function getAnalyticsSnapshot() {
     attendanceClicks: attendanceClicks._sum.count ?? 0,
     filterUses: filterUses._sum.count ?? 0,
     calendarExports: calendarExports._sum.count ?? 0,
+    calendarExportBreakdown: summarizeCalendarExportBreakdown(calendarExportBreakdown as AnalyticsMetricGroupRow[]),
     attendanceCount,
     notificationOptIns,
     aiUsageCount: aiUsage._count,

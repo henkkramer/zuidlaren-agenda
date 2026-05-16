@@ -225,6 +225,14 @@ export default async function AdminPage() {
                 <small>AI-aanvragen</small>
               </span>
             </div>
+            {analytics.calendarExportBreakdown.length ? (
+              <p className="small-muted">
+                Agenda exports:{" "}
+                {analytics.calendarExportBreakdown
+                  .map((item) => `${item.kind.replaceAll("_", " ")} ${item.count}`)
+                  .join(", ")}
+              </p>
+            ) : null}
             <p className="small-muted">Laatste {analytics.windowDays} dagen. Geen cookies of persoonlijke browseprofielen.</p>
           </section>
 
