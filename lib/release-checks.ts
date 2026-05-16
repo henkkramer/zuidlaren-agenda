@@ -9,6 +9,7 @@ export const releaseCheckEndpoints: ReleaseCheckEndpoint[] = [
   { path: "/api/health/release", required: true },
   { path: "/api/mobile/capabilities", required: true },
   { path: "/api/public/activities?limit=3", required: true },
+  { path: "/api/public/calendar?limit=3", required: true },
 ];
 
 export function normalizeReleaseBaseUrl(value: string | undefined) {

@@ -50,6 +50,7 @@ const requiredFiles = [
   "lib/content-maintenance-queue.ts",
   "lib/calendar-feed.ts",
   "lib/calendar-export.ts",
+  "lib/analytics-breakdown.ts",
   "lib/public-activity-pagination.ts",
   ".github/workflows/ci.yml",
   "docs/ci-release-gate.md",
@@ -213,6 +214,9 @@ assert(calendarFeedDocs.includes("Retry-After"), "Calendar feed docs must docume
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");
+
+const releaseChecks = read("lib/release-checks.ts");
+assert(releaseChecks.includes("/api/public/calendar?limit=3"), "Release checks must include the public calendar feed");
 
 const queue = read("implementation-plan/SPRINT-QUEUE.md");
 assert(queue.includes("## Sprint 19 - MVP Launch Readiness"), "Sprint 19 must be listed in the queue");

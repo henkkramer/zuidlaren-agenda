@@ -20,6 +20,7 @@ test("release check URL plan includes required runtime endpoints", () => {
       "https://agenda.example.nl/api/health/release",
       "https://agenda.example.nl/api/mobile/capabilities",
       "https://agenda.example.nl/api/public/activities?limit=3",
+      "https://agenda.example.nl/api/public/calendar?limit=3",
     ],
   );
 });

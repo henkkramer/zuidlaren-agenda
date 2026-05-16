@@ -65,6 +65,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 56 | Done | Personal Agenda Export Privacy Hardening | `17`, `08`, `20` |
 | 57 | Done | Calendar Export Rate Limiting | `17`, `08`, `20` |
 | 58 | Done | Calendar Feed Filename Sanitization | `17`, `20`, `21` |
+| 59 | Done | Calendar Export Runtime Checks | `19`, `20`, `21` |
+| 60 | Done | Calendar Export Admin Visibility Polish | `14`, `16`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1284,3 +1286,41 @@ Acceptance:
 
 - Generated `.ics` filenames are short ASCII values.
 - Unsafe activity slugs or titles cannot leak into raw response headers.
+
+## Sprint 59 - Calendar Export Runtime Checks
+
+Status: Done
+
+Goal:
+
+Keep the public calendar feed covered by the release runtime check command.
+
+Scope:
+
+- Add public calendar feed to release check endpoint plan.
+- Extend release-check unit coverage.
+- Launch smoke guard keeps the runtime check wired.
+
+Acceptance:
+
+- `npm run release:check` validates the public calendar feed in addition to public activity JSON.
+- Calendar runtime checks stay unauthenticated and safe for production release validation.
+
+## Sprint 60 - Calendar Export Admin Visibility Polish
+
+Status: Done
+
+Goal:
+
+Make aggregate calendar export analytics easier for the operator to interpret.
+
+Scope:
+
+- Calendar export breakdown helper by export kind.
+- Admin analytics shows public feed, single activity, personal agenda, or unknown export counts when present.
+- Unit coverage for breakdown ordering and fallback behavior.
+
+Acceptance:
+
+- Admins can distinguish calendar export usage by kind.
+- Breakdown remains aggregate and does not expose user identifiers.
