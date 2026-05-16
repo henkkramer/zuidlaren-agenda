@@ -342,9 +342,18 @@ assert(!filterControls.includes("<select"), "Public agenda filters must use butt
 assert(filterControls.includes("filter-button-groups"), "Public agenda filters must render grouped button controls");
 assert(filterControls.includes("options.categories"), "Public agenda category filters must use available event categories");
 
+const agendaShell = read("components/zuidlaren-agenda-shell.tsx");
+assert(!agendaShell.includes("getPublicActivities"), "Public agenda shell must not fall back to mock activities after filtering");
+assert(agendaShell.includes("enableFilterLinks"), "Public agenda cards must expose tag filter links");
+
+const activityCard = read("components/activity-card.tsx");
+assert(activityCard.includes("tag-link"), "Activity card tags must be usable as filter links");
+assert(activityCard.includes("filterHref(\"category\""), "Activity card category tags must link to category filters");
+
 const publicActivityQuery = read("lib/public-activity-query.ts");
 assert(publicActivityQuery.includes("defaultFrom"), "Public activity queries must default to today and later");
 assert(publicActivityQuery.includes("hasCustomDateFilter"), "Public activity queries must allow explicit past date ranges");
+assert(publicActivityQuery.includes("hasSome: tagVariants"), "Public activity search must match visible tag labels case-insensitively");
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");

@@ -388,6 +388,7 @@ a {
   background-position: center;
   background-size: cover;
   box-shadow: var(--shadow-card);
+  cursor: pointer;
   text-align: left;
 }
 
@@ -447,12 +448,25 @@ a {
 }
 
 .tag {
+  display: inline-flex;
+  align-items: center;
   border-radius: 999px;
   background: rgba(248, 246, 241, 0.16);
   padding: 7px 10px;
   color: white;
   font-size: 0.76rem;
   font-weight: 750;
+  text-decoration: none;
+}
+
+.tag-link {
+  border: 1px solid rgba(255, 255, 255, 0.32);
+}
+
+.tag-link:hover,
+.tag-link:focus-visible {
+  background: rgba(248, 246, 241, 0.28);
+  outline: none;
 }
 
 .activity-card p {

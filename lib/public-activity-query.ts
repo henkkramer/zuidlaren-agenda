@@ -52,6 +52,18 @@ function addDays(date: Date, days: number) {
   return next;
 }
 
+function tagSearchVariants(value: string) {
+  const cleaned = value.trim();
+  if (!cleaned) return [];
+
+  return [
+    cleaned,
+    cleaned.toLowerCase(),
+    cleaned.toUpperCase(),
+    cleaned.charAt(0).toUpperCase() + cleaned.slice(1).toLowerCase(),
+  ].filter((variant, index, variants) => variants.indexOf(variant) === index);
+}
+
 function weekendRange(now: Date) {
   const today = startOfDay(now);
   const day = today.getDay();
@@ -129,14 +141,18 @@ export function buildActivityWhere(filters: ActivityFilterState): Prisma.Activit
   }
 
   if (filters.q) {
+    const tagVariants = tagSearchVariants(filters.q);
+
     and.push({
       OR: [
         { title: { contains: filters.q, mode: "insensitive" } },
         { shortDescription: { contains: filters.q, mode: "insensitive" } },
         { description: { contains: filters.q, mode: "insensitive" } },
         { organizerName: { contains: filters.q, mode: "insensitive" } },
+        { category: { name: { contains: filters.q, mode: "insensitive" } } },
+        { category: { slug: { contains: filters.q, mode: "insensitive" } } },
         { location: { name: { contains: filters.q, mode: "insensitive" } } },
-        { typeTags: { has: filters.q } },
+        ...(tagVariants.length ? [{ typeTags: { hasSome: tagVariants } }] : []),
       ],
     });
   }
