@@ -89,6 +89,7 @@ This queue is the single execution sequence for the existing implementation plan
 | 80 | Done | Calendar Documentation Archive Review | `20`, `19`, `21` |
 | 81 | Done | Public Agenda Button Filters | `05`, `07`, `18` |
 | 82 | Done | Real Public Filter Data Wiring | `05`, `07`, `18` |
+| 83 | Done | Full Regression Verification | `17`, `18`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1795,3 +1796,27 @@ Acceptance:
 - Selecting a public filter changes the real card result set.
 - Searching for visible categories or tags can match real activity records.
 - Cards shown on the homepage are backed by the public activity query rather than local mock fallback data.
+
+## Sprint 83 - Full Regression Verification
+
+Status: Done
+
+Goal:
+
+Run a complete regression pass after the public filter fixes and preserve the result for release review.
+
+Scope:
+
+- Run typecheck, unit tests, lint, smoke/e2e, and production build.
+- Start the current branch on an alternate local port because `3088` was occupied.
+- Verify public activity API filtering for default, category, type, indoor/outdoor, search, and no-hit search cases.
+- Verify filtered homepage rendering and empty-state behavior over HTTP.
+- Run release checks against the local runtime.
+- Bootstrap the local admin user required by release health.
+- Add `docs/regression-report-2026-05-16.md`.
+
+Acceptance:
+
+- Automated regression commands pass.
+- Runtime release checks pass with no warnings.
+- The regression result and local environment fix are documented.
