@@ -8,6 +8,7 @@ Use this index to find the current public and mobile-safe API documentation with
 | --- | --- |
 | `docs/public-api-release-notes.md` | Current controlled MVP public API snapshot. |
 | `docs/public-api-changelog.md` | Chronological record for public API and calendar export changes. |
+| `docs/public-api-governance-review.md` | Pre-merge review checklist for public/mobile-safe API changes. |
 | `docs/mobile-api-readiness.md` | Future native-client API direction and stable endpoint list. |
 | `docs/calendar-feeds.md` | Calendar export endpoint behavior and frozen contract. |
 
@@ -16,6 +17,7 @@ Use this index to find the current public and mobile-safe API documentation with
 | Document | Use |
 | --- | --- |
 | `docs/calendar-runbook-drill.md` | Pre-tester and post-change calendar export drill. |
+| `docs/calendar-documentation-map.md` | Task-based map for the calendar documentation set. |
 | `docs/calendar-maintenance-checklist.md` | Routine calendar export maintenance checklist. |
 | `docs/calendar-client-troubleshooting.md` | Operator diagnosis for calendar-client issues. |
 | `docs/calendar-support-faq.md` | Short support replies for common user questions. |

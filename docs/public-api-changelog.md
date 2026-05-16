@@ -8,8 +8,20 @@ This changelog records public and mobile-safe API changes for the controlled MVP
 - Include the sprint number, date, changed surface, and operator impact.
 - Update `docs/public-api-release-notes.md` when the current release snapshot changes.
 - Use `docs/public-api-docs-index.md` to find related public API documentation.
+- Use `docs/public-api-governance-review.md` before merging public/mobile-safe API changes.
 - Update `lib/mobile-contracts.ts` and `tests/mobile-contracts.test.ts` when endpoint contracts change.
 - Run `npm run test:e2e` so launch smoke confirms release-note and changelog coverage.
+
+## 2026-05-16 - Sprint 77
+
+Changed surface:
+
+- Added `docs/public-api-governance-review.md` as the pre-merge governance checklist for public/mobile-safe API changes.
+- Added `docs/calendar-documentation-map.md` to route calendar documentation updates to the right document.
+
+Operator impact:
+
+- Reviewers have a single governance checklist before merging public API or calendar export changes.
 
 ## 2026-05-16 - Sprint 75
 

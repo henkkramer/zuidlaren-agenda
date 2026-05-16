@@ -32,6 +32,7 @@ See `docs/calendar-metrics.md` for aggregate export metrics and monitoring seman
 See `docs/calendar-client-troubleshooting.md` for client-specific subscription and refresh problems.
 See `docs/calendar-support-faq.md` for user-facing support answers.
 See `docs/calendar-maintenance-checklist.md` for routine calendar export maintenance.
+See `docs/calendar-documentation-map.md` to choose the right calendar document for updates.
 
 ## Frozen Contract
 
