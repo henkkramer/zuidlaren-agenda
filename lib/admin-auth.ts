@@ -1,8 +1,10 @@
 import "server-only";
 
-import type { Prisma } from "@prisma/client";
 import { getCurrentSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+
+type JsonInput = string | number | boolean | null | JsonInput[] | { [key: string]: JsonInput };
+type AuditMetadata = Exclude<JsonInput, null>;
 
 type AdminAccess =
   | {
@@ -43,7 +45,7 @@ export async function createAdminAuditLog(input: {
   action: string;
   targetId?: string;
   targetType: string;
-  metadata?: Prisma.InputJsonValue;
+  metadata?: AuditMetadata;
 }) {
   return prisma.auditLog.create({
     data: {

@@ -7,6 +7,10 @@ import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
 
+type NotificationRecipient = {
+  id: string;
+};
+
 type BusinessNotificationCampaignContext = {
   params: Promise<{
     businessId: string;
@@ -74,7 +78,7 @@ export async function POST(request: Request, context: BusinessNotificationCampai
       activityId: activity?.id,
       requestedById: access.userId,
       deliveries: {
-        create: recipients.map((recipient) => ({
+        create: (recipients as NotificationRecipient[]).map((recipient) => ({
           userId: recipient.id,
           status: "PENDING",
           channel: "email",

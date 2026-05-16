@@ -2,6 +2,11 @@ import "server-only";
 
 import { prisma } from "@/lib/prisma";
 
+type NotificationDeliveryStatusRow = {
+  _count: number;
+  status: string;
+};
+
 function since(days: number) {
   const date = new Date();
   date.setUTCDate(date.getUTCDate() - days);
@@ -75,7 +80,7 @@ export async function getAnalyticsSnapshot() {
     notificationOptIns,
     aiUsageCount: aiUsage._count,
     aiCostCents: aiUsage._sum.costCents ?? 0,
-    notificationDeliveries: notificationDeliveries.map((row) => ({
+    notificationDeliveries: (notificationDeliveries as NotificationDeliveryStatusRow[]).map((row) => ({
       status: row.status.toLowerCase(),
       count: row._count,
     })),

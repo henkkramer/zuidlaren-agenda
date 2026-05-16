@@ -2,6 +2,23 @@ import "server-only";
 
 import { prisma } from "@/lib/prisma";
 
+type RecentTransactionRow = {
+  amountCents: number;
+  business: { name: string };
+  currency: string;
+  description: string;
+  id: string;
+  status: string;
+};
+
+type RecentWebhookEventRow = {
+  eventType: string;
+  id: string;
+  provider: string;
+  receivedAt: Date;
+  status: string;
+};
+
 export async function getBillingSummary() {
   const [
     customers,
@@ -34,7 +51,7 @@ export async function getBillingSummary() {
     openTransactions,
     paidAmountCents: paidTransactions._sum.amountCents ?? 0,
     webhookEvents,
-    recentTransactions: recentTransactions.map((transaction) => ({
+    recentTransactions: (recentTransactions as RecentTransactionRow[]).map((transaction) => ({
       id: transaction.id,
       businessName: transaction.business.name,
       description: transaction.description,
@@ -42,7 +59,7 @@ export async function getBillingSummary() {
       amountCents: transaction.amountCents,
       currency: transaction.currency,
     })),
-    recentWebhookEvents: recentWebhookEvents.map((event) => ({
+    recentWebhookEvents: (recentWebhookEvents as RecentWebhookEventRow[]).map((event) => ({
       id: event.id,
       provider: event.provider,
       eventType: event.eventType,

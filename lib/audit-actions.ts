@@ -53,7 +53,12 @@ export const sensitiveAuditActions: AuditActionCoverage[] = [
   {
     action: "notification_campaign.approve",
     source: "app/api/admin/notification-campaigns/[campaignId]/approve/route.ts",
-    purpose: "Admin approves a notification campaign.",
+    purpose: "Admin approves and sends a notification campaign.",
+  },
+  {
+    action: "payment.webhook.receive",
+    source: "app/api/webhooks/mollie/route.ts",
+    purpose: "Mollie webhook receipt, duplicate, and rejection handling.",
   },
   {
     action: "admin.business.status.update",

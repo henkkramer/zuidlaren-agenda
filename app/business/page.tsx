@@ -2,6 +2,16 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentBusinessMemberships } from "@/lib/business-permissions";
 
+type BusinessMembershipRow = {
+  business: {
+    name: string;
+    slug: string;
+    status: string;
+  };
+  id: string;
+  role: string;
+};
+
 export const dynamic = "force-dynamic";
 
 export default async function BusinessIndexPage() {
@@ -27,7 +37,7 @@ export default async function BusinessIndexPage() {
           </div>
         ) : (
           <div className="business-list">
-            {memberships.map((membership) => (
+            {(memberships as BusinessMembershipRow[]).map((membership) => (
               <Link className="business-list-item" href={`/business/${membership.business.slug}`} key={membership.id}>
                 <span>
                   <strong>{membership.business.name}</strong>

@@ -33,6 +33,21 @@ export function normalizeMollieWebhookEvent(body: string, fallbackId: string) {
   };
 }
 
+export function mollieWebhookAuditMetadata(input: {
+  eventId: string;
+  eventType: string;
+  signatureValid: boolean;
+  status: "DUPLICATE" | "RECEIVED" | "REJECTED";
+}) {
+  return {
+    eventId: input.eventId,
+    eventType: input.eventType,
+    provider: "mollie",
+    signatureValid: input.signatureValid,
+    status: input.status,
+  };
+}
+
 export function verifyMollieWebhookSignature(input: {
   body: string;
   signature?: string | null;

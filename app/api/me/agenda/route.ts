@@ -3,6 +3,12 @@ import { getCurrentSession } from "@/lib/auth";
 import { mapActivityRecord } from "@/lib/activity-mapper";
 import { prisma } from "@/lib/prisma";
 
+type AgendaAttendanceRow = {
+  activity: Parameters<typeof mapActivityRecord>[0];
+  status: string;
+  visibility: string;
+};
+
 export async function GET() {
   const session = await getCurrentSession();
 
@@ -34,7 +40,7 @@ export async function GET() {
   });
 
   return NextResponse.json({
-    activities: attendances.map((attendance) => ({
+    activities: (attendances as AgendaAttendanceRow[]).map((attendance) => ({
       activity: mapActivityRecord(attendance.activity),
       attendance: {
         status: attendance.status.toLowerCase(),

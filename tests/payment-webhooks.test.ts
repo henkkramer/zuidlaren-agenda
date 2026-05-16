@@ -1,7 +1,12 @@
 import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import { test } from "node:test";
-import { normalizeMollieWebhookEvent, summarizeWebhookPayload, verifyMollieWebhookSignature } from "@/lib/payment-webhooks";
+import {
+  mollieWebhookAuditMetadata,
+  normalizeMollieWebhookEvent,
+  summarizeWebhookPayload,
+  verifyMollieWebhookSignature,
+} from "@/lib/payment-webhooks";
 
 test("mollie webhook signature verification accepts prefixed and raw HMAC signatures", () => {
   const body = JSON.stringify({ id: "evt_123", type: "payment.paid" });
@@ -38,4 +43,22 @@ test("mollie webhook payload summary truncates provider-controlled strings", () 
   assert.equal(summary.id?.length, 120);
   assert.equal(summary.type?.length, 120);
   assert.equal(summary.resource?.length, 120);
+});
+
+test("mollie webhook audit metadata is constrained", () => {
+  assert.deepEqual(
+    mollieWebhookAuditMetadata({
+      eventId: "evt_123",
+      eventType: "payment.paid",
+      signatureValid: true,
+      status: "RECEIVED",
+    }),
+    {
+      eventId: "evt_123",
+      eventType: "payment.paid",
+      provider: "mollie",
+      signatureValid: true,
+      status: "RECEIVED",
+    },
+  );
 });
