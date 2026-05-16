@@ -27,6 +27,7 @@ const requiredFiles = [
   "app/api/health/route.ts",
   "app/api/health/ready/route.ts",
   "app/api/health/release/route.ts",
+  "app/api/public/calendar/route.ts",
   "app/api/public/activities/route.ts",
   "app/api/reports/route.ts",
   "app/api/mobile/capabilities/route.ts",
@@ -45,6 +46,8 @@ const requiredFiles = [
   "lib/release-checks.ts",
   "lib/admin-activity-import.ts",
   "lib/content-maintenance-queue.ts",
+  "lib/calendar-feed.ts",
+  "lib/public-activity-pagination.ts",
   ".github/workflows/ci.yml",
   "docs/ci-release-gate.md",
   "docs/audit-log-coverage.md",
@@ -167,7 +170,15 @@ for (const command of ["npm run lint", "npm run typecheck", "npm run test", "npm
 
 const capabilities = buildMobileCapabilities();
 assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/public/activities"), "Mobile capabilities must expose public activities");
+assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/public/calendar"), "Mobile capabilities must expose public calendar feed");
 assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/me/agenda"), "Mobile capabilities must expose personal agenda");
+
+const publicActivitiesRoute = read("app/api/public/activities/route.ts");
+assert(publicActivitiesRoute.includes("nextCursor"), "Public activities API must expose cursor pagination metadata");
+assert(publicActivitiesRoute.includes("publicApiHeaders"), "Public activities API must use stable public API headers");
+
+const publicCalendarRoute = read("app/api/public/calendar/route.ts");
+assert(publicCalendarRoute.includes("buildPublicCalendarFeed"), "Public calendar route must build an iCalendar feed");
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");

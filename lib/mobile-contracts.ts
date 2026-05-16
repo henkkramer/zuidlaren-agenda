@@ -18,7 +18,13 @@ export const mobileEndpointContracts: MobileEndpointContract[] = [
     method: "GET",
     path: "/api/public/activities",
     auth: "public",
-    purpose: "List published activities with the same filters used by the web agenda.",
+    purpose: "List published activities with the same filters used by the web agenda and cursor pagination for mobile clients.",
+  },
+  {
+    method: "GET",
+    path: "/api/public/calendar",
+    auth: "public",
+    purpose: "Subscribe to published public agenda items as an iCalendar feed.",
   },
   {
     method: "GET",

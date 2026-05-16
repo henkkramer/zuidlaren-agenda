@@ -8,6 +8,7 @@ Public mobile-safe endpoints:
 
 - `GET /api/mobile/capabilities`
 - `GET /api/public/activities`
+- `GET /api/public/calendar`
 - `GET /api/public/activities/{activityId}`
 - `GET /api/me`
 - `GET /api/me/agenda`
@@ -16,7 +17,9 @@ Public mobile-safe endpoints:
 - `PATCH /api/activities/{activityId}/attendance`
 - `DELETE /api/activities/{activityId}/attendance`
 
-Public list/detail responses include an `apiVersion` field. Activity objects use the existing web shape so mobile clients can reuse the same display terminology:
+Public list/detail responses include an `apiVersion` field and `X-Zuidlaren-Api-Version` header. `GET /api/public/activities` includes `meta.nextCursor` when another page is available. Public responses use short-lived cache headers for conservative reverse-proxy and native-client reuse.
+
+Activity objects use the existing web shape so mobile clients can reuse the same display terminology:
 
 - `id`
 - `title`
@@ -67,6 +70,8 @@ Current reusable modules:
 - `lib/activity-mapper.ts`
 - `lib/public-activity-query.ts`
 - `lib/mobile-contracts.ts`
+- `lib/calendar-feed.ts`
+- `lib/public-activity-pagination.ts`
 - `lib/privacy-export.ts`
 
 Business/admin APIs are not part of the native MVP unless mobile management becomes a product requirement.

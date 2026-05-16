@@ -3,6 +3,7 @@ import "server-only";
 import { mapActivityRecord } from "@/lib/activity-mapper";
 import type { Activity } from "@/lib/activity-types";
 import { prisma } from "@/lib/prisma";
+import { buildPublicActivityCursor, buildPublicActivityCursorWhere } from "@/lib/public-activity-pagination";
 import { buildActivityWhere, type ActivityFilterOptions, type ActivityFilterState } from "@/lib/public-activity-query";
 
 export type PublicActivityFeed = {
@@ -10,6 +11,7 @@ export type PublicActivityFeed = {
   filterOptions: ActivityFilterOptions;
   hasMore: boolean;
   limit: number;
+  nextCursor: string | null;
 };
 
 export async function getPublicFilterOptions(): Promise<ActivityFilterOptions> {
@@ -31,26 +33,30 @@ export async function getPublicFilterOptions(): Promise<ActivityFilterOptions> {
 }
 
 export async function getPublicActivityFeed(filters: ActivityFilterState): Promise<PublicActivityFeed> {
+  const cursorWhere = buildPublicActivityCursorWhere(filters.cursor);
+  const where = cursorWhere ? { AND: [buildActivityWhere(filters), cursorWhere] } : buildActivityWhere(filters);
   const [activities, filterOptions] = await Promise.all([
     prisma.activity.findMany({
-      where: buildActivityWhere(filters),
+      where,
       include: {
         category: true,
         location: true,
       },
       take: filters.limit + 1,
-      orderBy: { startAt: "asc" },
+      orderBy: [{ startAt: "asc" }, { slug: "asc" }],
     }),
     getPublicFilterOptions(),
   ]);
   const hasMore = activities.length > filters.limit;
   const visibleActivities = hasMore ? activities.slice(0, filters.limit) : activities;
+  const lastVisibleActivity = visibleActivities.at(-1);
 
   return {
     activities: visibleActivities.map(mapActivityRecord),
     filterOptions,
     hasMore,
     limit: filters.limit,
+    nextCursor: hasMore && lastVisibleActivity ? buildPublicActivityCursor({ slug: lastVisibleActivity.slug, startAt: lastVisibleActivity.startAt }) : null,
   };
 }
 

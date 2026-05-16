@@ -53,6 +53,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 44 | Done | Content Maintenance Queue | `05`, `14`, `21` |
 | 45 | Done | Email Campaign Delivery Controls | `12`, `14`, `17` |
 | 46 | Done | Mollie Webhook Audit Hardening | `13`, `17`, `18` |
+| 47 | Done | Public Calendar Feed | `08`, `20`, `21` |
+| 48 | Done | Public API Pagination Hardening | `05`, `07`, `20` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1035,3 +1037,43 @@ Acceptance:
 
 - Mollie webhook events are represented in both webhook logs and audit logs.
 - Live payment mutation remains disabled while sandbox/audit readiness improves.
+
+## Sprint 47 - Public Calendar Feed
+
+Status: Done
+
+Goal:
+
+Expose the public agenda in a calendar-client-friendly format without changing the main web feed.
+
+Scope:
+
+- Shared iCalendar feed builder with escaping and stable event identifiers.
+- Public `/api/public/calendar` route using the existing activity filters.
+- Mobile/API readiness documentation updated with the calendar endpoint.
+- Unit and launch-smoke coverage for the calendar feed.
+
+Acceptance:
+
+- Calendar clients can subscribe to published activities through a public ICS endpoint.
+- The route remains filter-compatible with the public agenda.
+
+## Sprint 48 - Public API Pagination Hardening
+
+Status: Done
+
+Goal:
+
+Make the public activity API safer for future mobile clients and external consumers.
+
+Scope:
+
+- Cursor parsing and cursor `where` construction for stable chronological pagination.
+- Public activity API response metadata includes `nextCursor` when more results exist.
+- Public API responses include version and conservative cache headers.
+- Mobile capabilities, documentation, unit tests, and launch-smoke checks updated.
+
+Acceptance:
+
+- Clients can request the next page using a cursor instead of only increasing result limits.
+- Public API consumers can read the active API version from response headers.

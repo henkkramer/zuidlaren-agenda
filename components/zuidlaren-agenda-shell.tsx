@@ -39,7 +39,7 @@ function PublicAgenda({
   hasMore: boolean;
   onOpen: (activity: Activity) => void;
 }) {
-  const moreQuery = toQueryString(filters, { limit: filters.limit + 24 });
+  const moreQuery = toQueryString({ ...filters, cursor: undefined }, { limit: filters.limit + 24 });
 
   return (
     <>
