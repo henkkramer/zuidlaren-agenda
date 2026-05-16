@@ -18,6 +18,7 @@ Use this index to find the current public and mobile-safe API documentation with
 | --- | --- |
 | `docs/calendar-runbook-drill.md` | Pre-tester and post-change calendar export drill. |
 | `docs/calendar-documentation-map.md` | Task-based map for the calendar documentation set. |
+| `docs/calendar-documentation-archive-review.md` | Review checklist for keeping active calendar docs distinct from historical sprint notes. |
 | `docs/calendar-maintenance-checklist.md` | Routine calendar export maintenance checklist. |
 | `docs/calendar-client-troubleshooting.md` | Operator diagnosis for calendar-client issues. |
 | `docs/calendar-support-faq.md` | Short support replies for common user questions. |

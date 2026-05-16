@@ -85,6 +85,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 76 | Done | Calendar Export Maintenance Checklist | `19`, `20`, `21` |
 | 77 | Done | Public API Governance Review | `20`, `18`, `21` |
 | 78 | Done | Calendar Export Documentation Cleanup | `20`, `19`, `21` |
+| 79 | Done | Public API Governance Smoke Fixtures | `18`, `20`, `21` |
+| 80 | Done | Calendar Documentation Archive Review | `20`, `19`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1704,3 +1706,44 @@ Acceptance:
 
 - Calendar documentation has a task-based routing map.
 - Future calendar documentation updates have clear ownership and less duplication risk.
+
+## Sprint 79 - Public API Governance Smoke Fixtures
+
+Status: Done
+
+Goal:
+
+Back the public API governance checklist with lightweight source-level fixtures and fast tests.
+
+Scope:
+
+- Add `lib/public-api-governance.ts`.
+- Add `tests/public-api-governance.test.ts`.
+- Track required governance docs and review checks in a reusable fixture.
+- Link fixture maintenance from governance review and changelog docs.
+- Add launch-smoke guards for the governance fixture.
+
+Acceptance:
+
+- Governance requirements have both documentation and unit-test coverage.
+- Missing required governance docs can be detected without reading all documentation manually.
+
+## Sprint 80 - Calendar Documentation Archive Review
+
+Status: Done
+
+Goal:
+
+Keep active calendar docs distinct from historical sprint notes and duplicate guidance.
+
+Scope:
+
+- Add `docs/calendar-documentation-archive-review.md`.
+- Define active calendar documentation sources, archive rules, and duplicate-review checks.
+- Link archive review from calendar documentation map, maintenance checklist, and docs index.
+- Add launch-smoke guards for the archive review.
+
+Acceptance:
+
+- Calendar documentation cleanup has a repeatable archive-review checklist.
+- Historical sprint queue entries remain preserved while active docs stay focused.

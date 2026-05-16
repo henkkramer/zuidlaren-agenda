@@ -10,7 +10,19 @@ This changelog records public and mobile-safe API changes for the controlled MVP
 - Use `docs/public-api-docs-index.md` to find related public API documentation.
 - Use `docs/public-api-governance-review.md` before merging public/mobile-safe API changes.
 - Update `lib/mobile-contracts.ts` and `tests/mobile-contracts.test.ts` when endpoint contracts change.
+- Update `lib/public-api-governance.ts` and `tests/public-api-governance.test.ts` when governance fixtures change.
 - Run `npm run test:e2e` so launch smoke confirms release-note and changelog coverage.
+
+## 2026-05-16 - Sprint 79
+
+Changed surface:
+
+- Added `lib/public-api-governance.ts` and `tests/public-api-governance.test.ts` as lightweight governance smoke fixtures.
+- Added `docs/calendar-documentation-archive-review.md` for reviewing duplicate or historical calendar notes.
+
+Operator impact:
+
+- Governance requirements now have both documentation and fast test coverage.
 
 ## 2026-05-16 - Sprint 77
 

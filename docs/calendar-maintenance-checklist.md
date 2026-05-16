@@ -25,5 +25,6 @@ Use this checklist during routine maintenance, before changing calendar behavior
 - For repeated `429` responses, follow `docs/calendar-abuse-response.md`.
 - For user-facing subscription problems, use `docs/calendar-client-troubleshooting.md`.
 - For support replies, use `docs/calendar-support-faq.md`.
+- For old or duplicate calendar notes, use `docs/calendar-documentation-archive-review.md`.
 - Keep personal calendar exports private, no-store, and session-bound.
 - Keep public calendar release checks enabled.
