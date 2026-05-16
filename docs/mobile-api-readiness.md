@@ -19,7 +19,17 @@ Public mobile-safe endpoints:
 - `PATCH /api/activities/{activityId}/attendance`
 - `DELETE /api/activities/{activityId}/attendance`
 
-Public list/detail responses include an `apiVersion` field and `X-Zuidlaren-Api-Version` header. `GET /api/public/activities` includes `meta.nextCursor` when another page is available. Public responses use short-lived cache headers for conservative reverse-proxy and native-client reuse. Calendar clients can use the full-feed ICS endpoint, the single-activity ICS endpoint, or the signed-in personal agenda ICS endpoint. See `docs/calendar-feeds.md` for client behavior and caching notes.
+Public list/detail responses include an `apiVersion` field and `X-Zuidlaren-Api-Version` header. `GET /api/public/activities` includes `meta.nextCursor` when another page is available. Public responses use short-lived cache headers for conservative reverse-proxy and native-client reuse. Calendar clients can use the full-feed ICS endpoint, the single-activity ICS endpoint, or the signed-in personal agenda ICS endpoint. The frozen calendar export contract lives in `calendarEndpointContracts` in `lib/mobile-contracts.ts`. See `docs/calendar-feeds.md` for client behavior and caching notes.
+
+Calendar export contract:
+
+| Endpoint | Auth | Cache | Response |
+| --- | --- | --- | --- |
+| `GET /api/public/calendar` | Public | `public, max-age=60, stale-while-revalidate=300` | `text/calendar; charset=utf-8` |
+| `GET /api/public/activities/{activityId}/calendar` | Public | `public, max-age=60, stale-while-revalidate=300` | `text/calendar; charset=utf-8` |
+| `GET /api/me/agenda/calendar` | Session | `private, no-store` | `text/calendar; charset=utf-8` |
+
+All calendar exports keep `ETag`, `If-None-Match`, `304 Not Modified`, `429`, and `Retry-After` behavior.
 
 Activity objects use the existing web shape so mobile clients can reuse the same display terminology:
 
@@ -74,6 +84,7 @@ Current reusable modules:
 - `lib/public-activity-query.ts`
 - `lib/mobile-contracts.ts`
 - `lib/calendar-feed.ts`
+- `lib/calendar-export.ts`
 - `lib/public-activity-pagination.ts`
 - `lib/privacy-export.ts`
 

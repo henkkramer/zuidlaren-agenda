@@ -59,6 +59,7 @@ const requiredFiles = [
   "docs/mobile-api-readiness.md",
   "docs/calendar-feeds.md",
   "docs/calendar-abuse-response.md",
+  "docs/calendar-metrics.md",
   "docs/operator-handoff.md",
   "docs/pr-release-handoff.md",
   "scripts/ensure-admin.ts",
@@ -184,6 +185,10 @@ assert(
 );
 assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/me/agenda"), "Mobile capabilities must expose personal agenda");
 assert(capabilities.endpoints.some((endpoint) => endpoint.path === "/api/me/agenda/calendar"), "Mobile capabilities must expose personal agenda calendar export");
+assert(
+  capabilities.calendarExports.some((endpoint) => endpoint.path === "/api/public/calendar" && endpoint.contentType === "text/calendar; charset=utf-8"),
+  "Mobile capabilities must expose frozen calendar export contracts",
+);
 
 const publicActivitiesRoute = read("app/api/public/activities/route.ts");
 assert(publicActivitiesRoute.includes("nextCursor"), "Public activities API must expose cursor pagination metadata");
@@ -216,11 +221,19 @@ assert(calendarFeedDocs.includes("X-Zuidlaren-Api-Version"), "Calendar feed docs
 assert(calendarFeedDocs.includes("noindex, nofollow, noarchive"), "Calendar feed docs must document personal feed noindex headers");
 assert(calendarFeedDocs.includes("Retry-After"), "Calendar feed docs must document rate limiting behavior");
 assert(calendarFeedDocs.includes("If-None-Match"), "Calendar feed docs must document conditional request behavior");
+assert(calendarFeedDocs.includes("Frozen Contract"), "Calendar feed docs must document the frozen calendar export contract");
 
 const calendarAbuseDocs = read("docs/calendar-abuse-response.md");
 assert(calendarAbuseDocs.includes("429"), "Calendar abuse docs must describe rate-limit responses");
 assert(calendarAbuseDocs.includes("ETag"), "Calendar abuse docs must describe client cache behavior");
 assert(calendarAbuseDocs.includes("agenda exports totaal"), "Calendar abuse docs must explain admin monitoring copy");
+
+const calendarMetricsDocs = read("docs/calendar-metrics.md");
+assert(calendarMetricsDocs.includes("calendar_export"), "Calendar metrics docs must describe the export metric");
+assert(calendarMetricsDocs.includes("public_feed"), "Calendar metrics docs must describe public feed dimensions");
+assert(calendarMetricsDocs.includes("single_activity"), "Calendar metrics docs must describe single activity dimensions");
+assert(calendarMetricsDocs.includes("personal_agenda"), "Calendar metrics docs must describe personal agenda dimensions");
+assert(calendarMetricsDocs.includes("304 Not Modified"), "Calendar metrics docs must explain conditional request metric behavior");
 
 const operatorHandoff = read("docs/operator-handoff.md");
 assert(operatorHandoff.includes("Calendar Exports"), "Operator handoff must include calendar export operations");

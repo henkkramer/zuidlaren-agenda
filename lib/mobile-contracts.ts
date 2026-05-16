@@ -7,6 +7,46 @@ export type MobileEndpointContract = {
   purpose: string;
 };
 
+export type CalendarEndpointContract = {
+  method: "GET";
+  path: string;
+  auth: "public" | "session";
+  cache: "public, max-age=60, stale-while-revalidate=300" | "private, no-store";
+  contentType: "text/calendar; charset=utf-8";
+  conditionalRequests: "If-None-Match returns 304 Not Modified when ETag matches";
+  rateLimit: "429 with Retry-After";
+};
+
+export const calendarEndpointContracts: CalendarEndpointContract[] = [
+  {
+    method: "GET",
+    path: "/api/public/calendar",
+    auth: "public",
+    cache: "public, max-age=60, stale-while-revalidate=300",
+    contentType: "text/calendar; charset=utf-8",
+    conditionalRequests: "If-None-Match returns 304 Not Modified when ETag matches",
+    rateLimit: "429 with Retry-After",
+  },
+  {
+    method: "GET",
+    path: "/api/public/activities/{activityId}/calendar",
+    auth: "public",
+    cache: "public, max-age=60, stale-while-revalidate=300",
+    contentType: "text/calendar; charset=utf-8",
+    conditionalRequests: "If-None-Match returns 304 Not Modified when ETag matches",
+    rateLimit: "429 with Retry-After",
+  },
+  {
+    method: "GET",
+    path: "/api/me/agenda/calendar",
+    auth: "session",
+    cache: "private, no-store",
+    contentType: "text/calendar; charset=utf-8",
+    conditionalRequests: "If-None-Match returns 304 Not Modified when ETag matches",
+    rateLimit: "429 with Retry-After",
+  },
+];
+
 export const mobileEndpointContracts: MobileEndpointContract[] = [
   {
     method: "GET",
@@ -99,5 +139,6 @@ export function buildMobileCapabilities() {
       deviceTokenRegistration: "planned",
     },
     endpoints: mobileEndpointContracts,
+    calendarExports: calendarEndpointContracts,
   };
 }
