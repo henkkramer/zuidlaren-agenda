@@ -9,7 +9,6 @@ import { FilterControls } from "@/components/filter-controls";
 import { MobileHeader } from "@/components/mobile-header";
 import { CalendarPlus } from "lucide-react";
 import type { Activity } from "@/lib/activity-types";
-import { getPublicActivities } from "@/lib/activity-service";
 import { toQueryString, type ActivityFilterOptions, type ActivityFilterState } from "@/lib/public-activity-query";
 
 function BrandHeader() {
@@ -57,7 +56,7 @@ function PublicAgenda({
       <FilterControls filters={filters} options={filterOptions} />
       <div className="feed-list">
         {activities.map((activity) => (
-          <ActivityCard activity={activity} key={activity.id} onOpen={onOpen} />
+          <ActivityCard activity={activity} enableFilterLinks key={activity.id} onOpen={onOpen} />
         ))}
       </div>
       {activities.length === 0 ? (
@@ -87,7 +86,7 @@ export function ZuidlarenAgendaShell({
   initialActivities?: Activity[];
 }) {
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
-  const activities = initialActivities?.length ? initialActivities : getPublicActivities();
+  const activities = initialActivities ?? [];
   const activeFilters = filters ?? { limit: 24 };
   const options = filterOptions ?? { categories: [], indoorOutdoor: [], locations: [], organizers: [], types: [] };
 

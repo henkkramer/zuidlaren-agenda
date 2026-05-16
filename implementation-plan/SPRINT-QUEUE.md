@@ -88,6 +88,7 @@ This queue is the single execution sequence for the existing implementation plan
 | 79 | Done | Public API Governance Smoke Fixtures | `18`, `20`, `21` |
 | 80 | Done | Calendar Documentation Archive Review | `20`, `19`, `21` |
 | 81 | Done | Public Agenda Button Filters | `05`, `07`, `18` |
+| 82 | Done | Real Public Filter Data Wiring | `05`, `07`, `18` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1771,3 +1772,26 @@ Acceptance:
 - The public agenda has no dropdown select controls for filters.
 - Category buttons include categories used by published events.
 - Default browsing excludes past events, while explicit past date ranges still work.
+
+## Sprint 82 - Real Public Filter Data Wiring
+
+Status: Done
+
+Goal:
+
+Make visible public agenda cards, card tags, filter buttons, date filters, and search all operate on the real public activity feed.
+
+Scope:
+
+- Remove the client-side mock activity fallback from the public agenda shell.
+- Keep empty filtered results empty instead of replacing them with sample cards.
+- Make category and visible card tags link to the matching public filters.
+- Include indoor/outdoor card labels as filterable chips when present.
+- Expand search to match category names, category slugs, and visible tag labels in addition to title, description, organizer, and location.
+- Add smoke checks that prevent the public shell from reintroducing mock fallback behavior.
+
+Acceptance:
+
+- Selecting a public filter changes the real card result set.
+- Searching for visible categories or tags can match real activity records.
+- Cards shown on the homepage are backed by the public activity query rather than local mock fallback data.
