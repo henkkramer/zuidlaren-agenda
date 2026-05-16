@@ -7,6 +7,7 @@ export type AnalyticsMetric =
   | "activity_view"
   | "activity_source_click"
   | "attendance_click"
+  | "calendar_export"
   | "filter_use";
 
 type AnalyticsInput = {

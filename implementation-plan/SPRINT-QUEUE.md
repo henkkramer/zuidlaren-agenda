@@ -61,6 +61,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 52 | Done | Personal Calendar Export UI | `06`, `08`, `20` |
 | 53 | Done | Calendar Feed Documentation and Client Notes | `08`, `20`, `21` |
 | 54 | Done | Calendar Export Contract Coverage | `18`, `20`, `21` |
+| 55 | Done | Calendar Feed Observability | `16`, `08`, `20` |
+| 56 | Done | Personal Agenda Export Privacy Hardening | `17`, `08`, `20` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1200,3 +1202,43 @@ Acceptance:
 - Public calendar responses keep short-lived shared cache headers.
 - Personal calendar responses keep private no-store headers.
 - Generated iCalendar lines stay client-safe for strict parsers.
+
+## Sprint 55 - Calendar Feed Observability
+
+Status: Done
+
+Goal:
+
+Make calendar export usage visible without adding personal tracking.
+
+Scope:
+
+- Add `calendar_export` analytics metric support.
+- Record public feed, single-activity, and personal agenda calendar exports.
+- Show aggregate calendar export count in the admin analytics snapshot.
+- Launch smoke guard for calendar export analytics wiring.
+
+Acceptance:
+
+- Operators can see aggregate calendar export usage in the admin dashboard.
+- Personal calendar exports do not include user ids in analytics dimensions.
+
+## Sprint 56 - Personal Agenda Export Privacy Hardening
+
+Status: Done
+
+Goal:
+
+Reduce accidental indexing and shared caching risk for signed-in personal calendar exports.
+
+Scope:
+
+- Add noindex/noarchive robot header to session API responses.
+- Keep personal calendar responses private and no-store.
+- Document personal calendar privacy behavior and analytics limits.
+- Unit and launch smoke coverage for personal export privacy headers.
+
+Acceptance:
+
+- Personal calendar exports are marked private and not indexable.
+- Documentation clearly warns that personal calendar URLs require the active session.

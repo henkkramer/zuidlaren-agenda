@@ -11,5 +11,6 @@ export function sessionApiHeaders(apiVersion: string) {
   return {
     "Cache-Control": "private, no-store",
     "X-Zuidlaren-Api-Version": apiVersion,
+    "X-Robots-Tag": "noindex, nofollow, noarchive",
   };
 }
