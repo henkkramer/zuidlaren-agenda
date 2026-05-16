@@ -29,6 +29,9 @@ Calendar exports include weak `ETag` headers and return `304 Not Modified` when 
 
 See `docs/calendar-abuse-response.md` for operational handling of high-frequency calendar polling.
 See `docs/calendar-metrics.md` for aggregate export metrics and monitoring semantics.
+See `docs/calendar-client-troubleshooting.md` for client-specific subscription and refresh problems.
+See `docs/calendar-support-faq.md` for user-facing support answers.
+See `docs/calendar-maintenance-checklist.md` for routine calendar export maintenance.
 
 ## Frozen Contract
 

@@ -21,6 +21,8 @@ Public mobile-safe endpoints:
 
 Public list/detail responses include an `apiVersion` field and `X-Zuidlaren-Api-Version` header. `GET /api/public/activities` includes `meta.nextCursor` when another page is available. Public responses use short-lived cache headers for conservative reverse-proxy and native-client reuse. Calendar clients can use the full-feed ICS endpoint, the single-activity ICS endpoint, or the signed-in personal agenda ICS endpoint. The frozen calendar export contract lives in `calendarEndpointContracts` in `lib/mobile-contracts.ts`. See `docs/calendar-feeds.md` for client behavior and caching notes.
 
+Release-facing public API notes are summarized in `docs/public-api-release-notes.md`.
+
 Calendar export contract:
 
 | Endpoint | Auth | Cache | Response |

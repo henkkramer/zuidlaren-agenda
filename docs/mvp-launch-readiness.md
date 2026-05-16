@@ -27,7 +27,7 @@ Run against the deployed app:
 RELEASE_BASE_URL=https://<production-host> npm run release:check
 ```
 
-The command checks `/api/health`, `/api/health/ready`, `/api/health/release`, `/api/mobile/capabilities`, `/api/public/activities?limit=3`, and `/api/public/calendar?limit=3`.
+The command checks `/api/health`, `/api/health/ready`, `/api/health/release`, `/api/mobile/capabilities`, `/api/public/activities?limit=3`, and `/api/public/calendar?limit=3`. Output labels include `public calendar feed` and the returned content type so calendar release failures are easy to distinguish from JSON API checks.
 
 All routes are served with the shared security header policy from `lib/security-headers.ts`.
 
@@ -45,6 +45,11 @@ Warnings for empty content or missing admin users should be resolved before invi
 
 Admin bootstrap and operator handoff are documented in `docs/operator-handoff.md`.
 Pull request handoff rules are documented in `docs/pr-release-handoff.md`.
+Public API release notes are documented in `docs/public-api-release-notes.md`.
+Public API documentation is indexed in `docs/public-api-docs-index.md`.
+Public API changelog discipline is documented in `docs/public-api-changelog.md`.
+Calendar export runbook drills are documented in `docs/calendar-runbook-drill.md`.
+Calendar export maintenance is documented in `docs/calendar-maintenance-checklist.md`.
 
 ## Manual Release Gate
 

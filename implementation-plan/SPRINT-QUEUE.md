@@ -75,6 +75,14 @@ This queue is the single execution sequence for the existing implementation plan
 | 66 | Done | Calendar Feed Operational Handoff Update | `19`, `20`, `21` |
 | 67 | Done | Calendar Export Metrics Documentation | `16`, `20`, `21` |
 | 68 | Done | Public API Calendar Contract Freeze | `18`, `20`, `21` |
+| 69 | Done | Calendar Client Troubleshooting Notes | `20`, `19`, `21` |
+| 70 | Done | Calendar Export Release Check Result Detail | `19`, `20`, `21` |
+| 71 | Done | Calendar Export Runbook Drill | `19`, `20`, `21` |
+| 72 | Done | Public API Release Notes Snapshot | `20`, `18`, `21` |
+| 73 | Done | Public API Changelog Discipline | `20`, `18`, `21` |
+| 74 | Done | Calendar Export Support FAQ | `20`, `19`, `21` |
+| 75 | Done | Public API Documentation Index | `20`, `18`, `21` |
+| 76 | Done | Calendar Export Maintenance Checklist | `19`, `20`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1492,3 +1500,164 @@ Acceptance:
 
 - Calendar export contract changes require explicit code, test, and documentation updates.
 - Future clients can discover stable calendar export behavior through the capabilities payload and docs.
+
+## Sprint 69 - Calendar Client Troubleshooting Notes
+
+Status: Done
+
+Goal:
+
+Give operators a focused checklist for calendar-client subscription and refresh problems.
+
+Scope:
+
+- Add `docs/calendar-client-troubleshooting.md`.
+- Cover public feed, single-activity export, personal session requirements, `If-None-Match`, `304`, `429`, and `Retry-After`.
+- Link troubleshooting from the calendar feed reference.
+- Add launch-smoke guards for the troubleshooting notes.
+
+Acceptance:
+
+- Operators can diagnose common calendar-client issues without reading route code.
+- Calendar feed documentation points to the troubleshooting checklist.
+
+## Sprint 70 - Calendar Export Release Check Result Detail
+
+Status: Done
+
+Goal:
+
+Make release-check output identify the public calendar feed clearly.
+
+Scope:
+
+- Add labels and expected accept headers to release check endpoint definitions.
+- Print endpoint labels and response content type in `npm run release:check` output.
+- Test release-check URL, label, and accept-header planning.
+- Document the calendar release-check label in launch readiness.
+
+Acceptance:
+
+- `public calendar feed` appears in release-check output for `/api/public/calendar?limit=3`.
+- Calendar release check failures are distinguishable from JSON API failures.
+
+## Sprint 71 - Calendar Export Runbook Drill
+
+Status: Done
+
+Goal:
+
+Give operators a repeatable drill for validating calendar export behavior before tester invitations or calendar changes.
+
+Scope:
+
+- Add `docs/calendar-runbook-drill.md`.
+- Cover local validation, deployed release check, public feed, single-activity export, personal export privacy, conditional requests, analytics, and abuse-response handoff.
+- Link the drill from operator handoff.
+- Add launch-smoke guards for the drill.
+
+Acceptance:
+
+- Operators have a single calendar export drill covering release, privacy, cache, and abuse-response behavior.
+- The operator handoff points to the drill before calendar changes.
+
+## Sprint 72 - Public API Release Notes Snapshot
+
+Status: Done
+
+Goal:
+
+Keep a release-facing snapshot of the public and mobile-safe API surface.
+
+Scope:
+
+- Add `docs/public-api-release-notes.md`.
+- Summarize API version, public endpoints, session endpoints, calendar contract, and release validation commands.
+- Link release notes from mobile API readiness, MVP launch readiness, and PR handoff.
+- Add launch-smoke guards for the release notes.
+
+Acceptance:
+
+- Public API changes have a documented release-note target.
+- The controlled MVP API surface can be reviewed without reading route code.
+
+## Sprint 73 - Public API Changelog Discipline
+
+Status: Done
+
+Goal:
+
+Keep public API changes traceable after the release notes snapshot is introduced.
+
+Scope:
+
+- Add `docs/public-api-changelog.md`.
+- Document changelog update rules for public endpoints, headers, auth, cache, version, and calendar contract changes.
+- Seed entries for the current changelog discipline, release notes snapshot, and calendar contract freeze.
+- Link changelog requirements from PR handoff and public API release notes.
+- Add launch-smoke guards for the changelog.
+
+Acceptance:
+
+- Public API changes now have a release-note snapshot and a chronological changelog target.
+- PR handoff requires the changelog for public API or calendar export changes.
+
+## Sprint 74 - Calendar Export Support FAQ
+
+Status: Done
+
+Goal:
+
+Give support a concise FAQ for common calendar export questions.
+
+Scope:
+
+- Add `docs/calendar-support-faq.md`.
+- Cover filtered public feeds, unpublished single-event exports, personal session behavior, shared calendar limits, `ETag`/`If-None-Match`, and `429`/`Retry-After`.
+- Link FAQ from calendar feed and troubleshooting docs.
+- Add launch-smoke guards for the FAQ.
+
+Acceptance:
+
+- Support can answer common calendar export questions without reading route code.
+- Calendar troubleshooting points to the FAQ for user-facing replies.
+
+## Sprint 75 - Public API Documentation Index
+
+Status: Done
+
+Goal:
+
+Make the public API documentation set discoverable from one index.
+
+Scope:
+
+- Add `docs/public-api-docs-index.md`.
+- Group release/contract docs, calendar operations docs, and release-flow docs.
+- Link the index from release notes, changelog, launch readiness, and PR handoff.
+- Add launch-smoke guards for the index.
+
+Acceptance:
+
+- Release reviewers can find all public API and calendar docs from one place.
+- Public API documentation updates have a discoverable index target.
+
+## Sprint 76 - Calendar Export Maintenance Checklist
+
+Status: Done
+
+Goal:
+
+Give operators a routine maintenance checklist for calendar exports.
+
+Scope:
+
+- Add `docs/calendar-maintenance-checklist.md`.
+- Cover monthly checks, before-change checks, incident follow-up, analytics review, release-check review, contract update points, and changelog updates.
+- Link the checklist from calendar feed docs, runbook drill, operator handoff, launch readiness, and docs index.
+- Add launch-smoke guards for the checklist.
+
+Acceptance:
+
+- Calendar export maintenance has a repeatable checklist.
+- Calendar docs clearly separate support, troubleshooting, abuse response, runbook drill, and routine maintenance.

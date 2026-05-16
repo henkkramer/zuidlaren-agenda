@@ -1,15 +1,17 @@
 export type ReleaseCheckEndpoint = {
+  accept: "application/json" | "text/calendar";
+  label: string;
   path: string;
   required: boolean;
 };
 
 export const releaseCheckEndpoints: ReleaseCheckEndpoint[] = [
-  { path: "/api/health", required: true },
-  { path: "/api/health/ready", required: true },
-  { path: "/api/health/release", required: true },
-  { path: "/api/mobile/capabilities", required: true },
-  { path: "/api/public/activities?limit=3", required: true },
-  { path: "/api/public/calendar?limit=3", required: true },
+  { accept: "application/json", label: "process health", path: "/api/health", required: true },
+  { accept: "application/json", label: "database readiness", path: "/api/health/ready", required: true },
+  { accept: "application/json", label: "release health", path: "/api/health/release", required: true },
+  { accept: "application/json", label: "mobile capabilities", path: "/api/mobile/capabilities", required: true },
+  { accept: "application/json", label: "public activities", path: "/api/public/activities?limit=3", required: true },
+  { accept: "text/calendar", label: "public calendar feed", path: "/api/public/calendar?limit=3", required: true },
 ];
 
 export function normalizeReleaseBaseUrl(value: string | undefined) {

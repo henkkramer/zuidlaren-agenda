@@ -59,9 +59,16 @@ const requiredFiles = [
   "docs/mobile-api-readiness.md",
   "docs/calendar-feeds.md",
   "docs/calendar-abuse-response.md",
+  "docs/calendar-client-troubleshooting.md",
+  "docs/calendar-maintenance-checklist.md",
   "docs/calendar-metrics.md",
+  "docs/calendar-runbook-drill.md",
+  "docs/calendar-support-faq.md",
   "docs/operator-handoff.md",
   "docs/pr-release-handoff.md",
+  "docs/public-api-changelog.md",
+  "docs/public-api-docs-index.md",
+  "docs/public-api-release-notes.md",
   "scripts/ensure-admin.ts",
   "scripts/release-check.ts",
   ".env.example",
@@ -222,6 +229,9 @@ assert(calendarFeedDocs.includes("noindex, nofollow, noarchive"), "Calendar feed
 assert(calendarFeedDocs.includes("Retry-After"), "Calendar feed docs must document rate limiting behavior");
 assert(calendarFeedDocs.includes("If-None-Match"), "Calendar feed docs must document conditional request behavior");
 assert(calendarFeedDocs.includes("Frozen Contract"), "Calendar feed docs must document the frozen calendar export contract");
+assert(calendarFeedDocs.includes("calendar-client-troubleshooting"), "Calendar feed docs must link client troubleshooting notes");
+assert(calendarFeedDocs.includes("calendar-support-faq"), "Calendar feed docs must link support FAQ");
+assert(calendarFeedDocs.includes("calendar-maintenance-checklist"), "Calendar feed docs must link maintenance checklist");
 
 const calendarAbuseDocs = read("docs/calendar-abuse-response.md");
 assert(calendarAbuseDocs.includes("429"), "Calendar abuse docs must describe rate-limit responses");
@@ -235,18 +245,68 @@ assert(calendarMetricsDocs.includes("single_activity"), "Calendar metrics docs m
 assert(calendarMetricsDocs.includes("personal_agenda"), "Calendar metrics docs must describe personal agenda dimensions");
 assert(calendarMetricsDocs.includes("304 Not Modified"), "Calendar metrics docs must explain conditional request metric behavior");
 
+const calendarTroubleshootingDocs = read("docs/calendar-client-troubleshooting.md");
+assert(calendarTroubleshootingDocs.includes("If-None-Match"), "Calendar troubleshooting docs must mention conditional client requests");
+assert(calendarTroubleshootingDocs.includes("Retry-After"), "Calendar troubleshooting docs must mention rate-limit retry handling");
+assert(calendarTroubleshootingDocs.includes("public calendar feed"), "Calendar troubleshooting docs must mention release check calendar detail");
+assert(calendarTroubleshootingDocs.includes("calendar-support-faq"), "Calendar troubleshooting docs must link support FAQ");
+
+const calendarSupportFaq = read("docs/calendar-support-faq.md");
+assert(calendarSupportFaq.includes("private, no-store"), "Calendar support FAQ must explain personal export privacy");
+assert(calendarSupportFaq.includes("If-None-Match"), "Calendar support FAQ must explain conditional request behavior");
+assert(calendarSupportFaq.includes("Retry-After"), "Calendar support FAQ must explain rate-limit retry behavior");
+assert(calendarSupportFaq.includes("calendar-client-troubleshooting"), "Calendar support FAQ must link troubleshooting docs");
+
 const operatorHandoff = read("docs/operator-handoff.md");
 assert(operatorHandoff.includes("Calendar Exports"), "Operator handoff must include calendar export operations");
 assert(operatorHandoff.includes("/api/public/calendar"), "Operator handoff must list the public calendar endpoint");
 assert(operatorHandoff.includes("Retry-After"), "Operator handoff must mention rate-limit retry handling");
 assert(operatorHandoff.includes("If-None-Match"), "Operator handoff must mention conditional calendar requests");
 assert(operatorHandoff.includes("noindex, nofollow, noarchive"), "Operator handoff must mention personal feed indexing controls");
+assert(operatorHandoff.includes("calendar-runbook-drill"), "Operator handoff must link the calendar runbook drill");
+
+const calendarRunbookDrill = read("docs/calendar-runbook-drill.md");
+assert(calendarRunbookDrill.includes("public calendar feed"), "Calendar runbook drill must check release calendar output");
+assert(calendarRunbookDrill.includes("BEGIN:VCALENDAR"), "Calendar runbook drill must check iCalendar body shape");
+assert(calendarRunbookDrill.includes("private, no-store"), "Calendar runbook drill must check personal export privacy");
+assert(calendarRunbookDrill.includes("If-None-Match"), "Calendar runbook drill must check conditional request behavior");
+assert(calendarRunbookDrill.includes("calendar-maintenance-checklist"), "Calendar runbook drill must link maintenance checklist");
+
+const calendarMaintenanceChecklist = read("docs/calendar-maintenance-checklist.md");
+assert(calendarMaintenanceChecklist.includes("agenda exports totaal"), "Calendar maintenance checklist must include analytics review");
+assert(calendarMaintenanceChecklist.includes("public calendar feed"), "Calendar maintenance checklist must include release-check review");
+assert(calendarMaintenanceChecklist.includes("calendarEndpointContracts"), "Calendar maintenance checklist must mention contract update points");
+assert(calendarMaintenanceChecklist.includes("public-api-changelog"), "Calendar maintenance checklist must mention changelog updates");
+
+const publicApiReleaseNotes = read("docs/public-api-release-notes.md");
+assert(publicApiReleaseNotes.includes("X-Zuidlaren-Api-Version"), "Public API release notes must document the API version header");
+assert(publicApiReleaseNotes.includes("/api/public/activities"), "Public API release notes must document public activities");
+assert(publicApiReleaseNotes.includes("/api/public/calendar"), "Public API release notes must document public calendar export");
+assert(publicApiReleaseNotes.includes("/api/me/agenda/calendar"), "Public API release notes must document personal calendar export");
+assert(publicApiReleaseNotes.includes("public calendar feed"), "Public API release notes must document release-check calendar label");
+assert(publicApiReleaseNotes.includes("public-api-changelog"), "Public API release notes must link the changelog");
+assert(publicApiReleaseNotes.includes("public-api-docs-index"), "Public API release notes must link the docs index");
+
+const publicApiChangelog = read("docs/public-api-changelog.md");
+assert(publicApiChangelog.includes("Sprint 75"), "Public API changelog must include the docs index entry");
+assert(publicApiChangelog.includes("Sprint 73"), "Public API changelog must include the current changelog discipline entry");
+assert(publicApiChangelog.includes("Sprint 72"), "Public API changelog must include the release notes snapshot entry");
+assert(publicApiChangelog.includes("Sprint 68"), "Public API changelog must include the calendar contract freeze entry");
+assert(publicApiChangelog.includes("public-api-release-notes"), "Public API changelog must point to the release notes snapshot");
+
+const publicApiDocsIndex = read("docs/public-api-docs-index.md");
+assert(publicApiDocsIndex.includes("public-api-release-notes"), "Public API docs index must link release notes");
+assert(publicApiDocsIndex.includes("public-api-changelog"), "Public API docs index must link changelog");
+assert(publicApiDocsIndex.includes("calendar-maintenance-checklist"), "Public API docs index must link calendar maintenance checklist");
+assert(publicApiDocsIndex.includes("operator-handoff"), "Public API docs index must link operator handoff");
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");
+assert(releaseCheckScript.includes("content-type="), "release check output must include response content type details");
 
 const releaseChecks = read("lib/release-checks.ts");
 assert(releaseChecks.includes("/api/public/calendar?limit=3"), "Release checks must include the public calendar feed");
+assert(releaseChecks.includes("public calendar feed"), "Release checks must label the public calendar feed");
 
 const queue = read("implementation-plan/SPRINT-QUEUE.md");
 assert(queue.includes("## Sprint 19 - MVP Launch Readiness"), "Sprint 19 must be listed in the queue");
