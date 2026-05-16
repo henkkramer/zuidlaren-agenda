@@ -71,6 +71,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 62 | Done | Calendar Export Abuse-Response Documentation | `17`, `19`, `21` |
 | 63 | Done | Calendar Export Route Refactor | `17`, `20`, `18` |
 | 64 | Done | Calendar Feed Monitoring Copy Polish | `14`, `16`, `21` |
+| 65 | Done | Calendar Export Integration Smoke Fixtures | `18`, `20`, `21` |
+| 66 | Done | Calendar Feed Operational Handoff Update | `19`, `20`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1408,3 +1410,43 @@ Acceptance:
 
 - Operator-facing copy distinguishes total exports from export-kind breakdown.
 - Documentation keeps the aggregate nature of the monitoring explicit.
+
+## Sprint 65 - Calendar Export Integration Smoke Fixtures
+
+Status: Done
+
+Goal:
+
+Keep the shared calendar export path covered with fixture-level checks that exercise feed generation and response preparation together.
+
+Scope:
+
+- Add a representative public activity calendar fixture.
+- Verify iCalendar body, content type, sanitized filename, version header, cache header, and weak ETag behavior.
+- Verify matching `If-None-Match` requests produce `304 Not Modified`.
+- Extend launch smoke coverage for calendar route response preparation and aggregate analytics wiring.
+
+Acceptance:
+
+- Calendar export fixture coverage fails if feed generation or response headers drift apart.
+- Launch smoke keeps all calendar routes on the shared export preparation path.
+
+## Sprint 66 - Calendar Feed Operational Handoff Update
+
+Status: Done
+
+Goal:
+
+Make calendar export behavior clear in the operator handoff before release operations.
+
+Scope:
+
+- Add calendar export endpoints and operator behavior to `docs/operator-handoff.md`.
+- Document public caching, personal private/no-store handling, `noindex, nofollow, noarchive`, `If-None-Match`, `304`, `429`, and `Retry-After`.
+- Keep launch readiness aligned with the public calendar runtime check.
+- Add launch smoke guards for the operator handoff calendar section.
+
+Acceptance:
+
+- Operators can find calendar export handling without reading code.
+- Release readiness and smoke checks keep the public calendar runtime validation documented.

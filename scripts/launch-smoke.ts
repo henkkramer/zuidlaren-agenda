@@ -193,11 +193,14 @@ const publicCalendarRoute = read("app/api/public/calendar/route.ts");
 assert(publicCalendarRoute.includes("buildPublicCalendarFeed"), "Public calendar route must build an iCalendar feed");
 assert(publicCalendarRoute.includes("checkRateLimit"), "Public calendar route must rate limit exports");
 assert(publicCalendarRoute.includes("prepareCalendarResponse"), "Public calendar route must use shared calendar response preparation");
+assert(publicCalendarRoute.includes("recordAnalyticsMetric"), "Public calendar route must record aggregate calendar export analytics");
 
 const publicActivityCalendarRoute = read("app/api/public/activities/[activityId]/calendar/route.ts");
 assert(publicActivityCalendarRoute.includes("getPublicActivityDetail"), "Single-activity calendar route must read one public activity");
 assert(publicActivityCalendarRoute.includes("buildPublicCalendarFeed([activity])"), "Single-activity calendar route must build a one-event iCalendar feed");
 assert(publicActivityCalendarRoute.includes("checkRateLimit"), "Single-activity calendar route must rate limit exports");
+assert(publicActivityCalendarRoute.includes("prepareCalendarResponse"), "Single-activity calendar route must use shared calendar response preparation");
+assert(publicActivityCalendarRoute.includes("recordAnalyticsMetric"), "Single-activity calendar route must record aggregate calendar export analytics");
 
 const personalAgendaCalendarRoute = read("app/api/me/agenda/calendar/route.ts");
 assert(personalAgendaCalendarRoute.includes("getCurrentSession"), "Personal agenda calendar route must require a session");
@@ -218,6 +221,13 @@ const calendarAbuseDocs = read("docs/calendar-abuse-response.md");
 assert(calendarAbuseDocs.includes("429"), "Calendar abuse docs must describe rate-limit responses");
 assert(calendarAbuseDocs.includes("ETag"), "Calendar abuse docs must describe client cache behavior");
 assert(calendarAbuseDocs.includes("agenda exports totaal"), "Calendar abuse docs must explain admin monitoring copy");
+
+const operatorHandoff = read("docs/operator-handoff.md");
+assert(operatorHandoff.includes("Calendar Exports"), "Operator handoff must include calendar export operations");
+assert(operatorHandoff.includes("/api/public/calendar"), "Operator handoff must list the public calendar endpoint");
+assert(operatorHandoff.includes("Retry-After"), "Operator handoff must mention rate-limit retry handling");
+assert(operatorHandoff.includes("If-None-Match"), "Operator handoff must mention conditional calendar requests");
+assert(operatorHandoff.includes("noindex, nofollow, noarchive"), "Operator handoff must mention personal feed indexing controls");
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");
