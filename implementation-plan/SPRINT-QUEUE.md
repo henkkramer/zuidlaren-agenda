@@ -63,6 +63,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 54 | Done | Calendar Export Contract Coverage | `18`, `20`, `21` |
 | 55 | Done | Calendar Feed Observability | `16`, `08`, `20` |
 | 56 | Done | Personal Agenda Export Privacy Hardening | `17`, `08`, `20` |
+| 57 | Done | Calendar Export Rate Limiting | `17`, `08`, `20` |
+| 58 | Done | Calendar Feed Filename Sanitization | `17`, `20`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1242,3 +1244,43 @@ Acceptance:
 
 - Personal calendar exports are marked private and not indexable.
 - Documentation clearly warns that personal calendar URLs require the active session.
+
+## Sprint 57 - Calendar Export Rate Limiting
+
+Status: Done
+
+Goal:
+
+Protect calendar export endpoints from accidental or abusive high-frequency polling.
+
+Scope:
+
+- Shared calendar export rate-limit key helper.
+- Public feed and single-activity calendar export limits by client address.
+- Personal agenda calendar export limits by signed-in user.
+- Documentation, unit tests, and launch-smoke coverage.
+
+Acceptance:
+
+- Calendar export endpoints return `429` and `Retry-After` when limits are exceeded.
+- Personal export limits do not depend on raw shared client IP when a user session exists.
+
+## Sprint 58 - Calendar Feed Filename Sanitization
+
+Status: Done
+
+Goal:
+
+Keep calendar download filenames predictable and safe for browser and calendar-client handling.
+
+Scope:
+
+- Shared `.ics` filename sanitizer.
+- Calendar routes use sanitized `Content-Disposition` filenames.
+- Unit tests cover non-ASCII, punctuation, empty, and long filenames.
+- Calendar feed documentation notes filename normalization.
+
+Acceptance:
+
+- Generated `.ics` filenames are short ASCII values.
+- Unsafe activity slugs or titles cannot leak into raw response headers.
