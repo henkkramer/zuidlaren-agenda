@@ -27,7 +27,7 @@ Run against the deployed app:
 RELEASE_BASE_URL=https://<production-host> npm run release:check
 ```
 
-The command checks `/api/health`, `/api/health/ready`, `/api/health/release`, `/api/mobile/capabilities`, `/api/public/activities?limit=3`, and `/api/public/calendar?limit=3`.
+The command checks `/api/health`, `/api/health/ready`, `/api/health/release`, `/api/mobile/capabilities`, `/api/public/activities?limit=3`, and `/api/public/calendar?limit=3`. Output labels include `public calendar feed` and the returned content type so calendar release failures are easy to distinguish from JSON API checks.
 
 All routes are served with the shared security header policy from `lib/security-headers.ts`.
 

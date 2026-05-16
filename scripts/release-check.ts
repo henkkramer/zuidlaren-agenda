@@ -1,34 +1,41 @@
 import "dotenv/config";
 
-import { buildReleaseCheckUrls, releaseHealthWarnings } from "@/lib/release-checks";
+import { buildReleaseCheckUrls, type ReleaseCheckEndpoint, releaseHealthWarnings } from "@/lib/release-checks";
 
 type CheckResult = {
+  contentType: string;
+  label: string;
   ok: boolean;
   status: number;
   url: string;
   warnings: string[];
 };
 
-async function checkUrl(url: string): Promise<CheckResult> {
+async function checkUrl(check: ReleaseCheckEndpoint & { url: string }): Promise<CheckResult> {
   try {
-    const response = await fetch(url, {
+    const response = await fetch(check.url, {
       headers: {
-        Accept: "application/json",
+        Accept: check.accept,
       },
     });
+    const contentType = response.headers.get("content-type") ?? "";
     const payload = (await response.json().catch(() => null)) as unknown;
 
     return {
+      contentType,
+      label: check.label,
       ok: response.ok,
       status: response.status,
-      url,
+      url: check.url,
       warnings: releaseHealthWarnings(payload),
     };
   } catch {
     return {
+      contentType: "",
+      label: check.label,
       ok: false,
       status: 0,
-      url,
+      url: check.url,
       warnings: [],
     };
   }
@@ -42,13 +49,14 @@ async function main() {
   }
 
   const checks = buildReleaseCheckUrls(releaseBaseUrl);
-  const results = await Promise.all(checks.map((check) => checkUrl(check.url)));
+  const results = await Promise.all(checks.map((check) => checkUrl(check)));
   const failures = results.filter((result) => !result.ok);
   const warnings = results.filter((result) => result.warnings.length > 0);
 
   for (const result of results) {
     const warningText = result.warnings.length > 0 ? ` warnings=${result.warnings.join(",")}` : "";
-    console.info(`${result.ok ? "ok" : "fail"} ${result.status} ${result.url}${warningText}`);
+    const contentTypeText = result.contentType ? ` content-type=${result.contentType}` : "";
+    console.info(`${result.ok ? "ok" : "fail"} ${result.status} ${result.label} ${result.url}${contentTypeText}${warningText}`);
   }
 
   if (failures.length > 0) {

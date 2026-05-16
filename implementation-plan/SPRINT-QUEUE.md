@@ -75,6 +75,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 66 | Done | Calendar Feed Operational Handoff Update | `19`, `20`, `21` |
 | 67 | Done | Calendar Export Metrics Documentation | `16`, `20`, `21` |
 | 68 | Done | Public API Calendar Contract Freeze | `18`, `20`, `21` |
+| 69 | Done | Calendar Client Troubleshooting Notes | `20`, `19`, `21` |
+| 70 | Done | Calendar Export Release Check Result Detail | `19`, `20`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1492,3 +1494,43 @@ Acceptance:
 
 - Calendar export contract changes require explicit code, test, and documentation updates.
 - Future clients can discover stable calendar export behavior through the capabilities payload and docs.
+
+## Sprint 69 - Calendar Client Troubleshooting Notes
+
+Status: Done
+
+Goal:
+
+Give operators a focused checklist for calendar-client subscription and refresh problems.
+
+Scope:
+
+- Add `docs/calendar-client-troubleshooting.md`.
+- Cover public feed, single-activity export, personal session requirements, `If-None-Match`, `304`, `429`, and `Retry-After`.
+- Link troubleshooting from the calendar feed reference.
+- Add launch-smoke guards for the troubleshooting notes.
+
+Acceptance:
+
+- Operators can diagnose common calendar-client issues without reading route code.
+- Calendar feed documentation points to the troubleshooting checklist.
+
+## Sprint 70 - Calendar Export Release Check Result Detail
+
+Status: Done
+
+Goal:
+
+Make release-check output identify the public calendar feed clearly.
+
+Scope:
+
+- Add labels and expected accept headers to release check endpoint definitions.
+- Print endpoint labels and response content type in `npm run release:check` output.
+- Test release-check URL, label, and accept-header planning.
+- Document the calendar release-check label in launch readiness.
+
+Acceptance:
+
+- `public calendar feed` appears in release-check output for `/api/public/calendar?limit=3`.
+- Calendar release check failures are distinguishable from JSON API failures.

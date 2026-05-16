@@ -59,6 +59,7 @@ const requiredFiles = [
   "docs/mobile-api-readiness.md",
   "docs/calendar-feeds.md",
   "docs/calendar-abuse-response.md",
+  "docs/calendar-client-troubleshooting.md",
   "docs/calendar-metrics.md",
   "docs/operator-handoff.md",
   "docs/pr-release-handoff.md",
@@ -222,6 +223,7 @@ assert(calendarFeedDocs.includes("noindex, nofollow, noarchive"), "Calendar feed
 assert(calendarFeedDocs.includes("Retry-After"), "Calendar feed docs must document rate limiting behavior");
 assert(calendarFeedDocs.includes("If-None-Match"), "Calendar feed docs must document conditional request behavior");
 assert(calendarFeedDocs.includes("Frozen Contract"), "Calendar feed docs must document the frozen calendar export contract");
+assert(calendarFeedDocs.includes("calendar-client-troubleshooting"), "Calendar feed docs must link client troubleshooting notes");
 
 const calendarAbuseDocs = read("docs/calendar-abuse-response.md");
 assert(calendarAbuseDocs.includes("429"), "Calendar abuse docs must describe rate-limit responses");
@@ -235,6 +237,11 @@ assert(calendarMetricsDocs.includes("single_activity"), "Calendar metrics docs m
 assert(calendarMetricsDocs.includes("personal_agenda"), "Calendar metrics docs must describe personal agenda dimensions");
 assert(calendarMetricsDocs.includes("304 Not Modified"), "Calendar metrics docs must explain conditional request metric behavior");
 
+const calendarTroubleshootingDocs = read("docs/calendar-client-troubleshooting.md");
+assert(calendarTroubleshootingDocs.includes("If-None-Match"), "Calendar troubleshooting docs must mention conditional client requests");
+assert(calendarTroubleshootingDocs.includes("Retry-After"), "Calendar troubleshooting docs must mention rate-limit retry handling");
+assert(calendarTroubleshootingDocs.includes("public calendar feed"), "Calendar troubleshooting docs must mention release check calendar detail");
+
 const operatorHandoff = read("docs/operator-handoff.md");
 assert(operatorHandoff.includes("Calendar Exports"), "Operator handoff must include calendar export operations");
 assert(operatorHandoff.includes("/api/public/calendar"), "Operator handoff must list the public calendar endpoint");
@@ -244,9 +251,11 @@ assert(operatorHandoff.includes("noindex, nofollow, noarchive"), "Operator hando
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");
+assert(releaseCheckScript.includes("content-type="), "release check output must include response content type details");
 
 const releaseChecks = read("lib/release-checks.ts");
 assert(releaseChecks.includes("/api/public/calendar?limit=3"), "Release checks must include the public calendar feed");
+assert(releaseChecks.includes("public calendar feed"), "Release checks must label the public calendar feed");
 
 const queue = read("implementation-plan/SPRINT-QUEUE.md");
 assert(queue.includes("## Sprint 19 - MVP Launch Readiness"), "Sprint 19 must be listed in the queue");
