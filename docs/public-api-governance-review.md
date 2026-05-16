@@ -8,6 +8,7 @@ Use this review before merging public API, mobile-safe API, or calendar export c
 - `docs/public-api-changelog.md` has a newest-first entry with sprint number, date, changed surface, and operator impact.
 - `docs/public-api-docs-index.md` still points to every relevant release, contract, calendar, and handoff document.
 - Contract changes update `lib/mobile-contracts.ts`, `tests/mobile-contracts.test.ts`, and the related docs in the same branch.
+- Governance fixture changes update `lib/public-api-governance.ts` and `tests/public-api-governance.test.ts`.
 - Calendar export changes update `docs/calendar-documentation-map.md` and the relevant calendar operations document.
 - `scripts/launch-smoke.ts` guards any new required documentation or route contract.
 

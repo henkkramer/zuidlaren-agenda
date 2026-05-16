@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { buildMobileCapabilities } from "@/lib/mobile-contracts";
+import { publicApiGovernanceRequiredChecks, publicApiGovernanceRequiredDocs } from "@/lib/public-api-governance";
 
 const root = process.cwd();
 
@@ -52,6 +53,7 @@ const requiredFiles = [
   "lib/calendar-export.ts",
   "lib/analytics-breakdown.ts",
   "lib/public-activity-pagination.ts",
+  "lib/public-api-governance.ts",
   ".github/workflows/ci.yml",
   "docs/ci-release-gate.md",
   "docs/audit-log-coverage.md",
@@ -60,6 +62,7 @@ const requiredFiles = [
   "docs/calendar-feeds.md",
   "docs/calendar-abuse-response.md",
   "docs/calendar-client-troubleshooting.md",
+  "docs/calendar-documentation-archive-review.md",
   "docs/calendar-documentation-map.md",
   "docs/calendar-maintenance-checklist.md",
   "docs/calendar-metrics.md",
@@ -282,12 +285,20 @@ assert(calendarMaintenanceChecklist.includes("calendarEndpointContracts"), "Cale
 assert(calendarMaintenanceChecklist.includes("public-api-changelog"), "Calendar maintenance checklist must mention changelog updates");
 assert(calendarMaintenanceChecklist.includes("calendar-documentation-map"), "Calendar maintenance checklist must link documentation map");
 assert(calendarMaintenanceChecklist.includes("public-api-governance-review"), "Calendar maintenance checklist must link governance review");
+assert(calendarMaintenanceChecklist.includes("calendar-documentation-archive-review"), "Calendar maintenance checklist must link archive review");
+
+const calendarDocumentationArchiveReview = read("docs/calendar-documentation-archive-review.md");
+assert(calendarDocumentationArchiveReview.includes("Active Sources"), "Calendar documentation archive review must list active sources");
+assert(calendarDocumentationArchiveReview.includes("Archive Rule"), "Calendar documentation archive review must include archive rules");
+assert(calendarDocumentationArchiveReview.includes("implementation-plan/SPRINT-QUEUE.md"), "Calendar documentation archive review must preserve sprint history");
+assert(calendarDocumentationArchiveReview.includes("scripts/launch-smoke.ts"), "Calendar documentation archive review must keep smoke focused on active docs");
 
 const calendarDocumentationMap = read("docs/calendar-documentation-map.md");
 assert(calendarDocumentationMap.includes("calendar-feeds.md"), "Calendar documentation map must route endpoint behavior");
 assert(calendarDocumentationMap.includes("calendar-maintenance-checklist.md"), "Calendar documentation map must route maintenance tasks");
 assert(calendarDocumentationMap.includes("calendar-support-faq.md"), "Calendar documentation map must route support questions");
 assert(calendarDocumentationMap.includes("public-api-governance-review.md"), "Calendar documentation map must route API changes");
+assert(calendarDocumentationMap.includes("calendar-documentation-archive-review.md"), "Calendar documentation map must route archive review");
 
 const publicApiReleaseNotes = read("docs/public-api-release-notes.md");
 assert(publicApiReleaseNotes.includes("X-Zuidlaren-Api-Version"), "Public API release notes must document the API version header");
@@ -299,6 +310,7 @@ assert(publicApiReleaseNotes.includes("public-api-changelog"), "Public API relea
 assert(publicApiReleaseNotes.includes("public-api-docs-index"), "Public API release notes must link the docs index");
 
 const publicApiChangelog = read("docs/public-api-changelog.md");
+assert(publicApiChangelog.includes("Sprint 79"), "Public API changelog must include the governance smoke fixture entry");
 assert(publicApiChangelog.includes("Sprint 77"), "Public API changelog must include the governance review entry");
 assert(publicApiChangelog.includes("Sprint 75"), "Public API changelog must include the docs index entry");
 assert(publicApiChangelog.includes("Sprint 73"), "Public API changelog must include the current changelog discipline entry");
@@ -313,12 +325,26 @@ assert(publicApiDocsIndex.includes("calendar-maintenance-checklist"), "Public AP
 assert(publicApiDocsIndex.includes("operator-handoff"), "Public API docs index must link operator handoff");
 assert(publicApiDocsIndex.includes("public-api-governance-review"), "Public API docs index must link governance review");
 assert(publicApiDocsIndex.includes("calendar-documentation-map"), "Public API docs index must link calendar documentation map");
+assert(publicApiDocsIndex.includes("calendar-documentation-archive-review"), "Public API docs index must link calendar archive review");
 
 const publicApiGovernanceReview = read("docs/public-api-governance-review.md");
 assert(publicApiGovernanceReview.includes("public-api-release-notes"), "Public API governance review must require release notes review");
 assert(publicApiGovernanceReview.includes("public-api-changelog"), "Public API governance review must require changelog review");
 assert(publicApiGovernanceReview.includes("calendar-documentation-map"), "Public API governance review must require calendar map review");
 assert(publicApiGovernanceReview.includes("X-Zuidlaren-Api-Version"), "Public API governance review must check API version behavior");
+assert(publicApiGovernanceReview.includes("public-api-governance.ts"), "Public API governance review must mention governance fixtures");
+assert(publicApiGovernanceRequiredDocs.includes("docs/public-api-release-notes.md"), "Public API governance fixture must include release notes docs");
+assert(publicApiGovernanceRequiredDocs.includes("docs/calendar-documentation-map.md"), "Public API governance fixture must include calendar map docs");
+assert(publicApiGovernanceRequiredChecks.includes("release-check"), "Public API governance fixture must include release-check review");
+
+const filterControls = read("components/filter-controls.tsx");
+assert(!filterControls.includes("<select"), "Public agenda filters must use buttons instead of dropdown selects");
+assert(filterControls.includes("filter-button-groups"), "Public agenda filters must render grouped button controls");
+assert(filterControls.includes("options.categories"), "Public agenda category filters must use available event categories");
+
+const publicActivityQuery = read("lib/public-activity-query.ts");
+assert(publicActivityQuery.includes("defaultFrom"), "Public activity queries must default to today and later");
+assert(publicActivityQuery.includes("hasCustomDateFilter"), "Public activity queries must allow explicit past date ranges");
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");

@@ -60,6 +60,28 @@ test("activity filters clamp limit and build stable query state", () => {
   assert.equal(toQueryString(filters, { limit: 24 }), "family=1&period=week&price=free&q=muziek&type=Concert");
 });
 
+test("activity filters default to upcoming events and allow explicit past date ranges", () => {
+  const defaultWhere = buildActivityWhere(parseActivityFilters({}));
+  assert.ok(Array.isArray(defaultWhere.AND));
+  const defaultDateClause = defaultWhere.AND.find((clause) => "startAt" in clause) as { startAt: { gte?: Date; lt?: Date } } | undefined;
+  assert.ok(defaultDateClause?.startAt.gte);
+  assert.equal(defaultDateClause.startAt.lt, undefined);
+
+  const pastWhere = buildActivityWhere(parseActivityFilters({ end: "2026-01-10" }));
+  assert.ok(Array.isArray(pastWhere.AND));
+  const pastDateClause = pastWhere.AND.find((clause) => "startAt" in clause) as { startAt: { gte?: Date; lt?: Date } } | undefined;
+  assert.equal(pastDateClause?.startAt.gte, undefined);
+  assert.equal(pastDateClause?.startAt.lt?.getFullYear(), 2026);
+  assert.equal(pastDateClause?.startAt.lt?.getMonth(), 0);
+  assert.equal(pastDateClause?.startAt.lt?.getDate(), 11);
+
+  const futureEndWhere = buildActivityWhere(parseActivityFilters({ end: "2999-01-10" }));
+  assert.ok(Array.isArray(futureEndWhere.AND));
+  const futureEndDateClause = futureEndWhere.AND.find((clause) => "startAt" in clause) as { startAt: { gte?: Date; lt?: Date } } | undefined;
+  assert.ok(futureEndDateClause?.startAt.gte);
+  assert.equal(futureEndDateClause?.startAt.lt?.getFullYear(), 2999);
+});
+
 test("rate limit blocks after configured allowance", () => {
   const key = `test:${Date.now()}:${Math.random()}`;
 

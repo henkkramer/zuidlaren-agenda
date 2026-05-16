@@ -14,6 +14,7 @@ This map keeps the calendar documentation set focused and reduces duplicate guid
 | Handle repeated polling | `docs/calendar-abuse-response.md` | `docs/calendar-metrics.md`, `docs/operator-handoff.md` |
 | Interpret export volume | `docs/calendar-metrics.md` | `docs/calendar-abuse-response.md` |
 | Change public API behavior | `docs/public-api-governance-review.md` | `docs/public-api-changelog.md`, `docs/public-api-release-notes.md` |
+| Review old or duplicate docs | `docs/calendar-documentation-archive-review.md` | `implementation-plan/SPRINT-QUEUE.md`, `docs/public-api-docs-index.md` |
 
 ## Cleanup Rule
 

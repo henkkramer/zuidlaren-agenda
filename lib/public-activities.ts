@@ -15,16 +15,29 @@ export type PublicActivityFeed = {
 };
 
 export async function getPublicFilterOptions(): Promise<ActivityFilterOptions> {
-  const [categories, locations, organizers, typeRows, indoorOutdoorRows] = await Promise.all([
+  const [categories, activityCategoryRows, locations, organizers, typeRows, indoorOutdoorRows] = await Promise.all([
     prisma.activityCategory.findMany({ orderBy: { name: "asc" } }),
+    prisma.activity.findMany({
+      where: { status: "PUBLISHED" },
+      select: { category: { select: { name: true, slug: true } } },
+    }),
     prisma.location.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
     prisma.activity.findMany({ where: { status: "PUBLISHED" }, distinct: ["organizerName"], orderBy: { organizerName: "asc" }, select: { organizerName: true } }),
     prisma.activity.findMany({ where: { status: "PUBLISHED" }, select: { typeTags: true } }),
     prisma.activity.findMany({ where: { status: "PUBLISHED", indoorOutdoor: { not: null } }, distinct: ["indoorOutdoor"], select: { indoorOutdoor: true } }),
   ]);
+  const categoryMap = new Map<string, string>();
+
+  for (const category of categories) {
+    categoryMap.set(category.slug, category.name);
+  }
+
+  for (const row of activityCategoryRows) {
+    categoryMap.set(row.category.slug, row.category.name);
+  }
 
   return {
-    categories: categories.map((category) => ({ label: category.name, value: category.slug })),
+    categories: [...categoryMap.entries()].map(([value, label]) => ({ label, value })).sort((a, b) => a.label.localeCompare(b.label, "nl")),
     indoorOutdoor: indoorOutdoorRows.map((row) => row.indoorOutdoor).filter((value): value is string => Boolean(value)).sort(),
     locations: locations.map((location) => location.name),
     organizers: organizers.map((row) => row.organizerName),
