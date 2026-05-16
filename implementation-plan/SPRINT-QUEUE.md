@@ -79,6 +79,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 70 | Done | Calendar Export Release Check Result Detail | `19`, `20`, `21` |
 | 71 | Done | Calendar Export Runbook Drill | `19`, `20`, `21` |
 | 72 | Done | Public API Release Notes Snapshot | `20`, `18`, `21` |
+| 73 | Done | Public API Changelog Discipline | `20`, `18`, `21` |
+| 74 | Done | Calendar Export Support FAQ | `20`, `19`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1576,3 +1578,44 @@ Acceptance:
 
 - Public API changes have a documented release-note target.
 - The controlled MVP API surface can be reviewed without reading route code.
+
+## Sprint 73 - Public API Changelog Discipline
+
+Status: Done
+
+Goal:
+
+Keep public API changes traceable after the release notes snapshot is introduced.
+
+Scope:
+
+- Add `docs/public-api-changelog.md`.
+- Document changelog update rules for public endpoints, headers, auth, cache, version, and calendar contract changes.
+- Seed entries for the current changelog discipline, release notes snapshot, and calendar contract freeze.
+- Link changelog requirements from PR handoff and public API release notes.
+- Add launch-smoke guards for the changelog.
+
+Acceptance:
+
+- Public API changes now have a release-note snapshot and a chronological changelog target.
+- PR handoff requires the changelog for public API or calendar export changes.
+
+## Sprint 74 - Calendar Export Support FAQ
+
+Status: Done
+
+Goal:
+
+Give support a concise FAQ for common calendar export questions.
+
+Scope:
+
+- Add `docs/calendar-support-faq.md`.
+- Cover filtered public feeds, unpublished single-event exports, personal session behavior, shared calendar limits, `ETag`/`If-None-Match`, and `429`/`Retry-After`.
+- Link FAQ from calendar feed and troubleshooting docs.
+- Add launch-smoke guards for the FAQ.
+
+Acceptance:
+
+- Support can answer common calendar export questions without reading route code.
+- Calendar troubleshooting points to the FAQ for user-facing replies.

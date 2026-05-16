@@ -62,8 +62,10 @@ const requiredFiles = [
   "docs/calendar-client-troubleshooting.md",
   "docs/calendar-metrics.md",
   "docs/calendar-runbook-drill.md",
+  "docs/calendar-support-faq.md",
   "docs/operator-handoff.md",
   "docs/pr-release-handoff.md",
+  "docs/public-api-changelog.md",
   "docs/public-api-release-notes.md",
   "scripts/ensure-admin.ts",
   "scripts/release-check.ts",
@@ -226,6 +228,7 @@ assert(calendarFeedDocs.includes("Retry-After"), "Calendar feed docs must docume
 assert(calendarFeedDocs.includes("If-None-Match"), "Calendar feed docs must document conditional request behavior");
 assert(calendarFeedDocs.includes("Frozen Contract"), "Calendar feed docs must document the frozen calendar export contract");
 assert(calendarFeedDocs.includes("calendar-client-troubleshooting"), "Calendar feed docs must link client troubleshooting notes");
+assert(calendarFeedDocs.includes("calendar-support-faq"), "Calendar feed docs must link support FAQ");
 
 const calendarAbuseDocs = read("docs/calendar-abuse-response.md");
 assert(calendarAbuseDocs.includes("429"), "Calendar abuse docs must describe rate-limit responses");
@@ -243,6 +246,13 @@ const calendarTroubleshootingDocs = read("docs/calendar-client-troubleshooting.m
 assert(calendarTroubleshootingDocs.includes("If-None-Match"), "Calendar troubleshooting docs must mention conditional client requests");
 assert(calendarTroubleshootingDocs.includes("Retry-After"), "Calendar troubleshooting docs must mention rate-limit retry handling");
 assert(calendarTroubleshootingDocs.includes("public calendar feed"), "Calendar troubleshooting docs must mention release check calendar detail");
+assert(calendarTroubleshootingDocs.includes("calendar-support-faq"), "Calendar troubleshooting docs must link support FAQ");
+
+const calendarSupportFaq = read("docs/calendar-support-faq.md");
+assert(calendarSupportFaq.includes("private, no-store"), "Calendar support FAQ must explain personal export privacy");
+assert(calendarSupportFaq.includes("If-None-Match"), "Calendar support FAQ must explain conditional request behavior");
+assert(calendarSupportFaq.includes("Retry-After"), "Calendar support FAQ must explain rate-limit retry behavior");
+assert(calendarSupportFaq.includes("calendar-client-troubleshooting"), "Calendar support FAQ must link troubleshooting docs");
 
 const operatorHandoff = read("docs/operator-handoff.md");
 assert(operatorHandoff.includes("Calendar Exports"), "Operator handoff must include calendar export operations");
@@ -264,6 +274,13 @@ assert(publicApiReleaseNotes.includes("/api/public/activities"), "Public API rel
 assert(publicApiReleaseNotes.includes("/api/public/calendar"), "Public API release notes must document public calendar export");
 assert(publicApiReleaseNotes.includes("/api/me/agenda/calendar"), "Public API release notes must document personal calendar export");
 assert(publicApiReleaseNotes.includes("public calendar feed"), "Public API release notes must document release-check calendar label");
+assert(publicApiReleaseNotes.includes("public-api-changelog"), "Public API release notes must link the changelog");
+
+const publicApiChangelog = read("docs/public-api-changelog.md");
+assert(publicApiChangelog.includes("Sprint 73"), "Public API changelog must include the current changelog discipline entry");
+assert(publicApiChangelog.includes("Sprint 72"), "Public API changelog must include the release notes snapshot entry");
+assert(publicApiChangelog.includes("Sprint 68"), "Public API changelog must include the calendar contract freeze entry");
+assert(publicApiChangelog.includes("public-api-release-notes"), "Public API changelog must point to the release notes snapshot");
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");

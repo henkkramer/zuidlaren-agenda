@@ -26,3 +26,4 @@ Use this when a user can open the agenda in the browser but a calendar client do
 `npm run release:check` includes `public calendar feed` for `/api/public/calendar?limit=3`. A successful result confirms the deployed app can serve the unauthenticated calendar feed, but it does not validate signed-in personal calendar exports.
 
 Use `docs/calendar-abuse-response.md` when the same client or proxy repeatedly triggers `429` responses.
+Use `docs/calendar-support-faq.md` for short support answers to common user questions.
