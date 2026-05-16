@@ -49,6 +49,7 @@ const requiredFiles = [
   "lib/admin-activity-import.ts",
   "lib/content-maintenance-queue.ts",
   "lib/calendar-feed.ts",
+  "lib/calendar-export.ts",
   "lib/public-activity-pagination.ts",
   ".github/workflows/ci.yml",
   "docs/ci-release-gate.md",
@@ -188,22 +189,27 @@ assert(publicActivitiesRoute.includes("publicApiHeaders"), "Public activities AP
 
 const publicCalendarRoute = read("app/api/public/calendar/route.ts");
 assert(publicCalendarRoute.includes("buildPublicCalendarFeed"), "Public calendar route must build an iCalendar feed");
+assert(publicCalendarRoute.includes("checkRateLimit"), "Public calendar route must rate limit exports");
+assert(publicCalendarRoute.includes("calendarAttachmentHeader"), "Public calendar route must use sanitized filenames");
 
 const publicActivityCalendarRoute = read("app/api/public/activities/[activityId]/calendar/route.ts");
 assert(publicActivityCalendarRoute.includes("getPublicActivityDetail"), "Single-activity calendar route must read one public activity");
 assert(publicActivityCalendarRoute.includes("buildPublicCalendarFeed([activity])"), "Single-activity calendar route must build a one-event iCalendar feed");
+assert(publicActivityCalendarRoute.includes("checkRateLimit"), "Single-activity calendar route must rate limit exports");
 
 const personalAgendaCalendarRoute = read("app/api/me/agenda/calendar/route.ts");
 assert(personalAgendaCalendarRoute.includes("getCurrentSession"), "Personal agenda calendar route must require a session");
 assert(personalAgendaCalendarRoute.includes("Mijn Zuidlaren Agenda"), "Personal agenda calendar route must name the personal calendar feed");
 assert(personalAgendaCalendarRoute.includes("sessionApiHeaders"), "Personal agenda calendar route must use private session API headers");
 assert(personalAgendaCalendarRoute.includes("calendar_export"), "Personal agenda calendar route must record aggregate calendar export analytics");
+assert(personalAgendaCalendarRoute.includes("calendarRateLimitKey"), "Personal agenda calendar route must rate limit by signed-in user");
 
 const calendarFeedDocs = read("docs/calendar-feeds.md");
 assert(calendarFeedDocs.includes("/api/public/calendar"), "Calendar feed docs must describe public calendar subscriptions");
 assert(calendarFeedDocs.includes("/api/me/agenda/calendar"), "Calendar feed docs must describe private personal calendar exports");
 assert(calendarFeedDocs.includes("X-Zuidlaren-Api-Version"), "Calendar feed docs must document version headers");
 assert(calendarFeedDocs.includes("noindex, nofollow, noarchive"), "Calendar feed docs must document personal feed noindex headers");
+assert(calendarFeedDocs.includes("Retry-After"), "Calendar feed docs must document rate limiting behavior");
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");
