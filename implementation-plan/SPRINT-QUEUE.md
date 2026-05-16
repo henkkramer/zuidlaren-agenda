@@ -67,6 +67,10 @@ This queue is the single execution sequence for the existing implementation plan
 | 58 | Done | Calendar Feed Filename Sanitization | `17`, `20`, `21` |
 | 59 | Done | Calendar Export Runtime Checks | `19`, `20`, `21` |
 | 60 | Done | Calendar Export Admin Visibility Polish | `14`, `16`, `21` |
+| 61 | Done | Calendar Feed ETag and Conditional Request Prep | `20`, `17`, `21` |
+| 62 | Done | Calendar Export Abuse-Response Documentation | `17`, `19`, `21` |
+| 63 | Done | Calendar Export Route Refactor | `17`, `20`, `18` |
+| 64 | Done | Calendar Feed Monitoring Copy Polish | `14`, `16`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1324,3 +1328,83 @@ Acceptance:
 
 - Admins can distinguish calendar export usage by kind.
 - Breakdown remains aggregate and does not expose user identifiers.
+
+## Sprint 61 - Calendar Feed ETag and Conditional Request Prep
+
+Status: Done
+
+Goal:
+
+Reduce unnecessary calendar response transfer for repeat polling clients.
+
+Scope:
+
+- Shared weak ETag builder for calendar response bodies.
+- Calendar response header helper includes sanitized filename, content type, and ETag.
+- Public, single-activity, and personal calendar routes support `If-None-Match`.
+- Unit and launch-smoke coverage for conditional request behavior.
+
+Acceptance:
+
+- Matching `If-None-Match` requests return `304 Not Modified`.
+- Calendar export analytics are not incremented for unchanged conditional responses.
+
+## Sprint 62 - Calendar Export Abuse-Response Documentation
+
+Status: Done
+
+Goal:
+
+Document how operators should handle excessive calendar polling without breaking normal clients.
+
+Scope:
+
+- Dedicated `docs/calendar-abuse-response.md`.
+- Abuse signals, operator response steps, and client guidance.
+- Calendar feed docs link to the abuse-response runbook.
+- Launch smoke guard for the runbook.
+
+Acceptance:
+
+- Operators have a clear response path for repeated `429` calendar export traffic.
+- Documentation keeps release checks and client caching behavior explicit.
+
+## Sprint 63 - Calendar Export Route Refactor
+
+Status: Done
+
+Goal:
+
+Reduce duplication across calendar export routes before adding more calendar behavior.
+
+Scope:
+
+- Shared calendar rate-limit response helper.
+- Shared calendar response preparation helper for headers, ETag, and conditional response checks.
+- Calendar routes use shared helpers instead of duplicating header and rate-limit merge logic.
+- Unit and launch-smoke coverage for the helper contract.
+
+Acceptance:
+
+- Public, single-activity, and personal calendar routes use the same response preparation path.
+- `Retry-After`, API version, ETag, and sanitized filename behavior remains covered.
+
+## Sprint 64 - Calendar Feed Monitoring Copy Polish
+
+Status: Done
+
+Goal:
+
+Make calendar export monitoring labels clearer for the operator.
+
+Scope:
+
+- Admin analytics label clarifies total calendar export count.
+- Breakdown copy explicitly names export distribution.
+- Abuse-response runbook explains the admin monitoring labels.
+- Launch-smoke guard keeps the monitoring copy documented.
+
+Acceptance:
+
+- Operator-facing copy distinguishes total exports from export-kind breakdown.
+- Documentation keeps the aggregate nature of the monitoring explicit.

@@ -13,6 +13,7 @@ Zuidlaren Agenda exposes calendar exports for public discovery and signed-in per
 All calendar endpoints return `text/calendar; charset=utf-8` and include `X-Zuidlaren-Api-Version`.
 Personal calendar responses also include `X-Robots-Tag: noindex, nofollow, noarchive`.
 Calendar exports are rate limited per client or signed-in user and return `429` with `Retry-After` when exceeded.
+Calendar exports include weak `ETag` headers and return `304 Not Modified` when clients send a matching `If-None-Match`.
 
 ## Client Notes
 
@@ -23,7 +24,10 @@ Calendar exports are rate limited per client or signed-in user and return `429` 
 - Date-times are emitted in UTC with `DTSTART` and `DTEND`.
 - Long iCalendar lines are folded so strict calendar clients can parse the response.
 - Download filenames are normalized to short ASCII `.ics` filenames.
+- Clients should send `If-None-Match` on repeat requests and respect `304 Not Modified`.
 - Missing or unpublished single-activity exports return the normal versioned JSON error response.
+
+See `docs/calendar-abuse-response.md` for operational handling of high-frequency calendar polling.
 
 ## Validation
 

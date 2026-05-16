@@ -2,11 +2,11 @@ import { sessionApiHeaders } from "@/lib/api-response";
 import { recordAnalyticsMetric } from "@/lib/analytics";
 import { getCurrentSession } from "@/lib/auth";
 import { mapActivityRecord } from "@/lib/activity-mapper";
-import { calendarAttachmentHeader, calendarRateLimitKey } from "@/lib/calendar-export";
+import { calendarRateLimitKey, calendarRateLimitResponse, prepareCalendarResponse } from "@/lib/calendar-export";
 import { buildPublicCalendarFeed } from "@/lib/calendar-feed";
 import { mobileApiVersion } from "@/lib/mobile-contracts";
 import { prisma } from "@/lib/prisma";
-import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 type PersonalAgendaCalendarRow = {
   activity: Parameters<typeof mapActivityRecord>[0];
@@ -21,8 +21,7 @@ export async function GET(request: Request) {
 
   const rateLimit = checkRateLimit({ key: calendarRateLimitKey(request, "personal-agenda", session.user.id), limit: 30, windowMs: 60_000 });
   if (rateLimit.limited) {
-    const response = rateLimitResponse(rateLimit.resetAt);
-    return Response.json(response.body, { ...response.init, headers: { ...response.init.headers, ...sessionApiHeaders(mobileApiVersion) } });
+    return calendarRateLimitResponse(rateLimit.resetAt, sessionApiHeaders(mobileApiVersion));
   }
 
   const attendances = await prisma.attendance.findMany({
@@ -49,6 +48,12 @@ export async function GET(request: Request) {
   });
 
   const activities = (attendances as PersonalAgendaCalendarRow[]).map((attendance) => mapActivityRecord(attendance.activity));
+  const body = buildPublicCalendarFeed(activities, new Date(), {
+    description: "Mijn opgeslagen activiteiten in Zuidlaren",
+    name: "Mijn Zuidlaren Agenda",
+  });
+  const { notModifiedResponse, response } = prepareCalendarResponse(request, sessionApiHeaders(mobileApiVersion), "mijn-zuidlaren-agenda", body);
+  if (notModifiedResponse) return notModifiedResponse;
 
   await recordAnalyticsMetric({
     metric: "calendar_export",
@@ -57,17 +62,5 @@ export async function GET(request: Request) {
     },
   });
 
-  return new Response(
-    buildPublicCalendarFeed(activities, new Date(), {
-      description: "Mijn opgeslagen activiteiten in Zuidlaren",
-      name: "Mijn Zuidlaren Agenda",
-    }),
-    {
-      headers: {
-        ...sessionApiHeaders(mobileApiVersion),
-        "Content-Disposition": calendarAttachmentHeader("mijn-zuidlaren-agenda"),
-        "Content-Type": "text/calendar; charset=utf-8",
-      },
-    },
-  );
+  return response;
 }

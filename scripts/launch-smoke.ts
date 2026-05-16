@@ -58,6 +58,7 @@ const requiredFiles = [
   "docs/mvp-launch-readiness.md",
   "docs/mobile-api-readiness.md",
   "docs/calendar-feeds.md",
+  "docs/calendar-abuse-response.md",
   "docs/operator-handoff.md",
   "docs/pr-release-handoff.md",
   "scripts/ensure-admin.ts",
@@ -191,7 +192,7 @@ assert(publicActivitiesRoute.includes("publicApiHeaders"), "Public activities AP
 const publicCalendarRoute = read("app/api/public/calendar/route.ts");
 assert(publicCalendarRoute.includes("buildPublicCalendarFeed"), "Public calendar route must build an iCalendar feed");
 assert(publicCalendarRoute.includes("checkRateLimit"), "Public calendar route must rate limit exports");
-assert(publicCalendarRoute.includes("calendarAttachmentHeader"), "Public calendar route must use sanitized filenames");
+assert(publicCalendarRoute.includes("prepareCalendarResponse"), "Public calendar route must use shared calendar response preparation");
 
 const publicActivityCalendarRoute = read("app/api/public/activities/[activityId]/calendar/route.ts");
 assert(publicActivityCalendarRoute.includes("getPublicActivityDetail"), "Single-activity calendar route must read one public activity");
@@ -211,6 +212,12 @@ assert(calendarFeedDocs.includes("/api/me/agenda/calendar"), "Calendar feed docs
 assert(calendarFeedDocs.includes("X-Zuidlaren-Api-Version"), "Calendar feed docs must document version headers");
 assert(calendarFeedDocs.includes("noindex, nofollow, noarchive"), "Calendar feed docs must document personal feed noindex headers");
 assert(calendarFeedDocs.includes("Retry-After"), "Calendar feed docs must document rate limiting behavior");
+assert(calendarFeedDocs.includes("If-None-Match"), "Calendar feed docs must document conditional request behavior");
+
+const calendarAbuseDocs = read("docs/calendar-abuse-response.md");
+assert(calendarAbuseDocs.includes("429"), "Calendar abuse docs must describe rate-limit responses");
+assert(calendarAbuseDocs.includes("ETag"), "Calendar abuse docs must describe client cache behavior");
+assert(calendarAbuseDocs.includes("agenda exports totaal"), "Calendar abuse docs must explain admin monitoring copy");
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");

@@ -214,7 +214,7 @@ export default async function AdminPage() {
               </span>
               <span>
                 <strong>{analytics.calendarExports}</strong>
-                <small>agenda exports</small>
+                <small>agenda exports totaal</small>
               </span>
               <span>
                 <strong>{analytics.notificationOptIns}</strong>
@@ -227,7 +227,7 @@ export default async function AdminPage() {
             </div>
             {analytics.calendarExportBreakdown.length ? (
               <p className="small-muted">
-                Agenda exports:{" "}
+                Agenda export verdeling:{" "}
                 {analytics.calendarExportBreakdown
                   .map((item) => `${item.kind.replaceAll("_", " ")} ${item.count}`)
                   .join(", ")}
