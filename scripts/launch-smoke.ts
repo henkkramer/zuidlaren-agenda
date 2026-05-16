@@ -60,6 +60,7 @@ const requiredFiles = [
   "docs/calendar-feeds.md",
   "docs/calendar-abuse-response.md",
   "docs/calendar-client-troubleshooting.md",
+  "docs/calendar-documentation-map.md",
   "docs/calendar-maintenance-checklist.md",
   "docs/calendar-metrics.md",
   "docs/calendar-runbook-drill.md",
@@ -68,6 +69,7 @@ const requiredFiles = [
   "docs/pr-release-handoff.md",
   "docs/public-api-changelog.md",
   "docs/public-api-docs-index.md",
+  "docs/public-api-governance-review.md",
   "docs/public-api-release-notes.md",
   "scripts/ensure-admin.ts",
   "scripts/release-check.ts",
@@ -232,6 +234,7 @@ assert(calendarFeedDocs.includes("Frozen Contract"), "Calendar feed docs must do
 assert(calendarFeedDocs.includes("calendar-client-troubleshooting"), "Calendar feed docs must link client troubleshooting notes");
 assert(calendarFeedDocs.includes("calendar-support-faq"), "Calendar feed docs must link support FAQ");
 assert(calendarFeedDocs.includes("calendar-maintenance-checklist"), "Calendar feed docs must link maintenance checklist");
+assert(calendarFeedDocs.includes("calendar-documentation-map"), "Calendar feed docs must link documentation map");
 
 const calendarAbuseDocs = read("docs/calendar-abuse-response.md");
 assert(calendarAbuseDocs.includes("429"), "Calendar abuse docs must describe rate-limit responses");
@@ -277,6 +280,14 @@ assert(calendarMaintenanceChecklist.includes("agenda exports totaal"), "Calendar
 assert(calendarMaintenanceChecklist.includes("public calendar feed"), "Calendar maintenance checklist must include release-check review");
 assert(calendarMaintenanceChecklist.includes("calendarEndpointContracts"), "Calendar maintenance checklist must mention contract update points");
 assert(calendarMaintenanceChecklist.includes("public-api-changelog"), "Calendar maintenance checklist must mention changelog updates");
+assert(calendarMaintenanceChecklist.includes("calendar-documentation-map"), "Calendar maintenance checklist must link documentation map");
+assert(calendarMaintenanceChecklist.includes("public-api-governance-review"), "Calendar maintenance checklist must link governance review");
+
+const calendarDocumentationMap = read("docs/calendar-documentation-map.md");
+assert(calendarDocumentationMap.includes("calendar-feeds.md"), "Calendar documentation map must route endpoint behavior");
+assert(calendarDocumentationMap.includes("calendar-maintenance-checklist.md"), "Calendar documentation map must route maintenance tasks");
+assert(calendarDocumentationMap.includes("calendar-support-faq.md"), "Calendar documentation map must route support questions");
+assert(calendarDocumentationMap.includes("public-api-governance-review.md"), "Calendar documentation map must route API changes");
 
 const publicApiReleaseNotes = read("docs/public-api-release-notes.md");
 assert(publicApiReleaseNotes.includes("X-Zuidlaren-Api-Version"), "Public API release notes must document the API version header");
@@ -288,6 +299,7 @@ assert(publicApiReleaseNotes.includes("public-api-changelog"), "Public API relea
 assert(publicApiReleaseNotes.includes("public-api-docs-index"), "Public API release notes must link the docs index");
 
 const publicApiChangelog = read("docs/public-api-changelog.md");
+assert(publicApiChangelog.includes("Sprint 77"), "Public API changelog must include the governance review entry");
 assert(publicApiChangelog.includes("Sprint 75"), "Public API changelog must include the docs index entry");
 assert(publicApiChangelog.includes("Sprint 73"), "Public API changelog must include the current changelog discipline entry");
 assert(publicApiChangelog.includes("Sprint 72"), "Public API changelog must include the release notes snapshot entry");
@@ -299,6 +311,14 @@ assert(publicApiDocsIndex.includes("public-api-release-notes"), "Public API docs
 assert(publicApiDocsIndex.includes("public-api-changelog"), "Public API docs index must link changelog");
 assert(publicApiDocsIndex.includes("calendar-maintenance-checklist"), "Public API docs index must link calendar maintenance checklist");
 assert(publicApiDocsIndex.includes("operator-handoff"), "Public API docs index must link operator handoff");
+assert(publicApiDocsIndex.includes("public-api-governance-review"), "Public API docs index must link governance review");
+assert(publicApiDocsIndex.includes("calendar-documentation-map"), "Public API docs index must link calendar documentation map");
+
+const publicApiGovernanceReview = read("docs/public-api-governance-review.md");
+assert(publicApiGovernanceReview.includes("public-api-release-notes"), "Public API governance review must require release notes review");
+assert(publicApiGovernanceReview.includes("public-api-changelog"), "Public API governance review must require changelog review");
+assert(publicApiGovernanceReview.includes("calendar-documentation-map"), "Public API governance review must require calendar map review");
+assert(publicApiGovernanceReview.includes("X-Zuidlaren-Api-Version"), "Public API governance review must check API version behavior");
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");

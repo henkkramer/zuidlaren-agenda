@@ -83,6 +83,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 74 | Done | Calendar Export Support FAQ | `20`, `19`, `21` |
 | 75 | Done | Public API Documentation Index | `20`, `18`, `21` |
 | 76 | Done | Calendar Export Maintenance Checklist | `19`, `20`, `21` |
+| 77 | Done | Public API Governance Review | `20`, `18`, `21` |
+| 78 | Done | Calendar Export Documentation Cleanup | `20`, `19`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1661,3 +1663,44 @@ Acceptance:
 
 - Calendar export maintenance has a repeatable checklist.
 - Calendar docs clearly separate support, troubleshooting, abuse response, runbook drill, and routine maintenance.
+
+## Sprint 77 - Public API Governance Review
+
+Status: Done
+
+Goal:
+
+Add a pre-merge governance checklist for public API, mobile-safe API, and calendar export changes.
+
+Scope:
+
+- Add `docs/public-api-governance-review.md`.
+- Cover release notes, changelog, docs index, contract files, launch smoke, PR body, sprint queue, version header, auth boundaries, cache/privacy behavior, and release-check usefulness.
+- Link governance review from public API changelog, docs index, PR handoff, launch readiness, and calendar maintenance checklist.
+- Add launch-smoke guards for the governance review.
+
+Acceptance:
+
+- Public/mobile-safe API changes have a documented governance review before merge.
+- Reviewers can verify operator impact without reading route code.
+
+## Sprint 78 - Calendar Export Documentation Cleanup
+
+Status: Done
+
+Goal:
+
+Reduce calendar documentation sprawl by routing each task to the right document.
+
+Scope:
+
+- Add `docs/calendar-documentation-map.md`.
+- Map endpoint behavior, rollout validation, routine maintenance, user diagnosis, support answers, abuse response, metrics, and API behavior changes.
+- Add cleanup rules that keep endpoint facts, support phrasing, diagnosis, maintenance, abuse response, metrics, and release summaries in separate docs.
+- Link the map from calendar feed docs, maintenance checklist, docs index, governance review, and launch readiness.
+- Add launch-smoke guards for the map.
+
+Acceptance:
+
+- Calendar documentation has a task-based routing map.
+- Future calendar documentation updates have clear ownership and less duplication risk.

@@ -14,8 +14,10 @@ Use this checklist during routine maintenance, before changing calendar behavior
 
 - Read `docs/calendar-feeds.md` for the frozen contract.
 - Read `docs/public-api-docs-index.md` to identify all affected docs.
+- Read `docs/calendar-documentation-map.md` to avoid duplicating calendar guidance.
 - Update `calendarEndpointContracts` and `tests/mobile-contracts.test.ts` when endpoint contract behavior changes.
 - Update `docs/public-api-release-notes.md` and `docs/public-api-changelog.md` in the same branch.
+- Complete `docs/public-api-governance-review.md` before merge when public/mobile-safe behavior changes.
 - Run the full validation gate from `docs/calendar-runbook-drill.md`.
 
 ## After Incidents

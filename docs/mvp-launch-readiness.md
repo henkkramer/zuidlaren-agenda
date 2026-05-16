@@ -48,8 +48,10 @@ Pull request handoff rules are documented in `docs/pr-release-handoff.md`.
 Public API release notes are documented in `docs/public-api-release-notes.md`.
 Public API documentation is indexed in `docs/public-api-docs-index.md`.
 Public API changelog discipline is documented in `docs/public-api-changelog.md`.
+Public API governance review is documented in `docs/public-api-governance-review.md`.
 Calendar export runbook drills are documented in `docs/calendar-runbook-drill.md`.
 Calendar export maintenance is documented in `docs/calendar-maintenance-checklist.md`.
+Calendar documentation routing is documented in `docs/calendar-documentation-map.md`.
 
 ## Manual Release Gate
 
