@@ -41,3 +41,19 @@ test("calendar feed supports custom calendar metadata", () => {
   assert.match(feed, /X-WR-CALNAME:Mijn Zuidlaren Agenda/);
   assert.match(feed, /X-WR-CALDESC:Mijn opgeslagen activiteiten/);
 });
+
+test("calendar feed folds long iCalendar lines", () => {
+  const longFeed = buildPublicCalendarFeed([
+    {
+      ...activity,
+      shortDescription:
+        "Een zeer lange omschrijving voor calendar clients die regels moeten kunnen parsen zonder dat de iCalendar response te brede regels bevat.",
+      title: "Een bijzonder lange activiteitstitel voor contractcontrole in agenda clients",
+    },
+  ]);
+
+  const lines = longFeed.split("\r\n");
+
+  assert.ok(lines.every((line) => line.length <= 75));
+  assert.ok(lines.some((line) => line.startsWith(" ")));
+});
