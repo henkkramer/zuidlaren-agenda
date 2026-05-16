@@ -27,7 +27,7 @@ Run against the deployed app:
 RELEASE_BASE_URL=https://<production-host> npm run release:check
 ```
 
-The command checks `/api/health`, `/api/health/ready`, `/api/health/release`, `/api/mobile/capabilities`, and `/api/public/activities?limit=3`.
+The command checks `/api/health`, `/api/health/ready`, `/api/health/release`, `/api/mobile/capabilities`, `/api/public/activities?limit=3`, and `/api/public/calendar?limit=3`.
 
 All routes are served with the shared security header policy from `lib/security-headers.ts`.
 
@@ -50,6 +50,8 @@ Pull request handoff rules are documented in `docs/pr-release-handoff.md`.
 
 - Public agenda opens on desktop and mobile.
 - Cards, filters, date sorting, detail view, and load-more behavior work.
+- Public and single-activity calendar exports return `.ics` responses.
+- Personal agenda calendar export requires a signed-in session and returns private no-store headers.
 - Privacy and publication terms are reachable.
 - Account login link flow works with the configured email provider.
 - "Ik ga" saves as private by default.

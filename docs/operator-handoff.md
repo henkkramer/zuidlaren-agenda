@@ -51,6 +51,20 @@ Resolve release-health warnings before adding new testers.
 - Keep live payments disabled until the billing foundation is promoted to production payment handling.
 - Keep native mobile apps out of MVP operations; mobile API contracts are documentation and future-proofing only.
 
+## Calendar Exports
+
+The app exposes three iCalendar paths for public discovery and personal planning:
+
+- `GET /api/public/calendar` for the public agenda feed.
+- `GET /api/public/activities/{activityId}/calendar` for one published activity.
+- `GET /api/me/agenda/calendar` for the signed-in user's saved agenda.
+
+Public calendar responses use short public cache headers. Personal calendar responses use private no-store headers and `X-Robots-Tag: noindex, nofollow, noarchive`.
+
+Repeat calendar clients should send `If-None-Match`; matching feeds return `304 Not Modified` and do not count as a fresh export. High-frequency clients receive `429` with `Retry-After`. Use `docs/calendar-abuse-response.md` for repeated polling incidents and keep `/api/public/calendar?limit=3` in the release check.
+
+Admin analytics show aggregate calendar export volume only. Personal exports do not include user ids or selected activity ids in analytics dimensions.
+
 ## When Something Breaks
 
 - Check `/api/health` first for process health.
