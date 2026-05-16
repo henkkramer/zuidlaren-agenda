@@ -27,3 +27,39 @@ export function sanitizeCalendarFilename(input: string) {
 export function calendarAttachmentHeader(filename: string) {
   return `inline; filename="${sanitizeCalendarFilename(filename)}.ics"`;
 }
+
+export function calendarEtag(body: string) {
+  let hash = 5381;
+
+  for (let index = 0; index < body.length; index += 1) {
+    hash = (hash * 33) ^ body.charCodeAt(index);
+  }
+
+  return `W/"${(hash >>> 0).toString(16)}-${body.length}"`;
+}
+
+export function calendarResponseHeaders(baseHeaders: Record<string, string>, filename: string, body: string) {
+  return {
+    ...baseHeaders,
+    "Content-Disposition": calendarAttachmentHeader(filename),
+    "Content-Type": "text/calendar; charset=utf-8",
+    ETag: calendarEtag(body),
+  };
+}
+
+export function calendarNotModifiedResponse(request: Request, headers: Record<string, string>) {
+  const etag = headers.ETag;
+  const clientEtags = request.headers
+    .get("if-none-match")
+    ?.split(",")
+    .map((value) => value.trim());
+
+  if (!etag || !clientEtags?.includes(etag)) {
+    return null;
+  }
+
+  return new Response(null, {
+    headers,
+    status: 304,
+  });
+}

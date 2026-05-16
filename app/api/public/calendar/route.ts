@@ -1,6 +1,6 @@
 import { publicApiHeaders } from "@/lib/api-response";
 import { hasActiveFilterDimensions, recordAnalyticsMetric } from "@/lib/analytics";
-import { calendarAttachmentHeader, calendarRateLimitKey } from "@/lib/calendar-export";
+import { calendarNotModifiedResponse, calendarRateLimitKey, calendarResponseHeaders } from "@/lib/calendar-export";
 import { buildPublicCalendarFeed } from "@/lib/calendar-feed";
 import { mobileApiVersion } from "@/lib/mobile-contracts";
 import { getPublicActivityFeed } from "@/lib/public-activities";
@@ -17,6 +17,10 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const filters = parseActivityFilters(Object.fromEntries(url.searchParams.entries()));
   const feed = await getPublicActivityFeed({ ...filters, limit: 96 });
+  const body = buildPublicCalendarFeed(feed.activities);
+  const headers = calendarResponseHeaders(publicApiHeaders(mobileApiVersion), "zuidlaren-agenda", body);
+  const notModifiedResponse = calendarNotModifiedResponse(request, headers);
+  if (notModifiedResponse) return notModifiedResponse;
 
   await recordAnalyticsMetric({
     metric: "calendar_export",
@@ -26,11 +30,5 @@ export async function GET(request: Request) {
     },
   });
 
-  return new Response(buildPublicCalendarFeed(feed.activities), {
-    headers: {
-      ...publicApiHeaders(mobileApiVersion),
-      "Content-Disposition": calendarAttachmentHeader("zuidlaren-agenda"),
-      "Content-Type": "text/calendar; charset=utf-8",
-    },
-  });
+  return new Response(body, { headers });
 }

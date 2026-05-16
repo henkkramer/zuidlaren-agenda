@@ -1,6 +1,6 @@
 import { publicApiHeaders } from "@/lib/api-response";
 import { recordAnalyticsMetric } from "@/lib/analytics";
-import { calendarAttachmentHeader, calendarRateLimitKey } from "@/lib/calendar-export";
+import { calendarNotModifiedResponse, calendarRateLimitKey, calendarResponseHeaders } from "@/lib/calendar-export";
 import { buildPublicCalendarFeed } from "@/lib/calendar-feed";
 import { mobileApiVersion } from "@/lib/mobile-contracts";
 import { getPublicActivityDetail } from "@/lib/public-activities";
@@ -26,6 +26,11 @@ export async function GET(request: Request, context: PublicActivityCalendarConte
     return Response.json({ apiVersion: mobileApiVersion, error: "Activiteit niet gevonden" }, { headers: publicApiHeaders(mobileApiVersion), status: 404 });
   }
 
+  const body = buildPublicCalendarFeed([activity]);
+  const headers = calendarResponseHeaders(publicApiHeaders(mobileApiVersion), activity.id, body);
+  const notModifiedResponse = calendarNotModifiedResponse(request, headers);
+  if (notModifiedResponse) return notModifiedResponse;
+
   await recordAnalyticsMetric({
     metric: "calendar_export",
     activityId: activity.id,
@@ -36,11 +41,5 @@ export async function GET(request: Request, context: PublicActivityCalendarConte
     },
   });
 
-  return new Response(buildPublicCalendarFeed([activity]), {
-    headers: {
-      ...publicApiHeaders(mobileApiVersion),
-      "Content-Disposition": calendarAttachmentHeader(activity.id),
-      "Content-Type": "text/calendar; charset=utf-8",
-    },
-  });
+  return new Response(body, { headers });
 }
