@@ -55,6 +55,7 @@ const requiredFiles = [
   "docs/audit-log-coverage.md",
   "docs/mvp-launch-readiness.md",
   "docs/mobile-api-readiness.md",
+  "docs/calendar-feeds.md",
   "docs/operator-handoff.md",
   "docs/pr-release-handoff.md",
   "scripts/ensure-admin.ts",
@@ -195,6 +196,11 @@ assert(publicActivityCalendarRoute.includes("buildPublicCalendarFeed([activity])
 const personalAgendaCalendarRoute = read("app/api/me/agenda/calendar/route.ts");
 assert(personalAgendaCalendarRoute.includes("getCurrentSession"), "Personal agenda calendar route must require a session");
 assert(personalAgendaCalendarRoute.includes("Mijn Zuidlaren Agenda"), "Personal agenda calendar route must name the personal calendar feed");
+
+const calendarFeedDocs = read("docs/calendar-feeds.md");
+assert(calendarFeedDocs.includes("/api/public/calendar"), "Calendar feed docs must describe public calendar subscriptions");
+assert(calendarFeedDocs.includes("/api/me/agenda/calendar"), "Calendar feed docs must describe private personal calendar exports");
+assert(calendarFeedDocs.includes("X-Zuidlaren-Api-Version"), "Calendar feed docs must document version headers");
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");

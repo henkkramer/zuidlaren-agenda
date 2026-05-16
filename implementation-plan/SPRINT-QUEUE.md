@@ -59,6 +59,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 50 | Done | Single Activity Calendar Export | `06`, `08`, `20` |
 | 51 | Done | Personal Agenda Calendar Feed | `08`, `20`, `17` |
 | 52 | Done | Personal Calendar Export UI | `06`, `08`, `20` |
+| 53 | Done | Calendar Feed Documentation and Client Notes | `08`, `20`, `21` |
+| 54 | Done | Calendar Export Contract Coverage | `18`, `20`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1158,3 +1160,43 @@ Acceptance:
 
 - Users can reach the personal agenda calendar export without knowing the API URL.
 - The public and personal calendar affordances stay visually consistent.
+
+## Sprint 53 - Calendar Feed Documentation and Client Notes
+
+Status: Done
+
+Goal:
+
+Document how calendar clients should consume public and personal agenda exports.
+
+Scope:
+
+- Dedicated `docs/calendar-feeds.md`.
+- Endpoint table for public feed, single-event export, and personal agenda export.
+- Cache, auth, version-header, UID, and line-folding notes.
+- Launch smoke guard for the documentation.
+
+Acceptance:
+
+- Operators and future native clients have one calendar-feed reference.
+- Personal calendar privacy and session-cookie constraints are explicit.
+
+## Sprint 54 - Calendar Export Contract Coverage
+
+Status: Done
+
+Goal:
+
+Harden calendar export behavior with fast tests for response headers and iCalendar formatting contracts.
+
+Scope:
+
+- Unit tests for public and session API response headers.
+- Calendar-feed test coverage for folded long lines.
+- Mobile readiness docs point to the calendar-feed contract reference.
+
+Acceptance:
+
+- Public calendar responses keep short-lived shared cache headers.
+- Personal calendar responses keep private no-store headers.
+- Generated iCalendar lines stay client-safe for strict parsers.
