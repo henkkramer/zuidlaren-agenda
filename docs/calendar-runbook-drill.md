@@ -32,6 +32,7 @@ RELEASE_BASE_URL=https://<production-host> npm run release:check
 8. Send the same public calendar request with `If-None-Match` and confirm a matching `ETag` returns `304 Not Modified`.
 9. Review `/admin` analytics and confirm calendar export volume remains aggregate-only.
 10. Read `docs/calendar-client-troubleshooting.md` and `docs/calendar-abuse-response.md` before changing rate limits or proxy rules.
+11. Review `docs/calendar-maintenance-checklist.md` before closing the maintenance task.
 
 ## Pass Criteria
 

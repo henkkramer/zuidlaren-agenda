@@ -81,6 +81,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 72 | Done | Public API Release Notes Snapshot | `20`, `18`, `21` |
 | 73 | Done | Public API Changelog Discipline | `20`, `18`, `21` |
 | 74 | Done | Calendar Export Support FAQ | `20`, `19`, `21` |
+| 75 | Done | Public API Documentation Index | `20`, `18`, `21` |
+| 76 | Done | Calendar Export Maintenance Checklist | `19`, `20`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1619,3 +1621,43 @@ Acceptance:
 
 - Support can answer common calendar export questions without reading route code.
 - Calendar troubleshooting points to the FAQ for user-facing replies.
+
+## Sprint 75 - Public API Documentation Index
+
+Status: Done
+
+Goal:
+
+Make the public API documentation set discoverable from one index.
+
+Scope:
+
+- Add `docs/public-api-docs-index.md`.
+- Group release/contract docs, calendar operations docs, and release-flow docs.
+- Link the index from release notes, changelog, launch readiness, and PR handoff.
+- Add launch-smoke guards for the index.
+
+Acceptance:
+
+- Release reviewers can find all public API and calendar docs from one place.
+- Public API documentation updates have a discoverable index target.
+
+## Sprint 76 - Calendar Export Maintenance Checklist
+
+Status: Done
+
+Goal:
+
+Give operators a routine maintenance checklist for calendar exports.
+
+Scope:
+
+- Add `docs/calendar-maintenance-checklist.md`.
+- Cover monthly checks, before-change checks, incident follow-up, analytics review, release-check review, contract update points, and changelog updates.
+- Link the checklist from calendar feed docs, runbook drill, operator handoff, launch readiness, and docs index.
+- Add launch-smoke guards for the checklist.
+
+Acceptance:
+
+- Calendar export maintenance has a repeatable checklist.
+- Calendar docs clearly separate support, troubleshooting, abuse response, runbook drill, and routine maintenance.

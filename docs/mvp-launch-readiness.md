@@ -46,8 +46,10 @@ Warnings for empty content or missing admin users should be resolved before invi
 Admin bootstrap and operator handoff are documented in `docs/operator-handoff.md`.
 Pull request handoff rules are documented in `docs/pr-release-handoff.md`.
 Public API release notes are documented in `docs/public-api-release-notes.md`.
+Public API documentation is indexed in `docs/public-api-docs-index.md`.
 Public API changelog discipline is documented in `docs/public-api-changelog.md`.
 Calendar export runbook drills are documented in `docs/calendar-runbook-drill.md`.
+Calendar export maintenance is documented in `docs/calendar-maintenance-checklist.md`.
 
 ## Manual Release Gate
 

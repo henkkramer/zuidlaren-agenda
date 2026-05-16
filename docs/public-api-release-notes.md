@@ -3,6 +3,7 @@
 This snapshot summarizes the public and mobile-safe API surface included in the controlled MVP release.
 
 Release-facing API changes are tracked in `docs/public-api-changelog.md`.
+The public API documentation index is `docs/public-api-docs-index.md`.
 
 ## Version
 
