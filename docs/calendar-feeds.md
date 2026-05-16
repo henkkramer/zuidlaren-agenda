@@ -28,12 +28,26 @@ Calendar exports include weak `ETag` headers and return `304 Not Modified` when 
 - Missing or unpublished single-activity exports return the normal versioned JSON error response.
 
 See `docs/calendar-abuse-response.md` for operational handling of high-frequency calendar polling.
+See `docs/calendar-metrics.md` for aggregate export metrics and monitoring semantics.
+
+## Frozen Contract
+
+The calendar export API contract is frozen for current public and personal clients:
+
+- Method remains `GET`.
+- Response content type remains `text/calendar; charset=utf-8`.
+- Public feed and single-activity exports remain public and short-cacheable.
+- Personal agenda exports remain session-only, private, and no-store.
+- All calendar exports keep `ETag`, `If-None-Match`, `304 Not Modified`, `429`, and `Retry-After` behavior.
+
+Contract changes must update `calendarEndpointContracts` in `lib/mobile-contracts.ts`, `tests/mobile-contracts.test.ts`, this document, and `docs/mobile-api-readiness.md` in the same sprint.
 
 ## Validation
 
 Calendar contracts are covered by:
 
 - `tests/calendar-feed.test.ts`
+- `tests/calendar-export-integration.test.ts`
 - `tests/api-response.test.ts`
 - `tests/mobile-contracts.test.ts`
 - `npm run test:e2e`

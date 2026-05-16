@@ -73,6 +73,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 64 | Done | Calendar Feed Monitoring Copy Polish | `14`, `16`, `21` |
 | 65 | Done | Calendar Export Integration Smoke Fixtures | `18`, `20`, `21` |
 | 66 | Done | Calendar Feed Operational Handoff Update | `19`, `20`, `21` |
+| 67 | Done | Calendar Export Metrics Documentation | `16`, `20`, `21` |
+| 68 | Done | Public API Calendar Contract Freeze | `18`, `20`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1450,3 +1452,43 @@ Acceptance:
 
 - Operators can find calendar export handling without reading code.
 - Release readiness and smoke checks keep the public calendar runtime validation documented.
+
+## Sprint 67 - Calendar Export Metrics Documentation
+
+Status: Done
+
+Goal:
+
+Document what calendar export analytics mean and keep the monitoring semantics aggregate-only.
+
+Scope:
+
+- Add `docs/calendar-metrics.md`.
+- Describe `calendar_export` dimensions for `public_feed`, `single_activity`, and `personal_agenda`.
+- Document that matching `If-None-Match` requests return `304 Not Modified` before metrics are recorded.
+- Add launch-smoke guards for the metric documentation.
+
+Acceptance:
+
+- Operators can interpret calendar export analytics without reading route code.
+- Personal calendar export metrics remain documented as aggregate-only.
+
+## Sprint 68 - Public API Calendar Contract Freeze
+
+Status: Done
+
+Goal:
+
+Freeze the public and personal calendar export contract for current clients.
+
+Scope:
+
+- Add exported calendar endpoint contracts to `lib/mobile-contracts.ts`.
+- Expose the calendar export contract in mobile capabilities.
+- Add test coverage for endpoint, auth, cache, content type, conditional request, and rate-limit behavior.
+- Document the frozen contract in calendar feed and mobile API readiness docs.
+
+Acceptance:
+
+- Calendar export contract changes require explicit code, test, and documentation updates.
+- Future clients can discover stable calendar export behavior through the capabilities payload and docs.
