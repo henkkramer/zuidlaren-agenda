@@ -5,6 +5,8 @@ import {
   calendarEtag,
   calendarNotModifiedResponse,
   calendarRateLimitKey,
+  calendarRateLimitResponse,
+  prepareCalendarResponse,
   calendarResponseHeaders,
   sanitizeCalendarFilename,
 } from "@/lib/calendar-export";
@@ -52,4 +54,22 @@ test("calendar conditional request returns not modified on matching etag", () =>
   assert.equal(response?.status, 304);
   assert.equal(response?.headers.get("etag"), headers.ETag);
   assert.equal(calendarNotModifiedResponse(new Request("https://example.nl"), headers), null);
+});
+
+test("calendar response preparation returns reusable response shapes", async () => {
+  const request = new Request("https://example.nl/api/public/calendar");
+  const prepared = prepareCalendarResponse(request, { "X-Zuidlaren-Api-Version": "2026-05-14" }, "Agenda", "BEGIN:VCALENDAR");
+
+  assert.equal(prepared.notModifiedResponse, null);
+  assert.equal(prepared.headers["Content-Disposition"], 'inline; filename="agenda.ics"');
+  assert.equal(prepared.response.headers.get("etag"), prepared.headers.ETag);
+  assert.equal(await prepared.response.text(), "BEGIN:VCALENDAR");
+});
+
+test("calendar rate limit response merges retry and API headers", () => {
+  const response = calendarRateLimitResponse(Date.now() + 10_000, { "X-Zuidlaren-Api-Version": "2026-05-14" });
+
+  assert.equal(response.status, 429);
+  assert.equal(response.headers.get("x-zuidlaren-api-version"), "2026-05-14");
+  assert.ok(response.headers.get("retry-after"));
 });

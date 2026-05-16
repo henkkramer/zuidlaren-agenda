@@ -192,8 +192,7 @@ assert(publicActivitiesRoute.includes("publicApiHeaders"), "Public activities AP
 const publicCalendarRoute = read("app/api/public/calendar/route.ts");
 assert(publicCalendarRoute.includes("buildPublicCalendarFeed"), "Public calendar route must build an iCalendar feed");
 assert(publicCalendarRoute.includes("checkRateLimit"), "Public calendar route must rate limit exports");
-assert(publicCalendarRoute.includes("calendarResponseHeaders"), "Public calendar route must use sanitized filenames and etags");
-assert(publicCalendarRoute.includes("calendarNotModifiedResponse"), "Public calendar route must support conditional requests");
+assert(publicCalendarRoute.includes("prepareCalendarResponse"), "Public calendar route must use shared calendar response preparation");
 
 const publicActivityCalendarRoute = read("app/api/public/activities/[activityId]/calendar/route.ts");
 assert(publicActivityCalendarRoute.includes("getPublicActivityDetail"), "Single-activity calendar route must read one public activity");
@@ -218,6 +217,7 @@ assert(calendarFeedDocs.includes("If-None-Match"), "Calendar feed docs must docu
 const calendarAbuseDocs = read("docs/calendar-abuse-response.md");
 assert(calendarAbuseDocs.includes("429"), "Calendar abuse docs must describe rate-limit responses");
 assert(calendarAbuseDocs.includes("ETag"), "Calendar abuse docs must describe client cache behavior");
+assert(calendarAbuseDocs.includes("agenda exports totaal"), "Calendar abuse docs must explain admin monitoring copy");
 
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");

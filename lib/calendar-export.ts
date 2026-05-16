@@ -1,3 +1,5 @@
+import { rateLimitResponse } from "@/lib/rate-limit";
+
 const fallbackFilename = "zuidlaren-agenda";
 
 export function calendarRateLimitKey(request: Request, scope: "public-feed" | "single-activity" | "personal-agenda", userId?: string) {
@@ -62,4 +64,26 @@ export function calendarNotModifiedResponse(request: Request, headers: Record<st
     headers,
     status: 304,
   });
+}
+
+export function calendarRateLimitResponse(resetAt: number, headers: Record<string, string>) {
+  const response = rateLimitResponse(resetAt);
+  return Response.json(response.body, {
+    ...response.init,
+    headers: {
+      ...response.init.headers,
+      ...headers,
+    },
+  });
+}
+
+export function prepareCalendarResponse(request: Request, baseHeaders: Record<string, string>, filename: string, body: string) {
+  const headers = calendarResponseHeaders(baseHeaders, filename, body);
+  const notModifiedResponse = calendarNotModifiedResponse(request, headers);
+
+  return {
+    headers,
+    notModifiedResponse,
+    response: new Response(body, { headers }),
+  };
 }

@@ -8,6 +8,7 @@ Calendar export endpoints are intentionally lightweight, but calendar clients ca
 - Repeated `429` responses on `/api/public/activities/{activityId}/calendar`.
 - Repeated `429` responses on `/api/me/agenda/calendar` for a signed-in user.
 - Elevated `calendar_export` analytics counts without matching normal activity views.
+- Admin analytics shows the total `agenda exports totaal` count and the `Agenda export verdeling` breakdown by export kind.
 
 ## Response
 
@@ -16,6 +17,15 @@ Calendar export endpoints are intentionally lightweight, but calendar clients ca
 3. For personal agenda exports, ask the user to reduce calendar refresh frequency before disabling account access.
 4. Keep the public calendar endpoint in release checks; do not remove it to mitigate abuse.
 5. If abuse persists, tighten reverse-proxy limits for calendar paths before changing app-level product behavior.
+
+## Monitoring Copy
+
+The admin dashboard intentionally uses aggregate labels:
+
+- `agenda exports totaal` for total calendar export volume.
+- `Agenda export verdeling` for `public_feed`, `single_activity`, `personal_agenda`, or `unknown` export kinds.
+
+These labels are operational signals, not user-level tracking.
 
 ## Client Guidance
 
