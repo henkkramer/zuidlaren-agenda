@@ -97,9 +97,13 @@ export function buildActivityWhere(filters: ActivityFilterState): Prisma.Activit
   const and: Prisma.ActivityWhereInput[] = [{ status: "PUBLISHED" }];
   const customStart = parseDate(filters.start);
   const customEnd = parseDate(filters.end);
-  const range: { from?: Date; to?: Date } = filters.period ? periodRange(filters.period) : {};
+  const today = startOfDay(new Date());
+  const hasCustomDateFilter = Boolean(filters.start || filters.end);
+  const range: { from?: Date; to?: Date } = !hasCustomDateFilter && filters.period ? periodRange(filters.period) : {};
+  const explicitPastDate = Boolean((customStart && customStart < today) || (!customStart && customEnd && customEnd < today));
+  const defaultFrom = !filters.period && !explicitPastDate ? today : undefined;
 
-  const from = customStart ?? range.from;
+  const from = customStart ?? range.from ?? defaultFrom;
   const to = customEnd ? addDays(customEnd, 1) : range.to;
 
   if (from || to) {

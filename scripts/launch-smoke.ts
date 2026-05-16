@@ -337,6 +337,15 @@ assert(publicApiGovernanceRequiredDocs.includes("docs/public-api-release-notes.m
 assert(publicApiGovernanceRequiredDocs.includes("docs/calendar-documentation-map.md"), "Public API governance fixture must include calendar map docs");
 assert(publicApiGovernanceRequiredChecks.includes("release-check"), "Public API governance fixture must include release-check review");
 
+const filterControls = read("components/filter-controls.tsx");
+assert(!filterControls.includes("<select"), "Public agenda filters must use buttons instead of dropdown selects");
+assert(filterControls.includes("filter-button-groups"), "Public agenda filters must render grouped button controls");
+assert(filterControls.includes("options.categories"), "Public agenda category filters must use available event categories");
+
+const publicActivityQuery = read("lib/public-activity-query.ts");
+assert(publicActivityQuery.includes("defaultFrom"), "Public activity queries must default to today and later");
+assert(publicActivityQuery.includes("hasCustomDateFilter"), "Public activity queries must allow explicit past date ranges");
+
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");
 assert(releaseCheckScript.includes("content-type="), "release check output must include response content type details");
