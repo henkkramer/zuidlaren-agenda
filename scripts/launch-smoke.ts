@@ -93,7 +93,7 @@ for (const script of requiredScripts) {
 assert(packageJson.scripts.typecheck.includes("prisma generate"), "typecheck must generate Prisma Client before tsc");
 
 const envExample = read(".env.example");
-for (const key of ["DATABASE_URL", "NEXTAUTH_URL", "NEXTAUTH_SECRET", "EMAIL_FROM", "ADMIN_EMAIL", "RELEASE_BASE_URL", "PORT=3088"]) {
+for (const key of ["DATABASE_URL", "NEXTAUTH_URL", "NEXTAUTH_SECRET", "EMAIL_SERVER", "EMAIL_FROM", "ADMIN_EMAIL", "RELEASE_BASE_URL", "PORT=3088"]) {
   assert(envExample.includes(key), `.env.example is missing ${key}`);
 }
 
@@ -336,6 +336,12 @@ assert(publicApiGovernanceReview.includes("public-api-governance.ts"), "Public A
 assert(publicApiGovernanceRequiredDocs.includes("docs/public-api-release-notes.md"), "Public API governance fixture must include release notes docs");
 assert(publicApiGovernanceRequiredDocs.includes("docs/calendar-documentation-map.md"), "Public API governance fixture must include calendar map docs");
 assert(publicApiGovernanceRequiredChecks.includes("release-check"), "Public API governance fixture must include release-check review");
+
+const authModule = read("lib/auth.ts");
+assert(authModule.includes("const emailServer = process.env.EMAIL_SERVER"), "Email auth must read EMAIL_SERVER");
+assert(authModule.includes("server: emailServer"), "Email auth must pass EMAIL_SERVER to NextAuth");
+assert(authModule.includes("? {}"), "Email auth must skip the log override when EMAIL_SERVER is configured");
+assert(authModule.includes("auth.login_link.created"), "Email auth must keep a local log fallback when EMAIL_SERVER is missing");
 
 const filterControls = read("components/filter-controls.tsx");
 assert(filterControls.includes("filter-menu-row"), "Public agenda filters must render one compact dropdown row");

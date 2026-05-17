@@ -43,8 +43,11 @@ Before running `admin`, production `.env` must include:
 ```text
 ADMIN_EMAIL=owner@example.nl
 ADMIN_DISPLAY_NAME=Zuidlaren Agenda beheerder
+EMAIL_SERVER=smtp://user:password@smtp.example.nl:587
 EMAIL_FROM=Zuidlaren Agenda <noreply@example.local>
 ```
+
+`EMAIL_SERVER` enables real magic-link email delivery for `/account` login. If it is missing, the app falls back to logging the login link in server output for local development.
 
 After changing `.env`, restart the web service:
 
