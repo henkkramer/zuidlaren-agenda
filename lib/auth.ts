@@ -3,6 +3,7 @@ import type { Adapter } from "next-auth/adapters";
 import type { NextAuthOptions, Session } from "next-auth";
 import { getServerSession } from "next-auth";
 import EmailProvider from "next-auth/providers/email";
+import { createLoginLinkFallbackRecord } from "@/lib/login-link-fallback";
 import { prisma } from "@/lib/prisma";
 import { logInfo } from "@/lib/structured-log";
 
@@ -24,6 +25,7 @@ export const authOptions: NextAuthOptions = {
                 loginUrl: url,
                 provider: "email",
               });
+              console.warn(JSON.stringify(createLoginLinkFallbackRecord(identifier, url)));
             },
           }),
     }),

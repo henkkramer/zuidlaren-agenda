@@ -342,6 +342,11 @@ assert(authModule.includes("const emailServer = process.env.EMAIL_SERVER"), "Ema
 assert(authModule.includes("server: emailServer"), "Email auth must pass EMAIL_SERVER to NextAuth");
 assert(authModule.includes("? {}"), "Email auth must skip the log override when EMAIL_SERVER is configured");
 assert(authModule.includes("auth.login_link.created"), "Email auth must keep a local log fallback when EMAIL_SERVER is missing");
+assert(authModule.includes("createLoginLinkFallbackRecord"), "Email auth must print a copyable fallback login link when SMTP is missing");
+
+const loginLinkFallback = read("lib/login-link-fallback.ts");
+assert(loginLinkFallback.includes("auth.login_link.fallback"), "Email auth fallback must expose a copyable login link event when SMTP is missing");
+assert(loginLinkFallback.includes("loginLink: url"), "Email auth fallback must print the magic login link when SMTP is missing");
 
 const filterControls = read("components/filter-controls.tsx");
 assert(filterControls.includes("filter-menu-row"), "Public agenda filters must render one compact dropdown row");

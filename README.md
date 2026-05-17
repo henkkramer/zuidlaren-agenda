@@ -63,7 +63,12 @@ EMAIL_SERVER=smtp://user:password@smtp.example.nl:587
 EMAIL_FROM=Zuidlaren Agenda <noreply@example.nl>
 ```
 
-If `EMAIL_SERVER` is not set, local development logs the login link in the server output instead of sending mail.
+If `EMAIL_SERVER` is not set, the app logs the login link in the server output instead of sending mail. Search the web logs for:
+
+```text
+auth.login_link.fallback
+loginLink
+```
 
 Check a deployed release:
 
