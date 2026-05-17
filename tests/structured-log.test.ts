@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { createLoginLinkFallbackRecord } from "@/lib/login-link-fallback";
 import { createLogRecord, redactLogValue } from "@/lib/structured-log";
 
 test("structured log masks emails in non-sensitive text", () => {
@@ -34,4 +35,12 @@ test("error values only expose redacted messages", () => {
   const value = redactLogValue("error", new Error("Database failed for admin@example.nl"));
 
   assert.equal(value, "Database failed for ad***@example.nl");
+});
+
+test("login link fallback record exposes link while masking email", () => {
+  const record = createLoginLinkFallbackRecord("owner@example.nl", "https://example.nl/api/auth/callback/email?token=secret");
+
+  assert.equal(record.event, "auth.login_link.fallback");
+  assert.equal(record.email, "ow***@example.nl");
+  assert.equal(record.loginLink, "https://example.nl/api/auth/callback/email?token=secret");
 });

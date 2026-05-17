@@ -91,6 +91,8 @@ This queue is the single execution sequence for the existing implementation plan
 | 82 | Done | Real Public Filter Data Wiring | `05`, `07`, `18` |
 | 83 | Done | Full Regression Verification | `17`, `18`, `21` |
 | 84 | Done | Compact Public Filter Dropdowns | `05`, `06`, `07` |
+| 85 | Done | Real Login Link Email Delivery | `04`, `17`, `21` |
+| 86 | Done | Copyable Login Link Fallback Logs | `04`, `17`, `21` |
 
 ## Sprint 0 - Planning and UI Direction
 
@@ -1844,3 +1846,47 @@ Acceptance:
 - The public agenda no longer renders large secondary button groups.
 - Categorie, Locatie, Type, Binnen/Buiten, Organisator, and Vanaf are dropdown buttons.
 - The default public feed returns up to 50 activities.
+
+## Sprint 85 - Real Login Link Email Delivery
+
+Status: Done
+
+Goal:
+
+Send real `/account` magic login links when SMTP is configured, while preserving the local development log fallback.
+
+Scope:
+
+- Let NextAuth's email provider send verification emails when `EMAIL_SERVER` is configured.
+- Keep the structured log fallback for local development when `EMAIL_SERVER` is missing.
+- Document `EMAIL_SERVER` in `.env.example`, README, and deployment notes.
+- Update the check-email page copy to reflect real email delivery.
+- Add launch-smoke guards for the real-email path and fallback path.
+
+Acceptance:
+
+- Configured environments send real login links by email.
+- Local development without SMTP still logs the login link.
+- Deployment documentation lists the SMTP setting needed for admin login.
+
+## Sprint 86 - Copyable Login Link Fallback Logs
+
+Status: Done
+
+Goal:
+
+Make the no-SMTP login fallback usable by exposing the magic login link in server logs.
+
+Scope:
+
+- Keep standard structured-log redaction for sensitive `url` fields.
+- Add a dedicated `auth.login_link.fallback` warning event when `EMAIL_SERVER` is missing.
+- Mask the email address in the fallback record.
+- Include the copyable magic login URL in a `loginLink` field.
+- Document the fallback log event in README and check-email copy.
+- Add unit and smoke coverage for the fallback record.
+
+Acceptance:
+
+- Operators without SMTP can retrieve the magic login URL from web logs.
+- Existing sensitive URL redaction remains in place for normal structured logs.
