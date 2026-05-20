@@ -45,15 +45,34 @@ export async function getPublicFilterOptions(): Promise<ActivityFilterOptions> {
   };
 }
 
-export async function getPublicActivityFeed(filters: ActivityFilterState): Promise<PublicActivityFeed> {
+export async function getPublicActivityFeed(filters: ActivityFilterState, currentUserId?: string): Promise<PublicActivityFeed> {
   const cursorWhere = buildPublicActivityCursorWhere(filters.cursor);
-  const where = cursorWhere ? { AND: [buildActivityWhere(filters), cursorWhere] } : buildActivityWhere(filters);
+  const where = cursorWhere ? { AND: [buildActivityWhere(filters, currentUserId), cursorWhere] } : buildActivityWhere(filters, currentUserId);
   const [activities, filterOptions] = await Promise.all([
     prisma.activity.findMany({
       where,
       include: {
         category: true,
         location: true,
+        _count: {
+          select: {
+            attendances: {
+              where: {
+                status: "GOING",
+                visibility: "PUBLIC",
+              },
+            },
+          },
+        },
+        ...(currentUserId
+          ? {
+              attendances: {
+                where: { userId: currentUserId },
+                select: { status: true, visibility: true },
+                take: 1,
+              },
+            }
+          : {}),
       },
       take: filters.limit + 1,
       orderBy: [{ startAt: "asc" }, { slug: "asc" }],
@@ -82,6 +101,16 @@ export async function getPublicActivityDetail(activityId: string) {
     include: {
       category: true,
       location: true,
+      _count: {
+        select: {
+          attendances: {
+            where: {
+              status: "GOING",
+              visibility: "PUBLIC",
+            },
+          },
+        },
+      },
     },
   });
 

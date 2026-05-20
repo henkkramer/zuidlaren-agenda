@@ -26,6 +26,7 @@ function labelForFilter(key: string, value: string | boolean | number) {
 
   if (key === "category") return categoryLabels[String(value) as keyof typeof categoryLabels] ?? String(value);
   if (key === "family") return "Familie";
+  if (key === "going") return "Ik ga";
   if (key === "price") return value === "free" ? "Gratis" : "Betaald";
   if (key === "q") return `Zoeken: ${value}`;
   if (key === "start") return `Vanaf ${value}`;
@@ -120,6 +121,9 @@ export function FilterControls({ filters, options }: FilterControlsProps) {
         </button>
         <button className={`chip ${filters.family ? "active" : ""}`} onClick={() => go({ family: filters.family ? undefined : true })} type="button">
           Familie
+        </button>
+        <button className={`chip ${filters.going ? "active" : ""}`} onClick={() => go({ going: filters.going ? undefined : true })} type="button">
+          Ik ga
         </button>
         <button className={`chip ${filters.price === "free" ? "active" : ""}`} onClick={() => go({ price: filters.price === "free" ? undefined : "free" })} type="button">
           Gratis

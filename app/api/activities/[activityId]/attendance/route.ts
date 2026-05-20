@@ -64,6 +64,16 @@ function serializeAttendance(attendance: { status: string; visibility: string })
   };
 }
 
+function countPublicGoing(activityId: string) {
+  return prisma.attendance.count({
+    where: {
+      activityId,
+      status: "GOING",
+      visibility: "PUBLIC",
+    },
+  });
+}
+
 export async function POST(request: Request, context: AttendanceRouteContext) {
   const csrfResponse = rejectCrossOriginMutation(request);
   if (csrfResponse) return csrfResponse;
@@ -120,7 +130,9 @@ export async function POST(request: Request, context: AttendanceRouteContext) {
     },
   });
 
-  return NextResponse.json({ attendance: serializeAttendance(attendance) });
+  const publicGoingCount = await countPublicGoing(activity.id);
+
+  return NextResponse.json({ attendance: serializeAttendance(attendance), publicGoingCount });
 }
 
 export async function PATCH(request: Request, context: AttendanceRouteContext) {
@@ -167,7 +179,9 @@ export async function PATCH(request: Request, context: AttendanceRouteContext) {
     },
   });
 
-  return NextResponse.json({ attendance: serializeAttendance(attendance) });
+  const publicGoingCount = await countPublicGoing(activity.id);
+
+  return NextResponse.json({ attendance: serializeAttendance(attendance), publicGoingCount });
 }
 
 export async function DELETE(request: Request, context: AttendanceRouteContext) {

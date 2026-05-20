@@ -3,9 +3,10 @@ import type { Adapter } from "next-auth/adapters";
 import type { NextAuthOptions, Session } from "next-auth";
 import { getServerSession } from "next-auth";
 import EmailProvider from "next-auth/providers/email";
+import { shouldPromoteAdminUser } from "@/lib/admin-email";
 import { createLoginLinkFallbackRecord } from "@/lib/login-link-fallback";
 import { prisma } from "@/lib/prisma";
-import { logInfo } from "@/lib/structured-log";
+import { logError, logInfo } from "@/lib/structured-log";
 
 const emailServer = process.env.EMAIL_SERVER;
 const emailFrom = process.env.EMAIL_FROM ?? "Zuidlaren Agenda <noreply@zuidlaren.local>";
@@ -39,6 +40,21 @@ export const authOptions: NextAuthOptions = {
       }
 
       return session;
+    },
+  },
+  events: {
+    async signIn({ user }) {
+      if (!user.id || !shouldPromoteAdminUser(user.email)) return;
+
+      try {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { disabledAt: null, isAdmin: true },
+        });
+        logInfo("auth.admin.promoted", { email: user.email, userId: user.id });
+      } catch (error) {
+        logError("auth.admin.promote.failed", { email: user.email, error });
+      }
     },
   },
   pages: {
