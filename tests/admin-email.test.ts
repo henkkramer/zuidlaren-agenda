@@ -11,5 +11,5 @@ test("admin email normalization trims and lowercases configured addresses", () =
 test("admin promotion only matches the configured admin mailbox", () => {
   assert.equal(shouldPromoteAdminUser("owner@example.nl", "OWNER@example.nl"), true);
   assert.equal(shouldPromoteAdminUser("other@example.nl", "owner@example.nl"), false);
-  assert.equal(shouldPromoteAdminUser("owner@example.nl", undefined), false);
+  assert.equal(shouldPromoteAdminUser("owner@example.nl", null), false);
 });

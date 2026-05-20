@@ -3,7 +3,10 @@ export function normalizeAdminEmail(value: string | null | undefined) {
   return email || null;
 }
 
-export function shouldPromoteAdminUser(userEmail: string | null | undefined, configuredAdminEmail = process.env.ADMIN_EMAIL) {
+export function shouldPromoteAdminUser(
+  userEmail: string | null | undefined,
+  configuredAdminEmail: string | null | undefined = process.env.ADMIN_EMAIL,
+) {
   const normalizedUserEmail = normalizeAdminEmail(userEmail);
   const normalizedAdminEmail = normalizeAdminEmail(configuredAdminEmail);
 
