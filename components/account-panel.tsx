@@ -14,6 +14,7 @@ type AccountPanelProps =
       user: {
         email: string;
         displayName: string;
+        isAdmin: boolean;
         locale: string;
         deletionRequestedAt: string | null;
       };
@@ -122,6 +123,11 @@ export function AccountPanel(props: AccountPanelProps) {
             <div className="account-card">
               <h2>Profiel</h2>
               <p className="account-muted">{props.user.email}</p>
+              {props.user.isAdmin ? (
+                <Link className="outline-button" href="/admin">
+                  Open admin
+                </Link>
+              ) : null}
               <label>
                 Weergavenaam
                 <input

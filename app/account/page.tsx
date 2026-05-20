@@ -46,6 +46,7 @@ export default async function AccountPage() {
       user={{
         email: user.email,
         displayName: user.displayName ?? user.name ?? "",
+        isAdmin: user.isAdmin,
         locale: user.locale,
         deletionRequestedAt: user.deletionRequestedAt?.toISOString() ?? null,
       }}

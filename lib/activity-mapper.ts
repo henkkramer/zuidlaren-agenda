@@ -20,6 +20,13 @@ type ActivityRecord = {
   sourceUrl: string;
   indoorOutdoor: string | null;
   expectedVisitors: string | null;
+  _count?: {
+    attendances: number;
+  };
+  attendances?: Array<{
+    status: string;
+    visibility: string;
+  }>;
   sourceQuality: string | null;
 };
 
@@ -58,6 +65,13 @@ export function mapActivityRecord(activity: ActivityRecord): Activity {
     sourceUrl: activity.sourceUrl,
     indoorOutdoor: toIndoorOutdoor(activity.indoorOutdoor),
     expectedVisitors: activity.expectedVisitors ?? undefined,
+    myAttendance: activity.attendances?.[0]
+      ? {
+          status: activity.attendances[0].status.toLowerCase() as "going" | "maybe",
+          visibility: activity.attendances[0].visibility.toLowerCase() as "private" | "public",
+        }
+      : undefined,
+    publicGoingCount: activity._count?.attendances ?? 0,
     sourceQuality: activity.sourceQuality ?? undefined,
   };
 }

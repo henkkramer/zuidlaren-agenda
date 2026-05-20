@@ -60,6 +60,23 @@ test("activity filters clamp limit and build stable query state", () => {
   assert.equal(toQueryString(filters, { limit: 50 }), "family=1&period=week&price=free&q=muziek&type=Concert");
 });
 
+test("activity filters include my attendance only for authenticated users", () => {
+  const filters = parseActivityFilters({ going: "1" });
+
+  assert.equal(filters.going, true);
+  assert.equal(toQueryString(filters, { limit: 50 }), "going=1");
+
+  const anonymousWhere = buildActivityWhere(filters);
+  assert.ok(Array.isArray(anonymousWhere.AND));
+  assert.deepEqual(anonymousWhere.AND.at(-1), { id: "__no_authenticated_user__" });
+
+  const userWhere = buildActivityWhere(filters, "user-1");
+  assert.ok(Array.isArray(userWhere.AND));
+  assert.deepEqual(userWhere.AND.at(-1), {
+    attendances: { some: { userId: "user-1", status: "GOING" } },
+  });
+});
+
 test("activity filters default to upcoming events and allow explicit past date ranges", () => {
   const defaultWhere = buildActivityWhere(parseActivityFilters({}));
   assert.ok(Array.isArray(defaultWhere.AND));

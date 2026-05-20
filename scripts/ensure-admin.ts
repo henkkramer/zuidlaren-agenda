@@ -2,6 +2,7 @@ import "dotenv/config";
 
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { normalizeAdminEmail } from "../lib/admin-email";
 import { logError, logInfo } from "../lib/structured-log";
 
 const adminDisplayName = process.env.ADMIN_DISPLAY_NAME?.trim() || "Zuidlaren Agenda beheerder";
@@ -10,7 +11,7 @@ if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is required");
 }
 
-const configuredAdminEmail = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+const configuredAdminEmail = normalizeAdminEmail(process.env.ADMIN_EMAIL);
 
 if (!configuredAdminEmail) {
   throw new Error("ADMIN_EMAIL is required");

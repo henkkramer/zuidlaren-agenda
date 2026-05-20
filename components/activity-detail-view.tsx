@@ -9,7 +9,9 @@ import { activityDateParts, formatActivityEndTime } from "@/lib/date-format";
 
 export function ActivityDetailView({ activity, onBack }: { activity: Activity; onBack: () => void }) {
   const parts = activityDateParts(activity);
-  const [visibility, setVisibility] = useState<"private" | "public">("private");
+  const [visibility, setVisibility] = useState<"private" | "public">(activity.myAttendance?.visibility ?? "private");
+  const [myAttendance, setMyAttendance] = useState(activity.myAttendance);
+  const [publicGoingCount, setPublicGoingCount] = useState(activity.publicGoingCount ?? 0);
   const [status, setStatus] = useState("");
 
   async function markGoing() {
@@ -25,7 +27,27 @@ export function ActivityDetailView({ activity, onBack }: { activity: Activity; o
       return;
     }
 
-    setStatus(response.ok ? "Toegevoegd aan mijn agenda" : "Kon activiteit niet opslaan");
+    if (!response.ok) {
+      setStatus("Kon activiteit niet opslaan");
+      return;
+    }
+
+    const data = (await response.json()) as {
+      attendance?: {
+        status: "going" | "maybe";
+        visibility: "private" | "public";
+      };
+      publicGoingCount?: number;
+    };
+
+    if (data.attendance) {
+      setMyAttendance(data.attendance);
+      setVisibility(data.attendance.visibility);
+    }
+    if (typeof data.publicGoingCount === "number") {
+      setPublicGoingCount(data.publicGoingCount);
+    }
+    setStatus("Toegevoegd aan mijn agenda");
   }
 
   function trackSourceClick() {
@@ -105,6 +127,10 @@ export function ActivityDetailView({ activity, onBack }: { activity: Activity; o
         </div>
         <div className="section-divider" />
         <h3>Ik ga</h3>
+        <p className="account-muted">
+          {myAttendance ? "Je gaat naar deze activiteit." : "Nog niet toegevoegd aan je agenda."}
+          {publicGoingCount > 0 ? ` ${publicGoingCount} publiek zichtbaar.` : ""}
+        </p>
         <div className="visibility-grid">
           <button
             className={`visibility-card ${visibility === "private" ? "active" : ""}`}
@@ -122,7 +148,7 @@ export function ActivityDetailView({ activity, onBack }: { activity: Activity; o
           </button>
         </div>
         <button className="primary-button" onClick={markGoing} type="button">
-          Ik ga
+          {myAttendance ? "Ik ga bijwerken" : "Ik ga"}
         </button>
         {status ? <p className="action-status">{status}</p> : null}
         <div style={{ height: 12 }} />

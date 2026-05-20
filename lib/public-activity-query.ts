@@ -5,6 +5,7 @@ export type ActivityFilterState = {
   cursor?: string;
   end?: string;
   family?: boolean;
+  going?: boolean;
   indoorOutdoor?: string;
   limit: number;
   location?: string;
@@ -93,6 +94,7 @@ export function parseActivityFilters(searchParams: Record<string, string | strin
     cursor: clean(searchParams.cursor),
     end: clean(searchParams.end),
     family: clean(searchParams.family) === "1",
+    going: clean(searchParams.going) === "1",
     indoorOutdoor: clean(searchParams.indoorOutdoor),
     limit: Number.isFinite(requestedLimit) ? Math.min(Math.max(requestedLimit, 1), maxLimit) : defaultLimit,
     location: clean(searchParams.location),
@@ -105,7 +107,7 @@ export function parseActivityFilters(searchParams: Record<string, string | strin
   };
 }
 
-export function buildActivityWhere(filters: ActivityFilterState): Prisma.ActivityWhereInput {
+export function buildActivityWhere(filters: ActivityFilterState, currentUserId?: string): Prisma.ActivityWhereInput {
   const and: Prisma.ActivityWhereInput[] = [{ status: "PUBLISHED" }];
   const customStart = parseDate(filters.start);
   const customEnd = parseDate(filters.end);
@@ -138,6 +140,13 @@ export function buildActivityWhere(filters: ActivityFilterState): Prisma.Activit
     and.push({
       OR: [{ category: { slug: "kinderen" } }, { typeTags: { has: "Familie" } }, { typeTags: { has: "Kinderen" } }],
     });
+  }
+  if (filters.going) {
+    if (!currentUserId) {
+      and.push({ id: "__no_authenticated_user__" });
+    } else {
+      and.push({ attendances: { some: { userId: currentUserId, status: "GOING" } } });
+    }
   }
 
   if (filters.q) {

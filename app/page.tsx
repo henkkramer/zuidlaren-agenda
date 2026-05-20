@@ -1,5 +1,6 @@
 import { ZuidlarenAgendaShell } from "@/components/zuidlaren-agenda-shell";
 import { hasActiveFilterDimensions, recordAnalyticsMetric } from "@/lib/analytics";
+import { getCurrentSession } from "@/lib/auth";
 import { getPublicActivityFeed } from "@/lib/public-activities";
 import { parseActivityFilters } from "@/lib/public-activity-query";
 
@@ -11,7 +12,8 @@ type HomePageProps = {
 
 export default async function Home({ searchParams }: HomePageProps) {
   const filters = parseActivityFilters(await searchParams);
-  const feed = await getPublicActivityFeed(filters);
+  const session = await getCurrentSession();
+  const feed = await getPublicActivityFeed(filters, session?.user?.id);
 
   if (hasActiveFilterDimensions(filters)) {
     await recordAnalyticsMetric({

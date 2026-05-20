@@ -16,6 +16,11 @@ export type Activity = {
   sourceUrl: string;
   indoorOutdoor?: "Binnen" | "Buiten" | "Gemengd";
   expectedVisitors?: string;
+  myAttendance?: {
+    status: "going" | "maybe";
+    visibility: "private" | "public";
+  };
+  publicGoingCount?: number;
   sourceQuality?: string;
 };
 
