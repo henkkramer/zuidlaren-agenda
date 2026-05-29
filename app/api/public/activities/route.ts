@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { publicApiHeaders } from "@/lib/api-response";
 import { hasActiveFilterDimensions, recordAnalyticsMetric } from "@/lib/analytics";
 import { mobileApiVersion } from "@/lib/mobile-contracts";
@@ -10,7 +10,7 @@ export async function GET(request: Request) {
   const filters = parseActivityFilters(Object.fromEntries(url.searchParams.entries()));
   const feed = await getPublicActivityFeed(filters);
 
-  await recordAnalyticsMetric({
+  after(() => recordAnalyticsMetric({
     metric: "public_activity_list",
     dimensions: {
       endpoint: "public_api",
@@ -18,7 +18,7 @@ export async function GET(request: Request) {
       hasMore: feed.hasMore,
       limit: feed.limit,
     },
-  });
+  }));
 
   return NextResponse.json(
     {

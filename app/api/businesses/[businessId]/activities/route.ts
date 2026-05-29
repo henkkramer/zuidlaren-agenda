@@ -4,6 +4,7 @@ import { parseBusinessActivityPayload, type BusinessActivityPayload } from "@/li
 import { mapActivityRecord } from "@/lib/activity-mapper";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
+import { revalidatePublicActivityCaches } from "@/lib/public-activity-cache";
 import { slugify } from "@/lib/slugify";
 import { accessDeniedResponse, badRequestResponse } from "@/lib/route-helpers";
 
@@ -102,6 +103,8 @@ export async function POST(request: Request, context: BusinessActivitiesContext)
       location: true,
     },
   });
+
+  revalidatePublicActivityCaches({ filterOptions: true });
 
   await prisma.auditLog.create({
     data: {

@@ -1,8 +1,10 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
 import { mapActivityRecord } from "@/lib/activity-mapper";
 import type { Activity } from "@/lib/activity-types";
 import { prisma } from "@/lib/prisma";
+import { publicActivityFeedCacheTag, publicFilterOptionsCacheTag } from "@/lib/public-activity-cache";
 import { buildPublicActivityCursor, buildPublicActivityCursorWhere } from "@/lib/public-activity-pagination";
 import { buildActivityWhere, type ActivityFilterOptions, type ActivityFilterState } from "@/lib/public-activity-query";
 
@@ -16,7 +18,7 @@ export type PublicActivityFeed = {
 
 export type PublicActivityPage = Omit<PublicActivityFeed, "filterOptions">;
 
-export async function getPublicFilterOptions(): Promise<ActivityFilterOptions> {
+async function getPublicFilterOptionsUncached(): Promise<ActivityFilterOptions> {
   const [categories, activityRows, locations] = await Promise.all([
     prisma.activityCategory.findMany({ orderBy: { name: "asc" } }),
     prisma.activity.findMany({
@@ -58,7 +60,7 @@ export async function getPublicFilterOptions(): Promise<ActivityFilterOptions> {
   };
 }
 
-export async function getPublicActivityPage(filters: ActivityFilterState, currentUserId?: string): Promise<PublicActivityPage> {
+async function getPublicActivityPageUncached(filters: ActivityFilterState, currentUserId?: string): Promise<PublicActivityPage> {
   const cursorWhere = buildPublicActivityCursorWhere(filters.cursor);
   const where = cursorWhere ? { AND: [buildActivityWhere(filters, currentUserId), cursorWhere] } : buildActivityWhere(filters, currentUserId);
   const activities = await prisma.activity.findMany({
@@ -99,6 +101,24 @@ export async function getPublicActivityPage(filters: ActivityFilterState, curren
     limit: filters.limit,
     nextCursor: hasMore && lastVisibleActivity ? buildPublicActivityCursor({ slug: lastVisibleActivity.slug, startAt: lastVisibleActivity.startAt }) : null,
   };
+}
+
+const getCachedPublicFilterOptions = unstable_cache(getPublicFilterOptionsUncached, ["public-filter-options"], {
+  revalidate: 300,
+  tags: [publicFilterOptionsCacheTag],
+});
+
+const getCachedPublicActivityPage = unstable_cache(getPublicActivityPageUncached, ["public-activity-page"], {
+  revalidate: 60,
+  tags: [publicActivityFeedCacheTag],
+});
+
+export function getPublicFilterOptions(): Promise<ActivityFilterOptions> {
+  return getCachedPublicFilterOptions();
+}
+
+export function getPublicActivityPage(filters: ActivityFilterState, currentUserId?: string): Promise<PublicActivityPage> {
+  return getCachedPublicActivityPage(filters, currentUserId);
 }
 
 export async function getPublicActivityFeed(filters: ActivityFilterState, currentUserId?: string): Promise<PublicActivityFeed> {

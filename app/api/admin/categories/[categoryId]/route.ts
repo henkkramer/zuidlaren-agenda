@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminAuditLog, requireAdmin } from "@/lib/admin-auth";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
+import { revalidatePublicActivityCaches } from "@/lib/public-activity-cache";
 import { slugify } from "@/lib/slugify";
 import { accessDeniedResponse, badRequestResponse } from "@/lib/route-helpers";
 
@@ -42,6 +43,8 @@ export async function PATCH(request: Request, context: CategoryContext) {
       ...(slug ? { slug } : {}),
     },
   });
+
+  revalidatePublicActivityCaches({ filterOptions: true });
 
   await createAdminAuditLog({
     actorId: admin.userId,
