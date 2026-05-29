@@ -85,7 +85,7 @@ for (const file of requiredFiles) {
 }
 
 const packageJson = JSON.parse(read("package.json")) as { scripts: Record<string, string> };
-const requiredScripts = ["lint", "typecheck", "test", "test:e2e", "build", "dev:3088", "start:3088", "health", "release:check", "admin:ensure", "db:seed"];
+const requiredScripts = ["lint", "typecheck", "test", "test:e2e", "build", "dev:3088", "start:3088", "health", "release:check", "admin:ensure", "db:seed", "seed:credentials"];
 
 for (const script of requiredScripts) {
   assert(packageJson.scripts[script], `Missing package script: ${script}`);
@@ -102,6 +102,7 @@ assert(dockerCompose.includes('cpuset: "0-1"'), 'docker-compose.yml must pin the
 const dockerfile = read("Dockerfile");
 assert(dockerfile.includes("node:24-alpine@sha256:"), "Dockerfile must pin the Node base image by digest");
 assert(dockerfile.includes("npm ci --omit=dev"), "Dockerfile runtime dependencies must omit dev packages");
+assert(dockerfile.includes("scripts/seed-credentials.mjs"), "Dockerfile must copy the production credential seed script into the runtime image");
 
 const nextConfig = read("next.config.ts");
 assert(nextConfig.includes("securityHeadersForNext"), "next.config.ts must apply shared security headers");
@@ -429,6 +430,13 @@ assert(seedScript.includes('requiredSeedPassword("SEED_ADMIN_PASSWORD")'), "Seed
 assert(seedScript.includes('requiredSeedPassword("SEED_USER_PASSWORD")'), "Seed script must require test user password from the environment");
 assert(seedScript.includes('requiredSeedPassword("SEED_OWNER_PASSWORD")'), "Seed script must require owner password from the environment");
 assert(seedScript.includes('role: "OWNER"'), "Seed script must make eigenaar a business owner");
+
+const credentialSeedScript = read("scripts/seed-credentials.mjs");
+assert(packageJson.scripts["seed:credentials"] === "node scripts/seed-credentials.mjs", "package.json must expose a production-safe credential seed command");
+assert(credentialSeedScript.includes('requiredEnv("SEED_ADMIN_PASSWORD")'), "Production credential seed script must require the admin password from env");
+assert(credentialSeedScript.includes('ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "credentialLogin"'), "Production credential seed script must prepare credential columns");
+assert(credentialSeedScript.includes('CREATE UNIQUE INDEX IF NOT EXISTS "User_credentialLogin_key"'), "Production credential seed script must prepare the credential login unique index");
+assert(credentialSeedScript.includes('role: "OWNER"'), "Production credential seed script must link eigenaar as owner when a business exists");
 
 const loginLinkFallback = read("lib/login-link-fallback.ts");
 assert(loginLinkFallback.includes("auth.login_link.fallback"), "Email auth fallback must expose a copyable login link event when SMTP is missing");
