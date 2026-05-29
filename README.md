@@ -70,6 +70,19 @@ auth.login_link.fallback
 loginLink
 ```
 
+
+Seed credential fallback accounts in a deployed Docker container after the image has been rebuilt and deployed:
+
+```bash
+docker compose exec \
+  -e SEED_ADMIN_PASSWORD=admin123 \
+  -e SEED_USER_PASSWORD=henk \
+  -e SEED_OWNER_PASSWORD=eigenaar \
+  web npm run seed:credentials
+```
+
+Optional username overrides are `SEED_ADMIN_USERNAME`, `SEED_USER_USERNAME`, and `SEED_OWNER_USERNAME`; they default to `admin`, `henk`, and `eigenaar`.
+
 Check a deployed release:
 
 ```bash

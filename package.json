@@ -18,6 +18,7 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
+    "seed:credentials": "node scripts/seed-credentials.mjs",
     "perf:budget": "tsx scripts/perf-budget.ts"
   },
   "dependencies": {
