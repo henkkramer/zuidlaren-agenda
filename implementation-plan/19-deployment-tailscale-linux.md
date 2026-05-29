@@ -60,3 +60,18 @@ https://mb-linux.sailfish-musical.ts.net
 - The MVP can be tested from another device through Tailscale.
 - Deployment instructions are repeatable.
 
+
+## Performance and Runtime Guardrails
+
+The production image is built from a digest-pinned `node:24-alpine` base and the final runner stage uses Next standalone output. The runtime dependency install stage runs `npm ci --omit=dev` to keep dependency resolution explicit while the final image avoids copying duplicate `node_modules` content.
+
+Before deployment, run:
+
+```bash
+npm run build
+npm run perf:budget
+```
+
+The budget command checks the generated Next.js app build manifest and fails if `/`, `/account`, or `/business/[businessId]` exceed their JavaScript gzip budgets. In the Sprint 4 validation build the runner image was 324 MB.
+
+Operational logs in non-production include structured Prisma warnings for slow queries and repeated query shapes. In production, use the existing container logs plus `/api/health` and `/api/health/ready` for runtime checks. Web Vitals are aggregated through the app itself and visible in the admin analytics card after real traffic arrives.

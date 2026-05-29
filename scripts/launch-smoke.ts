@@ -99,9 +99,14 @@ for (const key of ["DATABASE_URL", "NEXTAUTH_URL", "NEXTAUTH_SECRET", "EMAIL_SER
 
 const dockerCompose = read("docker-compose.yml");
 assert(dockerCompose.includes('cpuset: "0-1"'), 'docker-compose.yml must pin the web service with cpuset: "0-1"');
+const dockerfile = read("Dockerfile");
+assert(dockerfile.includes("node:24-alpine@sha256:"), "Dockerfile must pin the Node base image by digest");
+assert(dockerfile.includes("npm ci --omit=dev"), "Dockerfile runtime dependencies must omit dev packages");
 
 const nextConfig = read("next.config.ts");
 assert(nextConfig.includes("securityHeadersForNext"), "next.config.ts must apply shared security headers");
+assert(nextConfig.includes("optimizePackageImports"), "next.config.ts must optimize package imports");
+assert(nextConfig.includes("/uploads/:path*"), "next.config.ts must add immutable upload cache headers");
 
 const profileRoute = read("app/api/me/profile/route.ts");
 assert(profileRoute.includes("rejectCrossOriginMutation"), "profile mutation route must apply CSRF origin guard");
@@ -212,6 +217,21 @@ const publicActivityCache = read("lib/public-activity-cache.ts");
 const homepage = read("app/page.tsx");
 const analyticsSnapshot = read("lib/analytics-snapshot.ts");
 const publicActivitiesRoute = read("app/api/public/activities/route.ts");
+const prismaSelects = read("lib/prisma-selects.ts");
+const personalAgenda = read("lib/personal-agenda.ts");
+const notificationCampaigns = read("lib/notification-campaigns.ts");
+const businessPermissions = read("lib/business-permissions.ts");
+const adminActivitiesRoute = read("app/api/admin/activities/route.ts");
+const adminBusinessesRoute = read("app/api/admin/businesses/route.ts");
+const adminReportsRoute = read("app/api/admin/reports/route.ts");
+const prismaSchema = read("prisma/schema.prisma");
+const tsconfig = read("tsconfig.json");
+const gitignore = read(".gitignore");
+const analyticsEventsRoute = read("app/api/analytics/events/route.ts");
+const webVitalsRoute = read("app/api/analytics/web-vitals/route.ts");
+const webVitalsReporter = read("components/web-vitals-reporter.tsx");
+const accountPanel = read("components/account-panel.tsx");
+const seed = read("prisma/seed.ts");
 assert(activityCard.includes("next/image"), "Activity cards must use next/image");
 assert(activityDetailView.includes("next/image"), "Activity detail hero must use next/image");
 assert(activityDetailView.includes("sendBeacon"), "Activity source analytics should use sendBeacon when available");
@@ -221,11 +241,34 @@ assert(rootLayout.includes("next/font/google"), "Root layout must use next/font 
 assert(publicActivities.includes("unstable_cache"), "Public activity read model must use Next cache");
 assert(publicActivities.includes("publicActivityFeedCacheTag"), "Public activity feed cache must use a shared tag");
 assert(publicActivityCache.includes("revalidatePublicActivityCaches"), "Public activity cache invalidation helper must exist");
+assert(homepage.includes("<Suspense"), "Homepage must stream filter controls and activity feed through Suspense");
+assert(agendaShell.includes("FilterControlsSkeleton"), "Agenda shell must expose a filter loading skeleton");
+assert(agendaShell.includes("ActivityFeedSkeleton"), "Agenda shell must expose an activity feed loading skeleton");
 assert(homepage.includes("after(() => recordAnalyticsMetric"), "Homepage analytics must run after render");
 assert(analyticsSnapshot.includes('by: ["metric"]'), "Analytics snapshot must group metric totals in one query");
 assert(publicActivitiesRoute.includes("nextCursor"), "Public activities API must expose cursor pagination metadata");
 assert(publicActivitiesRoute.includes("publicApiHeaders"), "Public activities API must use stable public API headers");
 assert(publicActivitiesRoute.includes("public_activity_list"), "Public activities API must record public list analytics");
+assert(prismaSelects.includes("activityRecordSelect"), "Shared Prisma selects must define the activity read model");
+assert(personalAgenda.includes("getPersonalAgendaItems"), "Personal agenda reads must be shared between page and API");
+assert(notificationCampaigns.includes("categorySlugs: { has"), "Campaign recipient filtering must run in SQL for categories");
+assert(notificationCampaigns.includes("locationSlugs: { has"), "Campaign recipient filtering must run in SQL for locations");
+assert(businessPermissions.includes("members: {"), "Business permission checks must load membership with the business query");
+assert(adminActivitiesRoute.includes("parseCursorPagination"), "Admin activities API must use cursor pagination");
+assert(adminBusinessesRoute.includes("parseCursorPagination"), "Admin businesses API must use cursor pagination");
+assert(adminReportsRoute.includes("parseCursorPagination"), "Admin reports API must use cursor pagination");
+assert(analyticsSnapshot.includes("createdAt: { gte: last30Days }"), "Analytics snapshot counts must stay inside the 30-day window");
+assert(prismaSchema.includes("@@index([status, organizerName])"), "Activity organizer filter index must exist");
+assert(prismaSchema.includes("@@index([status, indoorOutdoor])"), "Activity indoor/outdoor filter index must exist");
+assert(tsconfig.includes('"target": "ES2022"'), "TypeScript target must stay on ES2022");
+assert(gitignore.includes("tsconfig.tsbuildinfo"), "tsconfig.tsbuildinfo must remain ignored");
+assert(analyticsEventsRoute.includes("select: {"), "Analytics events route must select only required activity fields");
+assert(!analyticsEventsRoute.includes("include: {"), "Analytics events route must not include full activity relations");
+assert(accountPanel.includes("setTimeout") && accountPanel.includes("300"), "Account preference saves must be buffered");
+assert(webVitalsRoute.includes("web_vital"), "Web Vitals route must record aggregate web_vital analytics");
+assert(webVitalsReporter.includes("useReportWebVitals"), "Client Web Vitals reporter must use Next web vitals hook");
+assert(rootLayout.includes("WebVitalsReporter"), "Root layout must include the Web Vitals reporter");
+assert(seed.includes("seedActivities"), "Seed script must use seed-local activity data");
 
 const publicCalendarRoute = read("app/api/public/calendar/route.ts");
 assert(publicCalendarRoute.includes("buildPublicCalendarFeed"), "Public calendar route must build an iCalendar feed");
@@ -380,6 +423,7 @@ assert(filterControls.includes("filter-menu-row"), "Public agenda filters must r
 assert(filterControls.includes("renderFilterSelect"), "Public agenda filters must expose compact dropdown controls");
 assert(filterControls.includes("<select"), "Public agenda secondary filters must use dropdown controls");
 assert(filterControls.includes("options.categories"), "Public agenda category filters must use available event categories");
+assert(filterControls.includes("useMemo"), "Filter controls must memoize option maps");
 
 assert(!agendaShell.includes("getPublicActivities"), "Public agenda shell must not fall back to mock activities after filtering");
 assert(agendaShell.includes("enableFilterLinks"), "Public agenda cards must expose tag filter links");
@@ -393,6 +437,11 @@ assert(publicActivityQuery.includes("defaultFrom"), "Public activity queries mus
 assert(publicActivityQuery.includes("hasCustomDateFilter"), "Public activity queries must allow explicit past date ranges");
 assert(publicActivityQuery.includes("hasSome: tagVariants"), "Public activity search must match visible tag labels case-insensitively");
 
+const perfBudgetScript = read("scripts/perf-budget.ts");
+assert(packageJson.scripts["perf:budget"], "package.json must expose the performance budget command");
+assert(perfBudgetScript.includes("/business/[businessId]"), "Performance budget must cover the business dashboard route");
+assert(perfBudgetScript.includes("gzip"), "Performance budget must check gzip asset sizes");
+
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");
 assert(releaseCheckScript.includes("content-type="), "release check output must include response content type details");
@@ -404,5 +453,14 @@ assert(releaseChecks.includes("public calendar feed"), "Release checks must labe
 const queue = read("implementation-plan/SPRINT-QUEUE.md");
 assert(queue.includes("## Sprint 19 - MVP Launch Readiness"), "Sprint 19 must be listed in the queue");
 assert(queue.includes("Status: Done"), "Sprint queue should contain completed sprint statuses");
+
+const prismaModule = read("lib/prisma.ts");
+assert(prismaModule.includes("prisma.slow_query"), "Prisma module must warn on slow queries in non-production");
+assert(prismaModule.includes("prisma.repeated_query"), "Prisma module must warn on repeated query shapes in non-production");
+
+const observabilityPlan = read("implementation-plan/16-analytics-and-observability.md");
+assert(observabilityPlan.includes("Web Vitals"), "Observability docs must describe Web Vitals aggregation");
+const deploymentPlan = read("implementation-plan/19-deployment-tailscale-linux.md");
+assert(deploymentPlan.includes("perf:budget"), "Deployment docs must mention the performance budget check");
 
 console.info("Launch smoke checks passed");

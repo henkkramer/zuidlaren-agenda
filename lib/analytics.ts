@@ -9,7 +9,8 @@ export type AnalyticsMetric =
   | "attendance_click"
   | "calendar_export"
   | "filter_use"
-  | "public_activity_list";
+  | "public_activity_list"
+  | "web_vital";
 
 type AnalyticsInput = {
   metric: AnalyticsMetric;

@@ -36,22 +36,28 @@ export async function requireBusinessPermission(
     return { ok: false, status: 401, error: "Niet ingelogd" };
   }
 
-  const business = await getBusinessByParam(decodeURIComponent(businessId));
+  const business = await prisma.business.findFirst({
+    where: {
+      OR: [{ id: decodeURIComponent(businessId) }, { slug: decodeURIComponent(businessId) }],
+    },
+    include: {
+      members: {
+        where: {
+          userId: session.user.id,
+          active: true,
+        },
+        take: 1,
+      },
+    },
+  });
 
   if (!business) {
     return { ok: false, status: 404, error: "Bedrijf niet gevonden" };
   }
 
-  const membership = await prisma.businessMember.findUnique({
-    where: {
-      userId_businessId: {
-        userId: session.user.id,
-        businessId: business.id,
-      },
-    },
-  });
+  const membership = business.members[0];
 
-  if (!membership?.active) {
+  if (!membership) {
     return { ok: false, status: 403, error: "Geen toegang tot dit bedrijf" };
   }
 

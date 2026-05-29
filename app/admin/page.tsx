@@ -10,6 +10,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 import { getAnalyticsSnapshot } from "@/lib/analytics-snapshot";
 import { getBillingSummary } from "@/lib/billing-summary";
 import { prisma } from "@/lib/prisma";
+import { adminActivityListSelect } from "@/lib/prisma-selects";
 
 export const dynamic = "force-dynamic";
 
@@ -83,12 +84,12 @@ export default async function AdminPage() {
       take: 8,
     }),
     prisma.business.findMany({
-      include: { _count: { select: { activities: true, members: true } } },
+      select: { id: true, name: true, status: true, _count: { select: { activities: true, members: true } } },
       orderBy: [{ status: "asc" }, { name: "asc" }],
       take: 8,
     }),
     prisma.activity.findMany({
-      include: { business: true },
+      select: adminActivityListSelect,
       orderBy: { updatedAt: "desc" },
       take: 8,
     }),
@@ -110,8 +111,15 @@ export default async function AdminPage() {
     }),
     getAnalyticsSnapshot(),
     getBillingSummary(),
-    prisma.featureFlag.findMany({ orderBy: { key: "asc" } }),
-    prisma.auditLog.findMany({ orderBy: { createdAt: "desc" }, take: 10 }),
+    prisma.featureFlag.findMany({
+      select: { id: true, key: true, enabled: true, description: true },
+      orderBy: { key: "asc" },
+    }),
+    prisma.auditLog.findMany({
+      select: { id: true, action: true, targetType: true, createdAt: true },
+      orderBy: { createdAt: "desc" },
+      take: 10,
+    }),
   ]);
 
   return (
@@ -221,6 +229,10 @@ export default async function AdminPage() {
                 <small>agenda exports totaal</small>
               </span>
               <span>
+                <strong>{analytics.webVitals}</strong>
+                <small>Web Vitals</small>
+              </span>
+              <span>
                 <strong>{analytics.notificationOptIns}</strong>
                 <small>notificatie opt-ins</small>
               </span>
@@ -229,6 +241,14 @@ export default async function AdminPage() {
                 <small>AI-aanvragen</small>
               </span>
             </div>
+            {analytics.webVitalBreakdown.length ? (
+              <p className="small-muted">
+                Web Vitals:{" "}
+                {analytics.webVitalBreakdown
+                  .map((item) => item.kind.replaceAll("_", " ") + " " + item.count)
+                  .join(", ")}
+              </p>
+            ) : null}
             {analytics.calendarExportBreakdown.length ? (
               <p className="small-muted">
                 Agenda export verdeling:{" "}

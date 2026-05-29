@@ -93,6 +93,8 @@ Status: done on refactor.
 
 ## Sprint 3 — Data Layer Hardening
 
+Status: done on refactor.
+
 **Goal:** Make Prisma usage predictable: `select` discipline, push filters into SQL, add missing indexes, paginate admin endpoints.
 
 ### Workstreams
@@ -140,6 +142,8 @@ Status: done on refactor.
 
 ## Sprint 4 — Bundle, Build & Asset Polish
 
+Status: done on refactor.
+
 **Goal:** Tighten the shipped surface area.
 
 ### Workstreams
@@ -176,6 +180,8 @@ Status: done on refactor.
 ---
 
 ## Sprint 5 — Streaming, Observability & Guardrails
+
+Status: done on refactor.
 
 **Goal:** Make wins visible and prevent regressions.
 

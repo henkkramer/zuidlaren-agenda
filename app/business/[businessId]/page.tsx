@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { requireBusinessPermission } from "@/lib/business-permissions";
 import { mapActivityRecord } from "@/lib/activity-mapper";
 import { prisma } from "@/lib/prisma";
+import { businessActivityListSelect } from "@/lib/prisma-selects";
 import { activityDateParts } from "@/lib/date-format";
 import { BusinessNotificationCampaignForm } from "@/components/business-notification-campaign-form";
 
@@ -56,11 +57,9 @@ export default async function BusinessDashboardPage({ params }: BusinessDashboar
   const [activities, members, campaigns] = await Promise.all([
     prisma.activity.findMany({
       where: { businessId: access.business.id },
-      include: {
-        category: true,
-        location: true,
-      },
+      select: businessActivityListSelect,
       orderBy: { startAt: "asc" },
+      take: 12,
     }),
     prisma.businessMember.findMany({
       where: { businessId: access.business.id, active: true },
@@ -109,7 +108,7 @@ export default async function BusinessDashboardPage({ params }: BusinessDashboar
               <p className="account-muted">Nog geen activiteiten voor dit bedrijf.</p>
             ) : (
               <div className="business-activity-list">
-                {(activities as BusinessActivityRow[]).slice(0, 12).map((activity) => {
+                {(activities as BusinessActivityRow[]).map((activity) => {
                   const mappedActivity = mapActivityRecord(activity);
                   const parts = activityDateParts(mappedActivity);
                   return (

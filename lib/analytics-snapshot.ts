@@ -24,6 +24,7 @@ export async function getAnalyticsSnapshot() {
   const [
     metricCounts,
     calendarExportBreakdown,
+    webVitalBreakdown,
     attendanceCount,
     notificationOptIns,
     aiUsage,
@@ -40,7 +41,12 @@ export async function getAnalyticsSnapshot() {
       where: { metric: "calendar_export", day: { gte: last30Days } },
       _sum: { count: true },
     }),
-    prisma.attendance.count(),
+    prisma.analyticsDailyMetric.groupBy({
+      by: ["dimensionsKey"],
+      where: { metric: "web_vital", day: { gte: last30Days } },
+      _sum: { count: true },
+    }),
+    prisma.attendance.count({ where: { createdAt: { gte: last30Days } } }),
     prisma.notificationPreference.count({
       where: {
         OR: [{ activityReminders: true }, { weeklyDigest: true }, { businessUpdates: true }],
@@ -53,6 +59,7 @@ export async function getAnalyticsSnapshot() {
     }),
     prisma.notificationDelivery.groupBy({
       by: ["status"],
+      where: { createdAt: { gte: last30Days } },
       _count: true,
     }),
     prisma.auditLog.count({
@@ -80,6 +87,8 @@ export async function getAnalyticsSnapshot() {
     filterUses: metricCountMap.get("filter_use") ?? 0,
     publicActivityLists: metricCountMap.get("public_activity_list") ?? 0,
     calendarExports: metricCountMap.get("calendar_export") ?? 0,
+    webVitals: metricCountMap.get("web_vital") ?? 0,
+    webVitalBreakdown: summarizeCalendarExportBreakdown(webVitalBreakdown as AnalyticsMetricGroupRow[]).slice(0, 5),
     calendarExportBreakdown: summarizeCalendarExportBreakdown(calendarExportBreakdown as AnalyticsMetricGroupRow[]),
     attendanceCount,
     notificationOptIns,

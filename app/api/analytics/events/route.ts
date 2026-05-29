@@ -23,9 +23,11 @@ export async function POST(request: Request) {
 
   const activity = await prisma.activity.findUnique({
     where: { slug: activitySlug },
-    include: {
-      category: true,
-      location: true,
+    select: {
+      id: true,
+      status: true,
+      category: { select: { slug: true } },
+      location: { select: { slug: true } },
     },
   });
 

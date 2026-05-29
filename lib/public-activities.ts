@@ -4,6 +4,7 @@ import { unstable_cache } from "next/cache";
 import { mapActivityRecord } from "@/lib/activity-mapper";
 import type { Activity } from "@/lib/activity-types";
 import { prisma } from "@/lib/prisma";
+import { activityRecordSelect, activityRecordWithMyAttendanceSelect } from "@/lib/prisma-selects";
 import { publicActivityFeedCacheTag, publicFilterOptionsCacheTag } from "@/lib/public-activity-cache";
 import { buildPublicActivityCursor, buildPublicActivityCursorWhere } from "@/lib/public-activity-pagination";
 import { buildActivityWhere, type ActivityFilterOptions, type ActivityFilterState } from "@/lib/public-activity-query";
@@ -65,29 +66,16 @@ async function getPublicActivityPageUncached(filters: ActivityFilterState, curre
   const where = cursorWhere ? { AND: [buildActivityWhere(filters, currentUserId), cursorWhere] } : buildActivityWhere(filters, currentUserId);
   const activities = await prisma.activity.findMany({
     where,
-    include: {
-      category: true,
-      location: true,
-      _count: {
-        select: {
+    select: currentUserId
+      ? {
+          ...activityRecordWithMyAttendanceSelect,
           attendances: {
-            where: {
-              status: "GOING",
-              visibility: "PUBLIC",
-            },
+            where: { userId: currentUserId },
+            select: { status: true, visibility: true },
+            take: 1,
           },
-        },
-      },
-      ...(currentUserId
-        ? {
-            attendances: {
-              where: { userId: currentUserId },
-              select: { status: true, visibility: true },
-              take: 1,
-            },
-          }
-        : {}),
-    },
+        }
+      : activityRecordSelect,
     take: filters.limit + 1,
     orderBy: [{ startAt: "asc" }, { slug: "asc" }],
   });
@@ -136,29 +124,16 @@ export async function getPublicActivityDetail(activityId: string, currentUserId?
       slug: decodeURIComponent(activityId),
       status: "PUBLISHED",
     },
-    include: {
-      category: true,
-      location: true,
-      _count: {
-        select: {
+    select: currentUserId
+      ? {
+          ...activityRecordWithMyAttendanceSelect,
           attendances: {
-            where: {
-              status: "GOING",
-              visibility: "PUBLIC",
-            },
+            where: { userId: currentUserId },
+            select: { status: true, visibility: true },
+            take: 1,
           },
-        },
-      },
-      ...(currentUserId
-        ? {
-            attendances: {
-              where: { userId: currentUserId },
-              select: { status: true, visibility: true },
-              take: 1,
-            },
-          }
-        : {}),
-    },
+        }
+      : activityRecordSelect,
   });
 
   return activity ? mapActivityRecord(activity) : null;

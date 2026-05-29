@@ -20,7 +20,7 @@ const images = {
   christmas: "https://images.unsplash.com/photo-1512389142860-9c449e58a543?auto=format&fit=crop&w=1200&q=85"
 };
 
-export const mockActivities: Activity[] = [
+export const seedActivities: Activity[] = [
   {
     id: "rabo-dikke-banden-race-sprookjeshof-2026",
     title: "Rabo Dikke Banden Race Sprookjeshof",

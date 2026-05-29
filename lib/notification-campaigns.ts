@@ -12,6 +12,8 @@ type OptedInUser = User & {
   notificationPreferences: NotificationPreference | null;
 };
 
+export type CampaignRecipient = Pick<User, "id" | "email" | "name">;
+
 export function userMatchesCampaign(user: OptedInUser, activity?: CampaignActivity | null) {
   const preferences = user.notificationPreferences;
 
@@ -29,20 +31,36 @@ export function userMatchesCampaign(user: OptedInUser, activity?: CampaignActivi
   return categoryMatch && locationMatch;
 }
 
-export async function findCampaignRecipients(activity?: CampaignActivity | null) {
-  const users = await prisma.user.findMany({
+export async function findCampaignRecipients(activity?: CampaignActivity | null): Promise<CampaignRecipient[]> {
+  const activityPreferenceWhere = activity
+    ? {
+        AND: [
+          {
+            OR: [{ categorySlugs: { isEmpty: true } }, { categorySlugs: { has: activity.category.slug } }],
+          },
+          {
+            OR: [{ locationSlugs: { isEmpty: true } }, { locationSlugs: { has: activity.location.slug } }],
+          },
+        ],
+      }
+    : {};
+
+  return prisma.user.findMany({
     where: {
       disabledAt: null,
       notificationPreferences: {
-        businessUpdates: true,
+        is: {
+          businessUpdates: true,
+          ...activityPreferenceWhere,
+        },
       },
     },
-    include: {
-      notificationPreferences: true,
+    select: {
+      id: true,
+      email: true,
+      name: true,
     },
   });
-
-  return users.filter((user) => userMatchesCampaign(user, activity));
 }
 
 export async function hasRecentBusinessCampaign(businessId: string, requestedAfter: Date) {

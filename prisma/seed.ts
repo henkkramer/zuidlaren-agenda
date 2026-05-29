@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { aiActivityActions } from "../lib/ai-card-assistant-types";
 import { categoryLabels } from "../lib/activity-types";
-import { mockActivities } from "../lib/mock-activities";
+import { seedActivities } from "./seed-activities";
 import { slugify } from "../lib/slugify";
 
 const adapter = new PrismaPg({
@@ -26,7 +26,7 @@ async function main() {
     categoryBySlug.set(slug, category.id);
   }
 
-  for (const activity of mockActivities) {
+  for (const activity of seedActivities) {
     const businessSlug = slugify(activity.organizerName);
     const business = await prisma.business.upsert({
       where: { slug: businessSlug },

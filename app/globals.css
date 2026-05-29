@@ -1805,3 +1805,89 @@ a {
     grid-template-columns: 1fr;
   }
 }
+
+.agenda-skeleton-block {
+  display: grid;
+  gap: 12px;
+  padding: 0 18px 16px;
+}
+
+.skeleton-line,
+.skeleton-chip-row span,
+.skeleton-menu-row span,
+.skeleton-date,
+.skeleton-title,
+.skeleton-meta {
+  display: block;
+  overflow: hidden;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(36, 40, 32, 0.08), rgba(36, 40, 32, 0.15), rgba(36, 40, 32, 0.08));
+  background-size: 220% 100%;
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+.skeleton-line.wide {
+  width: 100%;
+  height: 46px;
+  border-radius: 16px;
+}
+
+.skeleton-chip-row,
+.skeleton-menu-row {
+  display: flex;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.skeleton-chip-row span {
+  width: 96px;
+  height: 34px;
+}
+
+.skeleton-menu-row span {
+  width: 130px;
+  height: 38px;
+  border-radius: 12px;
+}
+
+.skeleton-card {
+  min-height: 260px;
+  background: rgba(248, 246, 241, 0.72);
+  box-shadow: none;
+}
+
+.skeleton-card::after {
+  display: none;
+}
+
+.skeleton-date {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 72px;
+  height: 98px;
+  border-radius: 14px;
+}
+
+.skeleton-title {
+  position: absolute;
+  top: 24px;
+  right: 18px;
+  left: 108px;
+  height: 36px;
+  border-radius: 12px;
+}
+
+.skeleton-meta {
+  position: absolute;
+  right: 18px;
+  bottom: 24px;
+  left: 18px;
+  height: 28px;
+  border-radius: 10px;
+}
+
+@keyframes skeleton-pulse {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}

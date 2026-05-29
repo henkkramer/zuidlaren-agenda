@@ -3,7 +3,7 @@
 import { CalendarDays, Filter, MapPin, Search, Store, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { FormEvent, ReactNode } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { categoryLabels } from "@/lib/activity-types";
 import { toQueryString, type ActivityFilterOptions, type ActivityFilterState } from "@/lib/public-activity-query";
 
@@ -50,17 +50,20 @@ export function FilterControls({ filters, options }: FilterControlsProps) {
   }
 
   const activeFilters = Object.entries(filters).filter(([key, value]) => key !== "limit" && value !== undefined && value !== false && value !== "");
-  const locationOptions = options.locations.map((location) => ({ label: location, value: location }));
-  const organizerOptions = options.organizers.map((organizer) => ({ label: organizer, value: organizer }));
-  const typeOptions = options.types.map((type) => ({ label: type, value: type }));
-  const indoorOutdoorOptions = options.indoorOutdoor.map((value) => ({ label: value, value }));
-  const optionLabelByFilter = {
-    category: new Map(options.categories.map((option) => [option.value, option.label])),
-    indoorOutdoor: new Map(indoorOutdoorOptions.map((option) => [option.value, option.label])),
-    location: new Map(locationOptions.map((option) => [option.value, option.label])),
-    organizer: new Map(organizerOptions.map((option) => [option.value, option.label])),
-    type: new Map(typeOptions.map((option) => [option.value, option.label])),
-  };
+  const locationOptions = useMemo(() => options.locations.map((location) => ({ label: location, value: location })), [options.locations]);
+  const organizerOptions = useMemo(() => options.organizers.map((organizer) => ({ label: organizer, value: organizer })), [options.organizers]);
+  const typeOptions = useMemo(() => options.types.map((type) => ({ label: type, value: type })), [options.types]);
+  const indoorOutdoorOptions = useMemo(() => options.indoorOutdoor.map((value) => ({ label: value, value })), [options.indoorOutdoor]);
+  const optionLabelByFilter = useMemo(
+    () => ({
+      category: new Map(options.categories.map((option) => [option.value, option.label])),
+      indoorOutdoor: new Map(indoorOutdoorOptions.map((option) => [option.value, option.label])),
+      location: new Map(locationOptions.map((option) => [option.value, option.label])),
+      organizer: new Map(organizerOptions.map((option) => [option.value, option.label])),
+      type: new Map(typeOptions.map((option) => [option.value, option.label])),
+    }),
+    [indoorOutdoorOptions, locationOptions, options.categories, organizerOptions, typeOptions],
+  );
 
   function activeFilterLabel(key: string, value: string | boolean | number) {
     if (key in optionLabelByFilter && typeof value === "string") {
