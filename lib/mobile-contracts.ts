@@ -127,7 +127,7 @@ export function buildMobileCapabilities() {
     apiVersion: mobileApiVersion,
     locale: "nl-NL",
     auth: {
-      currentStrategy: "next-auth database session cookie",
+      currentStrategy: "next-auth JWT session cookie",
       mobileLaunchDirection: "add Apple/Google OAuth and token exchange before native app launch",
       supportsBearerTokens: false,
       plannedOAuthProviders: ["apple", "google"],

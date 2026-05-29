@@ -413,6 +413,22 @@ assert(authModule.includes("server: emailServer"), "Email auth must pass EMAIL_S
 assert(authModule.includes("? {}"), "Email auth must skip the log override when EMAIL_SERVER is configured");
 assert(authModule.includes("auth.login_link.created"), "Email auth must keep a local log fallback when EMAIL_SERVER is missing");
 assert(authModule.includes("createLoginLinkFallbackRecord"), "Email auth must print a copyable fallback login link when SMTP is missing");
+assert(authModule.includes("CredentialsProvider"), "Credential auth must remain available for seeded admin and test users");
+assert(authModule.includes('strategy: "jwt"'), "Credential auth must use JWT sessions because NextAuth credentials do not support database sessions");
+
+const adminLoginPage = read("app/admin/login/page.tsx");
+assert(adminLoginPage.includes("CredentialsLoginForm"), "Admin login page must use the credential login form");
+assert(adminLoginPage.includes('callbackUrl="/admin"'), "Admin login must return admins to /admin");
+
+const seedScript = read("prisma/seed.ts");
+for (const username of ["admin", "henk", "eigenaar"]) {
+  assert(seedScript.includes(`|| "${username}"`), `Seed script must default ${username} credential username when opt-in seeding is enabled`);
+}
+assert(seedScript.includes('process.env.SEED_CREDENTIAL_ACCOUNTS !== "true"'), "Seeded credential accounts must be explicitly enabled");
+assert(seedScript.includes('requiredSeedPassword("SEED_ADMIN_PASSWORD")'), "Seed script must require admin password from the environment");
+assert(seedScript.includes('requiredSeedPassword("SEED_USER_PASSWORD")'), "Seed script must require test user password from the environment");
+assert(seedScript.includes('requiredSeedPassword("SEED_OWNER_PASSWORD")'), "Seed script must require owner password from the environment");
+assert(seedScript.includes('role: "OWNER"'), "Seed script must make eigenaar a business owner");
 
 const loginLinkFallback = read("lib/login-link-fallback.ts");
 assert(loginLinkFallback.includes("auth.login_link.fallback"), "Email auth fallback must expose a copyable login link event when SMTP is missing");

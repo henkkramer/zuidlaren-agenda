@@ -4,6 +4,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { aiActivityActions } from "../lib/ai-card-assistant-types";
 import { categoryLabels } from "../lib/activity-types";
 import { seedActivities } from "./seed-activities";
+import { hashPassword, normalizeCredentialLogin } from "../lib/password-auth";
 import { slugify } from "../lib/slugify";
 
 const adapter = new PrismaPg({
@@ -13,6 +14,123 @@ const adapter = new PrismaPg({
 const prisma = new PrismaClient({
   adapter
 });
+
+type SeedCredentialUser = {
+  displayName: string;
+  email: string;
+  isAdmin?: boolean;
+  password: string;
+  username: string;
+};
+
+async function ensureCredentialUser(input: SeedCredentialUser) {
+  const credentialLogin = normalizeCredentialLogin(input.username);
+  const existing = await prisma.user.findFirst({
+    where: {
+      OR: [{ credentialLogin }, { email: input.email }]
+    },
+    select: { id: true, passwordHash: true }
+  });
+
+  if (!existing) {
+    return prisma.user.create({
+      data: {
+        credentialLogin,
+        disabledAt: null,
+        displayName: input.displayName,
+        email: input.email,
+        emailVerified: new Date(),
+        isAdmin: input.isAdmin ?? false,
+        mustChangePassword: true,
+        passwordHash: hashPassword(input.password)
+      }
+    });
+  }
+
+  return prisma.user.update({
+    where: { id: existing.id },
+    data: {
+      credentialLogin,
+      disabledAt: null,
+      displayName: input.displayName,
+      isAdmin: input.isAdmin ?? false,
+      ...(existing.passwordHash
+        ? {}
+        : {
+            mustChangePassword: true,
+            passwordHash: hashPassword(input.password)
+          })
+    }
+  });
+}
+
+function requiredSeedPassword(name: string) {
+  const value = process.env[name]?.trim();
+
+  if (!value) {
+    throw new Error(`${name} is required when SEED_CREDENTIAL_ACCOUNTS=true`);
+  }
+
+  return value;
+}
+
+async function seedCredentialAccounts() {
+  if (process.env.SEED_CREDENTIAL_ACCOUNTS !== "true") {
+    return null;
+  }
+
+  const [adminUser, regularUser, ownerUser] = await Promise.all([
+    ensureCredentialUser({
+      displayName: process.env.SEED_ADMIN_DISPLAY_NAME?.trim() || "Master admin",
+      email: process.env.SEED_ADMIN_EMAIL?.trim() || "admin@zuidlaren.local",
+      isAdmin: true,
+      password: requiredSeedPassword("SEED_ADMIN_PASSWORD"),
+      username: process.env.SEED_ADMIN_USERNAME?.trim() || "admin"
+    }),
+    ensureCredentialUser({
+      displayName: process.env.SEED_USER_DISPLAY_NAME?.trim() || "Henk",
+      email: process.env.SEED_USER_EMAIL?.trim() || "henk@zuidlaren.local",
+      password: requiredSeedPassword("SEED_USER_PASSWORD"),
+      username: process.env.SEED_USER_USERNAME?.trim() || "henk"
+    }),
+    ensureCredentialUser({
+      displayName: process.env.SEED_OWNER_DISPLAY_NAME?.trim() || "Eigenaar",
+      email: process.env.SEED_OWNER_EMAIL?.trim() || "eigenaar@zuidlaren.local",
+      password: requiredSeedPassword("SEED_OWNER_PASSWORD"),
+      username: process.env.SEED_OWNER_USERNAME?.trim() || "eigenaar"
+    })
+  ]);
+
+  const ownerBusiness = await prisma.business.findFirst({
+    where: { status: "APPROVED" },
+    orderBy: { name: "asc" }
+  });
+
+  if (ownerBusiness) {
+    await prisma.businessMember.upsert({
+      where: {
+        userId_businessId: {
+          businessId: ownerBusiness.id,
+          userId: ownerUser.id
+        }
+      },
+      update: {
+        active: true,
+        canPublishActivities: true,
+        role: "OWNER"
+      },
+      create: {
+        active: true,
+        businessId: ownerBusiness.id,
+        canPublishActivities: true,
+        role: "OWNER",
+        userId: ownerUser.id
+      }
+    });
+  }
+
+  return { adminUser, regularUser, ownerUser };
+}
 
 async function main() {
   const categoryBySlug = new Map<string, string>();
@@ -145,8 +263,15 @@ async function main() {
     });
   }
 
+  const seededUsers = await seedCredentialAccounts();
   const activityCount = await prisma.activity.count();
   console.log(`Seeded ${activityCount} activities.`);
+
+  if (seededUsers) {
+    console.log(`Seeded credential accounts: ${seededUsers.adminUser.credentialLogin}, ${seededUsers.regularUser.credentialLogin}, ${seededUsers.ownerUser.credentialLogin}.`);
+  } else {
+    console.log("Skipped credential account seeding. Set SEED_CREDENTIAL_ACCOUNTS=true to create local credential accounts.");
+  }
 }
 
 main()

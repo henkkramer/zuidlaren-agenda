@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { signIn, signOut } from "next-auth/react";
+import { CredentialsLoginForm } from "@/components/credentials-login-form";
 import type { FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 
@@ -14,8 +15,10 @@ type AccountPanelProps =
       user: {
         email: string;
         displayName: string;
+        credentialLogin: string | null;
         isAdmin: boolean;
         locale: string;
+        mustChangePassword: boolean;
         deletionRequestedAt: string | null;
       };
       preferences: {
@@ -43,6 +46,8 @@ export function AccountPanel(props: AccountPanelProps) {
   const [deletionRequested, setDeletionRequested] = useState(
     props.mode === "signed-in" ? Boolean(props.user.deletionRequestedAt) : false,
   );
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [status, setStatus] = useState("");
   const preferenceSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -58,6 +63,25 @@ export function AccountPanel(props: AccountPanelProps) {
     event.preventDefault();
     setStatus("Loginlink wordt gemaakt...");
     await signIn("email", { email, callbackUrl: "/account" });
+  }
+
+  async function changePassword() {
+    setStatus("Wachtwoord wijzigen...");
+    const response = await fetch("/api/me/password", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+
+    if (response.ok) {
+      setCurrentPassword("");
+      setNewPassword("");
+      setStatus("Wachtwoord gewijzigd");
+      return;
+    }
+
+    const body = (await response.json().catch(() => null)) as { error?: string } | null;
+    setStatus(body?.error ?? "Wachtwoord kon niet worden gewijzigd");
   }
 
   async function saveProfile() {
@@ -121,23 +145,32 @@ export function AccountPanel(props: AccountPanelProps) {
         <h1>Account</h1>
 
         {props.mode === "signed-out" ? (
-          <form className="account-form" onSubmit={handleSignIn}>
-            <label>
-              E-mailadres
-              <input
-                autoComplete="email"
-                inputMode="email"
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="naam@example.nl"
-                required
-                type="email"
-                value={email}
-              />
-            </label>
-            <button className="primary-button" type="submit">
-              Loginlink ontvangen
-            </button>
-          </form>
+          <div className="account-grid">
+            <div className="account-card">
+              <h2>Loginlink</h2>
+              <form className="account-form" onSubmit={handleSignIn}>
+                <label>
+                  E-mailadres
+                  <input
+                    autoComplete="email"
+                    inputMode="email"
+                    onChange={(event) => setEmail(event.target.value)}
+                    placeholder="naam@example.nl"
+                    required
+                    type="email"
+                    value={email}
+                  />
+                </label>
+                <button className="primary-button" type="submit">
+                  Loginlink ontvangen
+                </button>
+              </form>
+            </div>
+            <div className="account-card">
+              <h2>Testlogin</h2>
+              <CredentialsLoginForm callbackUrl="/account" submitLabel="Inloggen" />
+            </div>
+          </div>
         ) : (
           <div className="account-grid">
             <div className="account-card">
@@ -179,6 +212,36 @@ export function AccountPanel(props: AccountPanelProps) {
                 Profiel opslaan
               </button>
             </div>
+
+            {props.user.credentialLogin ? (
+              <div className="account-card">
+                <h2>Wachtwoord</h2>
+                {props.user.mustChangePassword ? <p className="account-muted">Wijzig het standaardwachtwoord na de eerste login.</p> : null}
+                <p className="account-muted">Loginnaam: {props.user.credentialLogin}</p>
+                <label>
+                  Huidig wachtwoord
+                  <input
+                    autoComplete="current-password"
+                    onChange={(event) => setCurrentPassword(event.target.value)}
+                    type="password"
+                    value={currentPassword}
+                  />
+                </label>
+                <label>
+                  Nieuw wachtwoord
+                  <input
+                    autoComplete="new-password"
+                    minLength={8}
+                    onChange={(event) => setNewPassword(event.target.value)}
+                    type="password"
+                    value={newPassword}
+                  />
+                </label>
+                <button className="primary-button" onClick={changePassword} type="button">
+                  Wachtwoord wijzigen
+                </button>
+              </div>
+            ) : null}
 
             <div className="account-card">
               <h2>Meldingen</h2>

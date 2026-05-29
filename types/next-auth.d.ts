@@ -14,3 +14,12 @@ declare module "next-auth" {
     locale: string;
   }
 }
+
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    displayName?: string | null;
+    id?: string;
+    locale?: string;
+  }
+}

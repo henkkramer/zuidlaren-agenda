@@ -92,6 +92,9 @@ model User {
   emailVerified           DateTime?
   image                   String?
   displayName             String?
+  credentialLogin         String?                 @unique
+  passwordHash            String?
+  mustChangePassword      Boolean                 @default(false)
   isAdmin                 Boolean                 @default(false)
   disabledAt              DateTime?
   locale                  String                  @default("nl-NL")
