@@ -40,7 +40,7 @@ export async function getAnalyticsSnapshot() {
       where: { metric: "calendar_export", day: { gte: last30Days } },
       _sum: { count: true },
     }),
-    prisma.attendance.count(),
+    prisma.attendance.count({ where: { createdAt: { gte: last30Days } } }),
     prisma.notificationPreference.count({
       where: {
         OR: [{ activityReminders: true }, { weeklyDigest: true }, { businessUpdates: true }],
@@ -53,6 +53,7 @@ export async function getAnalyticsSnapshot() {
     }),
     prisma.notificationDelivery.groupBy({
       by: ["status"],
+      where: { createdAt: { gte: last30Days } },
       _count: true,
     }),
     prisma.auditLog.count({

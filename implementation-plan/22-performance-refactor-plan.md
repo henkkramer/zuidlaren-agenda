@@ -93,6 +93,8 @@ Status: done on refactor.
 
 ## Sprint 3 — Data Layer Hardening
 
+Status: done on refactor.
+
 **Goal:** Make Prisma usage predictable: `select` discipline, push filters into SQL, add missing indexes, paginate admin endpoints.
 
 ### Workstreams

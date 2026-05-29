@@ -106,8 +106,8 @@ model User {
   reports                 Report[]
   mediaAssets             MediaAsset[]
   aiUsageLogs             AiUsageLog[]
-  requestedCampaigns      NotificationCampaign[] @relation("NotificationCampaignRequester")
-  approvedCampaigns       NotificationCampaign[] @relation("NotificationCampaignApprover")
+  requestedCampaigns      NotificationCampaign[]  @relation("NotificationCampaignRequester")
+  approvedCampaigns       NotificationCampaign[]  @relation("NotificationCampaignApprover")
   notificationDeliveries  NotificationDelivery[]
 }
 
@@ -148,36 +148,36 @@ model VerificationToken {
 }
 
 model NotificationPreference {
-  id                  String   @id @default(cuid())
-  userId              String   @unique
-  activityReminders   Boolean  @default(false)
-  weeklyDigest        Boolean  @default(false)
-  businessUpdates     Boolean  @default(false)
-  categorySlugs       String[]  @default([])
-  locationSlugs       String[]  @default([])
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  activityReminders Boolean  @default(false)
+  weeklyDigest      Boolean  @default(false)
+  businessUpdates   Boolean  @default(false)
+  categorySlugs     String[] @default([])
+  locationSlugs     String[] @default([])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Business {
-  id          String         @id @default(cuid())
-  slug        String         @unique
-  name        String
-  status      BusinessStatus @default(PENDING)
-  website     String?
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  activities  Activity[]
-  members     BusinessMember[]
-  mediaAssets MediaAsset[]
-  aiUsageLogs AiUsageLog[]
+  id                    String                 @id @default(cuid())
+  slug                  String                 @unique
+  name                  String
+  status                BusinessStatus         @default(PENDING)
+  website               String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  activities            Activity[]
+  members               BusinessMember[]
+  mediaAssets           MediaAsset[]
+  aiUsageLogs           AiUsageLog[]
   notificationCampaigns NotificationCampaign[]
-  paymentCustomer PaymentCustomer?
-  paymentSubscriptions PaymentSubscription[]
-  paymentTransactions PaymentTransaction[]
-  invoiceReferences InvoiceReference[]
+  paymentCustomer       PaymentCustomer?
+  paymentSubscriptions  PaymentSubscription[]
+  paymentTransactions   PaymentTransaction[]
+  invoiceReferences     InvoiceReference[]
 }
 
 model BusinessMember {
@@ -189,7 +189,7 @@ model BusinessMember {
   updatedAt            DateTime           @updatedAt
 
   userId String
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   businessId String
   business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
@@ -215,23 +215,23 @@ model Location {
 }
 
 model Activity {
-  id               String          @id @default(cuid())
-  slug             String          @unique
+  id               String         @id @default(cuid())
+  slug             String         @unique
   title            String
   shortDescription String
   description      String
   imageUrl         String
   startAt          DateTime
   endAt            DateTime
-  status           ActivityStatus  @default(PUBLISHED)
+  status           ActivityStatus @default(PUBLISHED)
   typeTags         String[]
   indoorOutdoor    String?
   expectedVisitors String?
   sourceQuality    String?
   sourceUrl        String
   organizerName    String
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
 
   categoryId String
   category   ActivityCategory @relation(fields: [categoryId], references: [id])
@@ -242,28 +242,30 @@ model Activity {
   businessId String?
   business   Business? @relation(fields: [businessId], references: [id])
 
-  attendances Attendance[]
-  reports     Report[]
+  attendances           Attendance[]
+  reports               Report[]
   notificationCampaigns NotificationCampaign[]
   analyticsDailyMetrics AnalyticsDailyMetric[]
 
   @@index([status, startAt])
+  @@index([status, organizerName])
+  @@index([status, indoorOutdoor])
   @@index([categoryId, startAt])
   @@index([locationId, startAt])
   @@index([businessId, startAt])
 }
 
 model Report {
-  id          String       @id @default(cuid())
-  reason      String
-  details     String?
-  status      ReportStatus @default(OPEN)
-  resolution  String?
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id         String       @id @default(cuid())
+  reason     String
+  details    String?
+  status     ReportStatus @default(OPEN)
+  resolution String?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
 
   reporterId String?
-  reporter   User? @relation(fields: [reporterId], references: [id], onDelete: SetNull)
+  reporter   User?   @relation(fields: [reporterId], references: [id], onDelete: SetNull)
 
   activityId String?
   activity   Activity? @relation(fields: [activityId], references: [id], onDelete: Cascade)
@@ -273,20 +275,20 @@ model Report {
 }
 
 model MediaAsset {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   filename     String
   originalName String
   mimeType     String
   sizeBytes    Int
   width        Int?
   height       Int?
-  storageKey   String   @unique
+  storageKey   String    @unique
   publicUrl    String
-  createdAt    DateTime @default(now())
+  createdAt    DateTime  @default(now())
   deletedAt    DateTime?
 
   ownerUserId String
-  ownerUser   User @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
+  ownerUser   User   @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
 
   businessId String?
   business   Business? @relation(fields: [businessId], references: [id], onDelete: Cascade)
@@ -304,7 +306,7 @@ model Attendance {
   updatedAt  DateTime             @updatedAt
 
   userId String
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   activityId String
   activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
@@ -431,16 +433,16 @@ model PaymentTransaction {
 }
 
 model InvoiceReference {
-  id             String   @id @default(cuid())
-  invoiceNumber  String?
-  provider       String   @default("internal")
-  providerUrl    String?
-  amountCents    Int
-  currency       String   @default("EUR")
-  issuedAt       DateTime?
-  dueAt          DateTime?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id            String    @id @default(cuid())
+  invoiceNumber String?
+  provider      String    @default("internal")
+  providerUrl   String?
+  amountCents   Int
+  currency      String    @default("EUR")
+  issuedAt      DateTime?
+  dueAt         DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   businessId String
   business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
@@ -456,18 +458,18 @@ model InvoiceReference {
 }
 
 model WebhookEventLog {
-  id              String             @id @default(cuid())
-  provider        String
-  eventId         String
-  eventType       String
-  status          WebhookEventStatus @default(RECEIVED)
-  signatureValid  Boolean            @default(false)
-  payloadSummary  Json?
-  error           String?
-  receivedAt      DateTime           @default(now())
-  processedAt     DateTime?
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  id             String             @id @default(cuid())
+  provider       String
+  eventId        String
+  eventType      String
+  status         WebhookEventStatus @default(RECEIVED)
+  signatureValid Boolean            @default(false)
+  payloadSummary Json?
+  error          String?
+  receivedAt     DateTime           @default(now())
+  processedAt    DateTime?
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
 
   @@unique([provider, eventId])
   @@index([provider, receivedAt])
@@ -494,10 +496,10 @@ model NotificationCampaign {
   activity   Activity? @relation(fields: [activityId], references: [id], onDelete: SetNull)
 
   requestedById String
-  requestedBy   User @relation("NotificationCampaignRequester", fields: [requestedById], references: [id], onDelete: Cascade)
+  requestedBy   User   @relation("NotificationCampaignRequester", fields: [requestedById], references: [id], onDelete: Cascade)
 
   approvedById String?
-  approvedBy   User? @relation("NotificationCampaignApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+  approvedBy   User?   @relation("NotificationCampaignApprover", fields: [approvedById], references: [id], onDelete: SetNull)
 
   deliveries NotificationDelivery[]
 
@@ -522,7 +524,7 @@ model NotificationDelivery {
   campaign   NotificationCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
 
   userId String
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([campaignId, userId, channel])
   @@index([userId, createdAt])
@@ -545,20 +547,20 @@ model AiPromptTemplate {
 }
 
 model AiUsageLog {
-  id               String        @id @default(cuid())
-  action           String
-  provider         String
-  status           AiUsageStatus @default(SUCCEEDED)
-  inputTokens      Int           @default(0)
-  outputTokens     Int           @default(0)
-  costCents        Int           @default(0)
-  inputSummary     String?
-  outputSummary    String?
-  error            String?
-  createdAt        DateTime      @default(now())
+  id            String        @id @default(cuid())
+  action        String
+  provider      String
+  status        AiUsageStatus @default(SUCCEEDED)
+  inputTokens   Int           @default(0)
+  outputTokens  Int           @default(0)
+  costCents     Int           @default(0)
+  inputSummary  String?
+  outputSummary String?
+  error         String?
+  createdAt     DateTime      @default(now())
 
   userId String
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   businessId String
   business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)

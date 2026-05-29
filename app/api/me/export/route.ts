@@ -12,14 +12,38 @@ export async function GET() {
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
-    include: {
-      notificationPreferences: true,
+    select: {
+      id: true,
+      email: true,
+      displayName: true,
+      locale: true,
+      deletionRequestedAt: true,
+      createdAt: true,
+      updatedAt: true,
+      notificationPreferences: {
+        select: {
+          activityReminders: true,
+          weeklyDigest: true,
+          businessUpdates: true,
+          categorySlugs: true,
+          locationSlugs: true,
+        },
+      },
       attendances: {
-        include: {
+        select: {
+          status: true,
+          visibility: true,
+          createdAt: true,
+          updatedAt: true,
           activity: {
-            include: {
-              category: true,
-              location: true,
+            select: {
+              slug: true,
+              title: true,
+              startAt: true,
+              endAt: true,
+              organizerName: true,
+              category: { select: { name: true, slug: true } },
+              location: { select: { name: true, slug: true } },
             },
           },
         },
@@ -30,7 +54,12 @@ export async function GET() {
         },
       },
       businessMemberships: {
-        include: {
+        select: {
+          active: true,
+          role: true,
+          canPublishActivities: true,
+          createdAt: true,
+          updatedAt: true,
           business: {
             select: {
               name: true,
