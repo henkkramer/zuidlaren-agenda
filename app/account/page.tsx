@@ -46,8 +46,10 @@ export default async function AccountPage() {
       user={{
         email: user.email,
         displayName: user.displayName ?? user.name ?? "",
+        credentialLogin: user.credentialLogin,
         isAdmin: user.isAdmin,
         locale: user.locale,
+        mustChangePassword: user.mustChangePassword,
         deletionRequestedAt: user.deletionRequestedAt?.toISOString() ?? null,
       }}
       preferences={{

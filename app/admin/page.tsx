@@ -74,7 +74,7 @@ export default async function AdminPage() {
   const admin = await requireAdmin();
 
   if (!admin.ok) {
-    redirect("/account");
+    redirect("/admin/login");
   }
 
   const [users, businesses, activities, reports, notificationCampaigns, analytics, billing, featureFlags, auditLogs] = await Promise.all([

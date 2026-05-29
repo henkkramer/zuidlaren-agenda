@@ -22,14 +22,18 @@ Implement user accounts with Auth.js email login and basic profile management.
 ## Technical Decisions
 
 - Use Auth.js with Prisma adapter.
-- Email login is the MVP authentication method.
+- Email login is the MVP authentication method for normal users.
+- A credentials provider is available for the seeded master admin and local test accounts; it uses JWT sessions because Auth.js credentials do not support database sessions.
 - Keep OAuth-compatible user model for later.
 - Protect user routes with server-side session checks.
+- Seeded credential accounts are opt-in via `SEED_CREDENTIAL_ACCOUNTS=true`; usernames default to `admin`, `henk`, and `eigenaar`, while passwords must be supplied through seed environment variables and are not reset after change.
 
 ## Implementation Tasks
 
 - Configure Auth.js.
 - Add email provider plumbing; development may log magic links if no provider is configured.
+- Add `/admin/login` for the master admin credential login.
+- Add password change flow for credential-backed accounts.
 - Add `/account` page.
 - Add `/api/me`.
 - Add profile update flow for display name and locale.
@@ -46,6 +50,7 @@ Implement user accounts with Auth.js email login and basic profile management.
 
 - `GET /api/me`
 - `PATCH /api/me/profile`
+- `PATCH /api/me/password`
 - `GET /api/me/notification-preferences`
 - `PATCH /api/me/notification-preferences`
 
@@ -55,6 +60,7 @@ Implement user accounts with Auth.js email login and basic profile management.
 - Logged-in user can read and update own profile.
 - User cannot update another user profile.
 - Session survives page refresh.
+- Seeded credential accounts can authenticate without SMTP.
 
 ## Acceptance Criteria
 
