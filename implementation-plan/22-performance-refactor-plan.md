@@ -142,6 +142,8 @@ Status: done on refactor.
 
 ## Sprint 4 — Bundle, Build & Asset Polish
 
+Status: done on refactor.
+
 **Goal:** Tighten the shipped surface area.
 
 ### Workstreams

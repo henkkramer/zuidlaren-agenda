@@ -99,9 +99,14 @@ for (const key of ["DATABASE_URL", "NEXTAUTH_URL", "NEXTAUTH_SECRET", "EMAIL_SER
 
 const dockerCompose = read("docker-compose.yml");
 assert(dockerCompose.includes('cpuset: "0-1"'), 'docker-compose.yml must pin the web service with cpuset: "0-1"');
+const dockerfile = read("Dockerfile");
+assert(dockerfile.includes("node:24-alpine@sha256:"), "Dockerfile must pin the Node base image by digest");
+assert(dockerfile.includes("npm ci --omit=dev"), "Dockerfile runtime dependencies must omit dev packages");
 
 const nextConfig = read("next.config.ts");
 assert(nextConfig.includes("securityHeadersForNext"), "next.config.ts must apply shared security headers");
+assert(nextConfig.includes("optimizePackageImports"), "next.config.ts must optimize package imports");
+assert(nextConfig.includes("/uploads/:path*"), "next.config.ts must add immutable upload cache headers");
 
 const profileRoute = read("app/api/me/profile/route.ts");
 assert(profileRoute.includes("rejectCrossOriginMutation"), "profile mutation route must apply CSRF origin guard");
@@ -220,6 +225,11 @@ const adminActivitiesRoute = read("app/api/admin/activities/route.ts");
 const adminBusinessesRoute = read("app/api/admin/businesses/route.ts");
 const adminReportsRoute = read("app/api/admin/reports/route.ts");
 const prismaSchema = read("prisma/schema.prisma");
+const tsconfig = read("tsconfig.json");
+const gitignore = read(".gitignore");
+const analyticsEventsRoute = read("app/api/analytics/events/route.ts");
+const accountPanel = read("components/account-panel.tsx");
+const seed = read("prisma/seed.ts");
 assert(activityCard.includes("next/image"), "Activity cards must use next/image");
 assert(activityDetailView.includes("next/image"), "Activity detail hero must use next/image");
 assert(activityDetailView.includes("sendBeacon"), "Activity source analytics should use sendBeacon when available");
@@ -245,6 +255,12 @@ assert(adminReportsRoute.includes("parseCursorPagination"), "Admin reports API m
 assert(analyticsSnapshot.includes("createdAt: { gte: last30Days }"), "Analytics snapshot counts must stay inside the 30-day window");
 assert(prismaSchema.includes("@@index([status, organizerName])"), "Activity organizer filter index must exist");
 assert(prismaSchema.includes("@@index([status, indoorOutdoor])"), "Activity indoor/outdoor filter index must exist");
+assert(tsconfig.includes('"target": "ES2022"'), "TypeScript target must stay on ES2022");
+assert(gitignore.includes("tsconfig.tsbuildinfo"), "tsconfig.tsbuildinfo must remain ignored");
+assert(analyticsEventsRoute.includes("select: {"), "Analytics events route must select only required activity fields");
+assert(!analyticsEventsRoute.includes("include: {"), "Analytics events route must not include full activity relations");
+assert(accountPanel.includes("setTimeout") && accountPanel.includes("300"), "Account preference saves must be buffered");
+assert(seed.includes("seedActivities"), "Seed script must use seed-local activity data");
 
 const publicCalendarRoute = read("app/api/public/calendar/route.ts");
 assert(publicCalendarRoute.includes("buildPublicCalendarFeed"), "Public calendar route must build an iCalendar feed");
@@ -399,6 +415,7 @@ assert(filterControls.includes("filter-menu-row"), "Public agenda filters must r
 assert(filterControls.includes("renderFilterSelect"), "Public agenda filters must expose compact dropdown controls");
 assert(filterControls.includes("<select"), "Public agenda secondary filters must use dropdown controls");
 assert(filterControls.includes("options.categories"), "Public agenda category filters must use available event categories");
+assert(filterControls.includes("useMemo"), "Filter controls must memoize option maps");
 
 assert(!agendaShell.includes("getPublicActivities"), "Public agenda shell must not fall back to mock activities after filtering");
 assert(agendaShell.includes("enableFilterLinks"), "Public agenda cards must expose tag filter links");

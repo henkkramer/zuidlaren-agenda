@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { signIn, signOut } from "next-auth/react";
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type AccountPanelProps =
   | {
@@ -44,6 +44,15 @@ export function AccountPanel(props: AccountPanelProps) {
     props.mode === "signed-in" ? Boolean(props.user.deletionRequestedAt) : false,
   );
   const [status, setStatus] = useState("");
+  const preferenceSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (preferenceSaveTimer.current) {
+        clearTimeout(preferenceSaveTimer.current);
+      }
+    };
+  }, []);
 
   async function handleSignIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -73,10 +82,21 @@ export function AccountPanel(props: AccountPanelProps) {
     setStatus(response.ok ? "Voorkeuren opgeslagen" : "Voorkeuren konden niet worden opgeslagen");
   }
 
+  function queuePreferenceSave(nextPreferences: typeof preferences) {
+    if (preferenceSaveTimer.current) {
+      clearTimeout(preferenceSaveTimer.current);
+    }
+
+    setStatus("Voorkeuren worden opgeslagen...");
+    preferenceSaveTimer.current = setTimeout(() => {
+      void savePreferences(nextPreferences);
+    }, 300);
+  }
+
   function updatePreference(key: keyof typeof preferences) {
     const nextPreferences = { ...preferences, [key]: !preferences[key] };
     setPreferences(nextPreferences);
-    void savePreferences(nextPreferences);
+    queuePreferenceSave(nextPreferences);
   }
 
   function togglePreferenceList(key: "categorySlugs" | "locationSlugs", slug: string) {
@@ -84,7 +104,7 @@ export function AccountPanel(props: AccountPanelProps) {
     const nextList = current.includes(slug) ? current.filter((item) => item !== slug) : [...current, slug];
     const nextPreferences = { ...preferences, [key]: nextList };
     setPreferences(nextPreferences);
-    void savePreferences(nextPreferences);
+    queuePreferenceSave(nextPreferences);
   }
 
   return (
