@@ -103,6 +103,7 @@ const dockerfile = read("Dockerfile");
 assert(dockerfile.includes("node:24-alpine@sha256:"), "Dockerfile must pin the Node base image by digest");
 assert(dockerfile.includes("npm ci --omit=dev"), "Dockerfile runtime dependencies must omit dev packages");
 assert(dockerfile.includes("scripts/seed-credentials.mjs"), "Dockerfile must copy the production credential seed script into the runtime image");
+assert(dockerfile.includes("COPY --from=runtime-deps") && dockerfile.includes("/app/node_modules ./node_modules"), "Dockerfile must copy production node_modules for runtime maintenance scripts");
 
 const nextConfig = read("next.config.ts");
 assert(nextConfig.includes("securityHeadersForNext"), "next.config.ts must apply shared security headers");
