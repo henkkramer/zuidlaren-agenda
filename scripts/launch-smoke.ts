@@ -202,7 +202,16 @@ assert(
   "Mobile capabilities must expose frozen calendar export contracts",
 );
 
+const publicActivities = read("lib/public-activities.ts");
+const publicActivityCache = read("lib/public-activity-cache.ts");
+const homepage = read("app/page.tsx");
+const analyticsSnapshot = read("lib/analytics-snapshot.ts");
 const publicActivitiesRoute = read("app/api/public/activities/route.ts");
+assert(publicActivities.includes("unstable_cache"), "Public activity read model must use Next cache");
+assert(publicActivities.includes("publicActivityFeedCacheTag"), "Public activity feed cache must use a shared tag");
+assert(publicActivityCache.includes("revalidatePublicActivityCaches"), "Public activity cache invalidation helper must exist");
+assert(homepage.includes("after(() => recordAnalyticsMetric"), "Homepage analytics must run after render");
+assert(analyticsSnapshot.includes('by: ["metric"]'), "Analytics snapshot must group metric totals in one query");
 assert(publicActivitiesRoute.includes("nextCursor"), "Public activities API must expose cursor pagination metadata");
 assert(publicActivitiesRoute.includes("publicApiHeaders"), "Public activities API must use stable public API headers");
 assert(publicActivitiesRoute.includes("public_activity_list"), "Public activities API must record public list analytics");

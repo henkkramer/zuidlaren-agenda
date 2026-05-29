@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import { recordAnalyticsMetric, type AnalyticsMetric } from "@/lib/analytics";
 import { prisma } from "@/lib/prisma";
 
@@ -33,12 +33,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  await recordAnalyticsMetric({
-    metric,
-    activityId: activity.id,
-    category: activity.category.slug,
-    location: activity.location.slug,
-  });
+  after(() =>
+    recordAnalyticsMetric({
+      metric,
+      activityId: activity.id,
+      category: activity.category.slug,
+      location: activity.location.slug,
+    }),
+  );
 
   return NextResponse.json({ ok: true });
 }

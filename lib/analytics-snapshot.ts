@@ -8,6 +8,11 @@ type NotificationDeliveryStatusRow = {
   status: string;
 };
 
+type MetricCountRow = {
+  metric: string;
+  _sum: { count: number | null };
+};
+
 function since(days: number) {
   const date = new Date();
   date.setUTCDate(date.getUTCDate() - days);
@@ -17,12 +22,7 @@ function since(days: number) {
 export async function getAnalyticsSnapshot() {
   const last30Days = since(30);
   const [
-    activityViews,
-    sourceClicks,
-    attendanceClicks,
-    filterUses,
-    publicActivityLists,
-    calendarExports,
+    metricCounts,
     calendarExportBreakdown,
     attendanceCount,
     notificationOptIns,
@@ -30,28 +30,9 @@ export async function getAnalyticsSnapshot() {
     notificationDeliveries,
     moderationActions,
   ] = await Promise.all([
-    prisma.analyticsDailyMetric.aggregate({
-      where: { metric: "activity_view", day: { gte: last30Days } },
-      _sum: { count: true },
-    }),
-    prisma.analyticsDailyMetric.aggregate({
-      where: { metric: "activity_source_click", day: { gte: last30Days } },
-      _sum: { count: true },
-    }),
-    prisma.analyticsDailyMetric.aggregate({
-      where: { metric: "attendance_click", day: { gte: last30Days } },
-      _sum: { count: true },
-    }),
-    prisma.analyticsDailyMetric.aggregate({
-      where: { metric: "filter_use", day: { gte: last30Days } },
-      _sum: { count: true },
-    }),
-    prisma.analyticsDailyMetric.aggregate({
-      where: { metric: "public_activity_list", day: { gte: last30Days } },
-      _sum: { count: true },
-    }),
-    prisma.analyticsDailyMetric.aggregate({
-      where: { metric: "calendar_export", day: { gte: last30Days } },
+    prisma.analyticsDailyMetric.groupBy({
+      by: ["metric"],
+      where: { day: { gte: last30Days } },
       _sum: { count: true },
     }),
     prisma.analyticsDailyMetric.groupBy({
@@ -87,14 +68,18 @@ export async function getAnalyticsSnapshot() {
     }),
   ]);
 
+  const metricCountMap = new Map(
+    (metricCounts as MetricCountRow[]).map((row) => [row.metric, row._sum.count ?? 0]),
+  );
+
   return {
     windowDays: 30,
-    activityViews: activityViews._sum.count ?? 0,
-    sourceClicks: sourceClicks._sum.count ?? 0,
-    attendanceClicks: attendanceClicks._sum.count ?? 0,
-    filterUses: filterUses._sum.count ?? 0,
-    publicActivityLists: publicActivityLists._sum.count ?? 0,
-    calendarExports: calendarExports._sum.count ?? 0,
+    activityViews: metricCountMap.get("activity_view") ?? 0,
+    sourceClicks: metricCountMap.get("activity_source_click") ?? 0,
+    attendanceClicks: metricCountMap.get("attendance_click") ?? 0,
+    filterUses: metricCountMap.get("filter_use") ?? 0,
+    publicActivityLists: metricCountMap.get("public_activity_list") ?? 0,
+    calendarExports: metricCountMap.get("calendar_export") ?? 0,
     calendarExportBreakdown: summarizeCalendarExportBreakdown(calendarExportBreakdown as AnalyticsMetricGroupRow[]),
     attendanceCount,
     notificationOptIns,

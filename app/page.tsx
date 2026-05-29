@@ -1,10 +1,11 @@
+import { after } from "next/server";
 import { ZuidlarenAgendaShell } from "@/components/zuidlaren-agenda-shell";
 import { hasActiveFilterDimensions, recordAnalyticsMetric } from "@/lib/analytics";
 import { getCurrentSession } from "@/lib/auth";
 import { getPublicActivityFeed } from "@/lib/public-activities";
 import { parseActivityFilters } from "@/lib/public-activity-query";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 type HomePageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -16,7 +17,7 @@ export default async function Home({ searchParams }: HomePageProps) {
   const feed = await getPublicActivityFeed(filters, session?.user?.id);
 
   if (hasActiveFilterDimensions(filters)) {
-    await recordAnalyticsMetric({
+    after(() => recordAnalyticsMetric({
       metric: "filter_use",
       category: filters.category,
       location: filters.location,
@@ -30,7 +31,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         dateRange: filters.start || filters.end ? true : undefined,
         hasSearch: filters.q ? true : undefined,
       },
-    });
+    }));
   }
 
   return (

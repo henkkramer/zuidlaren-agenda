@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireBusinessPermission } from "@/lib/business-permissions";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
+import { revalidatePublicActivityCaches } from "@/lib/public-activity-cache";
 import { accessDeniedResponse } from "@/lib/route-helpers";
 
 type PublishContext = {
@@ -37,6 +38,8 @@ export async function POST(request: Request, context: PublishContext) {
     where: { id: activity.id },
     data: { status: "PUBLISHED" },
   });
+
+  revalidatePublicActivityCaches({ filterOptions: true });
 
   await prisma.auditLog.create({
     data: {

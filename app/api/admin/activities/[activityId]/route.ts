@@ -3,6 +3,7 @@ import { createAdminAuditLog, requireAdmin } from "@/lib/admin-auth";
 import { parseAdminActivityStatus } from "@/lib/admin-status-input";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
+import { revalidatePublicActivityCaches } from "@/lib/public-activity-cache";
 import { accessDeniedResponse, badRequestResponse } from "@/lib/route-helpers";
 
 type ActivityContext = {
@@ -37,6 +38,8 @@ export async function PATCH(request: Request, context: ActivityContext) {
     where: { id: activityId },
     data: { status },
   });
+
+  revalidatePublicActivityCaches({ filterOptions: true });
 
   await createAdminAuditLog({
     actorId: admin.userId,
