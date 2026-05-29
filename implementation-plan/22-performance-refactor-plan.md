@@ -61,6 +61,8 @@ Status: done on refactor.
 
 ## Sprint 2 — Server/Client Boundary Cleanup
 
+Status: done on refactor.
+
 **Goal:** Stop shipping the whole shell to the browser. Move presentation back to RSC; keep only true interaction in client islands.
 
 ### Workstreams

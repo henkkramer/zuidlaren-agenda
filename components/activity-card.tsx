@@ -1,16 +1,12 @@
+import Image from "next/image";
 import { Bookmark, MapPin } from "lucide-react";
-import type { KeyboardEvent, MouseEvent } from "react";
 import { ActivityDateBadge } from "@/components/activity-date-badge";
 import { categoryLabels, type Activity, type ActivityCategory } from "@/lib/activity-types";
 import { activityDateParts } from "@/lib/date-format";
 
 function filterHref(key: "category" | "indoorOutdoor" | "type", value: string) {
   const params = new URLSearchParams({ [key]: value });
-  return `/?${params.toString()}`;
-}
-
-function stopCardOpen(event: MouseEvent<HTMLAnchorElement>) {
-  event.stopPropagation();
+  return "/?" + params.toString();
 }
 
 function uniqueTags(activity: Activity) {
@@ -27,35 +23,35 @@ export function ActivityCard({
   activity,
   enableFilterLinks = false,
   onOpen,
+  priority = false,
 }: {
   activity: Activity;
   enableFilterLinks?: boolean;
-  onOpen: (activity: Activity) => void;
+  onOpen?: (activity: Activity) => void;
+  priority?: boolean;
 }) {
   const parts = activityDateParts(activity);
   const tags = uniqueTags(activity);
-
-  function open() {
-    onOpen(activity);
-  }
-
-  function openFromKeyboard(event: KeyboardEvent<HTMLElement>) {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      open();
-    }
-  }
+  const detailHref = "/activity/" + encodeURIComponent(activity.id);
 
   return (
     <article
       className="activity-card"
-      style={{ backgroundImage: `url(${activity.imageUrl})` }}
-      aria-label={`${parts.longDate}, ${parts.time}, ${activity.title}, ${activity.locationName}`}
-      onClick={open}
-      onKeyDown={openFromKeyboard}
-      role="button"
-      tabIndex={0}
+      aria-label={parts.longDate + ", " + parts.time + ", " + activity.title + ", " + activity.locationName}
     >
+      <Image
+        alt=""
+        className="activity-card-image"
+        fill
+        priority={priority}
+        sizes="(max-width: 760px) 100vw, (max-width: 1200px) 50vw, 430px"
+        src={activity.imageUrl}
+      />
+      {onOpen ? (
+        <button className="activity-card-open" type="button" onClick={() => onOpen(activity)} aria-label={activity.title + " bekijken"} />
+      ) : (
+        <a className="activity-card-open" href={detailHref} aria-label={activity.title + " bekijken"} />
+      )}
       <div className="activity-card-heading">
         <ActivityDateBadge activity={activity} />
         <h3>{activity.title}</h3>
@@ -70,7 +66,7 @@ export function ActivityCard({
         </div>
         <div className="tag-row">
           {enableFilterLinks ? (
-            <a className="tag tag-link" href={filterHref("category", activity.category)} onClick={stopCardOpen}>
+            <a className="tag tag-link" href={filterHref("category", activity.category)}>
               {categoryLabels[activity.category as ActivityCategory]}
             </a>
           ) : (
@@ -78,7 +74,7 @@ export function ActivityCard({
           )}
           {tags.map((tag) =>
             enableFilterLinks ? (
-              <a className="tag tag-link" href={filterHref(tag === "Binnen" || tag === "Buiten" || tag === "Gemengd" ? "indoorOutdoor" : "type", tag)} key={tag} onClick={stopCardOpen}>
+              <a className="tag tag-link" href={filterHref(tag === "Binnen" || tag === "Buiten" || tag === "Gemengd" ? "indoorOutdoor" : "type", tag)} key={tag}>
                 {tag}
               </a>
             ) : (

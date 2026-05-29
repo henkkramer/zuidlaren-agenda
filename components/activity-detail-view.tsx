@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { ArrowLeft, Bookmark, CalendarDays, CalendarPlus, ExternalLink, Lock, MapPin, Share2, Users, UserRound } from "lucide-react";
 import { ActivityReportForm } from "@/components/activity-report-form";
@@ -7,7 +9,7 @@ import { ActivityDateBadge } from "@/components/activity-date-badge";
 import { categoryLabels, type Activity } from "@/lib/activity-types";
 import { activityDateParts, formatActivityEndTime } from "@/lib/date-format";
 
-export function ActivityDetailView({ activity, onBack }: { activity: Activity; onBack: () => void }) {
+export function ActivityDetailView({ activity, backHref = "/", onBack }: { activity: Activity; backHref?: string; onBack?: () => void }) {
   const parts = activityDateParts(activity);
   const [visibility, setVisibility] = useState<"private" | "public">(activity.myAttendance?.visibility ?? "private");
   const [myAttendance, setMyAttendance] = useState(activity.myAttendance);
@@ -51,20 +53,42 @@ export function ActivityDetailView({ activity, onBack }: { activity: Activity; o
   }
 
   function trackSourceClick() {
+    const payload = JSON.stringify({ event: "activity_source_click", activityId: activity.id });
+
+    if (navigator.sendBeacon) {
+      navigator.sendBeacon("/api/analytics/events", new Blob([payload], { type: "application/json" }));
+      return;
+    }
+
     void fetch("/api/analytics/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ event: "activity_source_click", activityId: activity.id }),
+      body: payload,
+      keepalive: true,
     });
   }
 
   return (
     <>
-      <div className="detail-hero" style={{ backgroundImage: `url(${activity.imageUrl})` }}>
+      <div className="detail-hero">
+        <Image
+          alt=""
+          className="detail-hero-image"
+          fill
+          priority
+          sizes="(max-width: 760px) 100vw, 760px"
+          src={activity.imageUrl}
+        />
         <div className="detail-topbar">
-          <button className="icon-button" onClick={onBack} aria-label="Terug">
-            <ArrowLeft />
-          </button>
+          {onBack ? (
+            <button className="icon-button" onClick={onBack} aria-label="Terug">
+              <ArrowLeft />
+            </button>
+          ) : (
+            <Link className="icon-button" href={backHref} aria-label="Terug">
+              <ArrowLeft />
+            </Link>
+          )}
           <div className="detail-actions">
             <button className="icon-button" aria-label="Delen">
               <Share2 />
