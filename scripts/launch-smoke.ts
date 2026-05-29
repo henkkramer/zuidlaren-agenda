@@ -202,11 +202,22 @@ assert(
   "Mobile capabilities must expose frozen calendar export contracts",
 );
 
+const activityCard = read("components/activity-card.tsx");
+const activityDetailView = read("components/activity-detail-view.tsx");
+const agendaShell = read("components/zuidlaren-agenda-shell.tsx");
+const activityDetailPage = read("app/activity/[activityId]/page.tsx");
+const rootLayout = read("app/layout.tsx");
 const publicActivities = read("lib/public-activities.ts");
 const publicActivityCache = read("lib/public-activity-cache.ts");
 const homepage = read("app/page.tsx");
 const analyticsSnapshot = read("lib/analytics-snapshot.ts");
 const publicActivitiesRoute = read("app/api/public/activities/route.ts");
+assert(activityCard.includes("next/image"), "Activity cards must use next/image");
+assert(activityDetailView.includes("next/image"), "Activity detail hero must use next/image");
+assert(activityDetailView.includes("sendBeacon"), "Activity source analytics should use sendBeacon when available");
+assert(!agendaShell.includes("use client"), "Agenda shell must remain a server component");
+assert(activityDetailPage.includes("getPublicActivityDetail"), "Route-driven activity detail page must load public activity details");
+assert(rootLayout.includes("next/font/google"), "Root layout must use next/font for typography");
 assert(publicActivities.includes("unstable_cache"), "Public activity read model must use Next cache");
 assert(publicActivities.includes("publicActivityFeedCacheTag"), "Public activity feed cache must use a shared tag");
 assert(publicActivityCache.includes("revalidatePublicActivityCaches"), "Public activity cache invalidation helper must exist");
@@ -370,11 +381,9 @@ assert(filterControls.includes("renderFilterSelect"), "Public agenda filters mus
 assert(filterControls.includes("<select"), "Public agenda secondary filters must use dropdown controls");
 assert(filterControls.includes("options.categories"), "Public agenda category filters must use available event categories");
 
-const agendaShell = read("components/zuidlaren-agenda-shell.tsx");
 assert(!agendaShell.includes("getPublicActivities"), "Public agenda shell must not fall back to mock activities after filtering");
 assert(agendaShell.includes("enableFilterLinks"), "Public agenda cards must expose tag filter links");
 
-const activityCard = read("components/activity-card.tsx");
 assert(activityCard.includes("tag-link"), "Activity card tags must be usable as filter links");
 assert(activityCard.includes("filterHref(\"category\""), "Activity card category tags must link to category filters");
 

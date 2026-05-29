@@ -130,7 +130,7 @@ export async function getPublicActivityFeed(filters: ActivityFilterState, curren
   };
 }
 
-export async function getPublicActivityDetail(activityId: string) {
+export async function getPublicActivityDetail(activityId: string, currentUserId?: string) {
   const activity = await prisma.activity.findFirst({
     where: {
       slug: decodeURIComponent(activityId),
@@ -149,6 +149,15 @@ export async function getPublicActivityDetail(activityId: string) {
           },
         },
       },
+      ...(currentUserId
+        ? {
+            attendances: {
+              where: { userId: currentUserId },
+              select: { status: true, visibility: true },
+              take: 1,
+            },
+          }
+        : {}),
     },
   });
 

@@ -1,8 +1,4 @@
-"use client";
-
-import { useState } from "react";
 import { ActivityCard } from "@/components/activity-card";
-import { ActivityDetailView } from "@/components/activity-detail-view";
 import { BottomNavigation } from "@/components/bottom-navigation";
 import { ChurchMark } from "@/components/church-mark";
 import { FilterControls } from "@/components/filter-controls";
@@ -11,7 +7,7 @@ import { CalendarPlus } from "lucide-react";
 import type { Activity } from "@/lib/activity-types";
 import { toQueryString, type ActivityFilterOptions, type ActivityFilterState } from "@/lib/public-activity-query";
 
-function BrandHeader() {
+export function BrandHeader() {
   return (
     <header className="brand-strip">
       <ChurchMark />
@@ -31,13 +27,11 @@ function PublicAgenda({
   filterOptions,
   filters,
   hasMore,
-  onOpen,
 }: {
   activities: Activity[];
   filterOptions: ActivityFilterOptions;
   filters: ActivityFilterState;
   hasMore: boolean;
-  onOpen: (activity: Activity) => void;
 }) {
   const moreQuery = toQueryString({ ...filters, cursor: undefined }, { limit: filters.limit + 24 });
   const calendarQuery = toQueryString({ ...filters, cursor: undefined }, { limit: 96 });
@@ -55,8 +49,8 @@ function PublicAgenda({
       </div>
       <FilterControls filters={filters} options={filterOptions} />
       <div className="feed-list">
-        {activities.map((activity) => (
-          <ActivityCard activity={activity} enableFilterLinks key={activity.id} onOpen={onOpen} />
+        {activities.map((activity, index) => (
+          <ActivityCard activity={activity} enableFilterLinks key={activity.id} priority={index < 2} />
         ))}
       </div>
       {activities.length === 0 ? (
@@ -85,30 +79,16 @@ export function ZuidlarenAgendaShell({
   hasMore?: boolean;
   initialActivities?: Activity[];
 }) {
-  const [selectedActivity, setSelectedActivity] = useState<Activity | null>(null);
   const activities = initialActivities ?? [];
   const activeFilters = filters ?? { limit: 50 };
   const options = filterOptions ?? { categories: [], indoorOutdoor: [], locations: [], organizers: [], types: [] };
-
-  function openActivity(activity: Activity) {
-    setSelectedActivity(activity);
-    void fetch("/api/analytics/events", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ event: "activity_view", activityId: activity.id }),
-    });
-  }
 
   return (
     <main className="app-page" id="main-content">
       <BrandHeader />
       <div className="app-container">
         <section className="agenda-surface">
-          {selectedActivity ? (
-            <ActivityDetailView activity={selectedActivity} onBack={() => setSelectedActivity(null)} />
-          ) : (
-            <PublicAgenda activities={activities} filterOptions={options} filters={activeFilters} hasMore={hasMore} onOpen={openActivity} />
-          )}
+          <PublicAgenda activities={activities} filterOptions={options} filters={activeFilters} hasMore={hasMore} />
         </section>
       </div>
       <BottomNavigation />
