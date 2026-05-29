@@ -1,9 +1,17 @@
+import { Suspense } from "react";
 import { after } from "next/server";
-import { ZuidlarenAgendaShell } from "@/components/zuidlaren-agenda-shell";
+import {
+  ActivityFeedSkeleton,
+  AgendaShellFrame,
+  FilterControlsSkeleton,
+  PublicActivityFeed,
+  PublicAgendaControls,
+} from "@/components/zuidlaren-agenda-shell";
+import { MobileHeader } from "@/components/mobile-header";
 import { hasActiveFilterDimensions, recordAnalyticsMetric } from "@/lib/analytics";
 import { getCurrentSession } from "@/lib/auth";
-import { getPublicActivityFeed } from "@/lib/public-activities";
-import { parseActivityFilters } from "@/lib/public-activity-query";
+import { getPublicActivityPage, getPublicFilterOptions } from "@/lib/public-activities";
+import { parseActivityFilters, type ActivityFilterState } from "@/lib/public-activity-query";
 
 export const revalidate = 60;
 
@@ -11,10 +19,19 @@ type HomePageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
+async function HomeFilterControls({ filters }: { filters: ActivityFilterState }) {
+  const filterOptions = await getPublicFilterOptions();
+  return <PublicAgendaControls filterOptions={filterOptions} filters={filters} />;
+}
+
+async function HomeActivityFeed({ filters }: { filters: ActivityFilterState }) {
+  const session = await getCurrentSession();
+  const feed = await getPublicActivityPage(filters, session?.user?.id);
+  return <PublicActivityFeed activities={feed.activities} filters={filters} hasMore={feed.hasMore} />;
+}
+
 export default async function Home({ searchParams }: HomePageProps) {
   const filters = parseActivityFilters(await searchParams);
-  const session = await getCurrentSession();
-  const feed = await getPublicActivityFeed(filters, session?.user?.id);
 
   if (hasActiveFilterDimensions(filters)) {
     after(() => recordAnalyticsMetric({
@@ -35,11 +52,14 @@ export default async function Home({ searchParams }: HomePageProps) {
   }
 
   return (
-    <ZuidlarenAgendaShell
-      filterOptions={feed.filterOptions}
-      filters={filters}
-      hasMore={feed.hasMore}
-      initialActivities={feed.activities}
-    />
+    <AgendaShellFrame>
+      <MobileHeader />
+      <Suspense fallback={<FilterControlsSkeleton />}>
+        <HomeFilterControls filters={filters} />
+      </Suspense>
+      <Suspense fallback={<ActivityFeedSkeleton />}>
+        <HomeActivityFeed filters={filters} />
+      </Suspense>
+    </AgendaShellFrame>
   );
 }

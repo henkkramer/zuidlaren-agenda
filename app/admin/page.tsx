@@ -229,6 +229,10 @@ export default async function AdminPage() {
                 <small>agenda exports totaal</small>
               </span>
               <span>
+                <strong>{analytics.webVitals}</strong>
+                <small>Web Vitals</small>
+              </span>
+              <span>
                 <strong>{analytics.notificationOptIns}</strong>
                 <small>notificatie opt-ins</small>
               </span>
@@ -237,6 +241,14 @@ export default async function AdminPage() {
                 <small>AI-aanvragen</small>
               </span>
             </div>
+            {analytics.webVitalBreakdown.length ? (
+              <p className="small-muted">
+                Web Vitals:{" "}
+                {analytics.webVitalBreakdown
+                  .map((item) => item.kind.replaceAll("_", " ") + " " + item.count)
+                  .join(", ")}
+              </p>
+            ) : null}
             {analytics.calendarExportBreakdown.length ? (
               <p className="small-muted">
                 Agenda export verdeling:{" "}

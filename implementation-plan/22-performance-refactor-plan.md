@@ -181,6 +181,8 @@ Status: done on refactor.
 
 ## Sprint 5 — Streaming, Observability & Guardrails
 
+Status: done on refactor.
+
 **Goal:** Make wins visible and prevent regressions.
 
 ### Workstreams

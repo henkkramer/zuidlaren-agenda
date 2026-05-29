@@ -228,6 +228,8 @@ const prismaSchema = read("prisma/schema.prisma");
 const tsconfig = read("tsconfig.json");
 const gitignore = read(".gitignore");
 const analyticsEventsRoute = read("app/api/analytics/events/route.ts");
+const webVitalsRoute = read("app/api/analytics/web-vitals/route.ts");
+const webVitalsReporter = read("components/web-vitals-reporter.tsx");
 const accountPanel = read("components/account-panel.tsx");
 const seed = read("prisma/seed.ts");
 assert(activityCard.includes("next/image"), "Activity cards must use next/image");
@@ -239,6 +241,9 @@ assert(rootLayout.includes("next/font/google"), "Root layout must use next/font 
 assert(publicActivities.includes("unstable_cache"), "Public activity read model must use Next cache");
 assert(publicActivities.includes("publicActivityFeedCacheTag"), "Public activity feed cache must use a shared tag");
 assert(publicActivityCache.includes("revalidatePublicActivityCaches"), "Public activity cache invalidation helper must exist");
+assert(homepage.includes("<Suspense"), "Homepage must stream filter controls and activity feed through Suspense");
+assert(agendaShell.includes("FilterControlsSkeleton"), "Agenda shell must expose a filter loading skeleton");
+assert(agendaShell.includes("ActivityFeedSkeleton"), "Agenda shell must expose an activity feed loading skeleton");
 assert(homepage.includes("after(() => recordAnalyticsMetric"), "Homepage analytics must run after render");
 assert(analyticsSnapshot.includes('by: ["metric"]'), "Analytics snapshot must group metric totals in one query");
 assert(publicActivitiesRoute.includes("nextCursor"), "Public activities API must expose cursor pagination metadata");
@@ -260,6 +265,9 @@ assert(gitignore.includes("tsconfig.tsbuildinfo"), "tsconfig.tsbuildinfo must re
 assert(analyticsEventsRoute.includes("select: {"), "Analytics events route must select only required activity fields");
 assert(!analyticsEventsRoute.includes("include: {"), "Analytics events route must not include full activity relations");
 assert(accountPanel.includes("setTimeout") && accountPanel.includes("300"), "Account preference saves must be buffered");
+assert(webVitalsRoute.includes("web_vital"), "Web Vitals route must record aggregate web_vital analytics");
+assert(webVitalsReporter.includes("useReportWebVitals"), "Client Web Vitals reporter must use Next web vitals hook");
+assert(rootLayout.includes("WebVitalsReporter"), "Root layout must include the Web Vitals reporter");
 assert(seed.includes("seedActivities"), "Seed script must use seed-local activity data");
 
 const publicCalendarRoute = read("app/api/public/calendar/route.ts");
@@ -429,6 +437,11 @@ assert(publicActivityQuery.includes("defaultFrom"), "Public activity queries mus
 assert(publicActivityQuery.includes("hasCustomDateFilter"), "Public activity queries must allow explicit past date ranges");
 assert(publicActivityQuery.includes("hasSome: tagVariants"), "Public activity search must match visible tag labels case-insensitively");
 
+const perfBudgetScript = read("scripts/perf-budget.ts");
+assert(packageJson.scripts["perf:budget"], "package.json must expose the performance budget command");
+assert(perfBudgetScript.includes("/business/[businessId]"), "Performance budget must cover the business dashboard route");
+assert(perfBudgetScript.includes("gzip"), "Performance budget must check gzip asset sizes");
+
 const releaseCheckScript = read("scripts/release-check.ts");
 assert(releaseCheckScript.includes("releaseHealthWarnings"), "release check must fail on release health warnings");
 assert(releaseCheckScript.includes("content-type="), "release check output must include response content type details");
@@ -440,5 +453,14 @@ assert(releaseChecks.includes("public calendar feed"), "Release checks must labe
 const queue = read("implementation-plan/SPRINT-QUEUE.md");
 assert(queue.includes("## Sprint 19 - MVP Launch Readiness"), "Sprint 19 must be listed in the queue");
 assert(queue.includes("Status: Done"), "Sprint queue should contain completed sprint statuses");
+
+const prismaModule = read("lib/prisma.ts");
+assert(prismaModule.includes("prisma.slow_query"), "Prisma module must warn on slow queries in non-production");
+assert(prismaModule.includes("prisma.repeated_query"), "Prisma module must warn on repeated query shapes in non-production");
+
+const observabilityPlan = read("implementation-plan/16-analytics-and-observability.md");
+assert(observabilityPlan.includes("Web Vitals"), "Observability docs must describe Web Vitals aggregation");
+const deploymentPlan = read("implementation-plan/19-deployment-tailscale-linux.md");
+assert(deploymentPlan.includes("perf:budget"), "Deployment docs must mention the performance budget check");
 
 console.info("Launch smoke checks passed");

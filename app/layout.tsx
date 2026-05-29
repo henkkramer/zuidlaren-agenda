@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
+import { WebVitalsReporter } from "@/components/web-vitals-reporter";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
@@ -21,6 +22,7 @@ export default function RootLayout({
         <a className="skip-link" href="#main-content">
           Direct naar inhoud
         </a>
+        <WebVitalsReporter />
         {children}
       </body>
     </html>
