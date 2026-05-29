@@ -4,6 +4,7 @@ import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { getEmailProvider } from "@/lib/email-provider";
 import { buildCampaignEmailMessage, summarizeDeliveryAttempts } from "@/lib/notification-delivery";
 import { prisma } from "@/lib/prisma";
+import { accessDeniedResponse } from "@/lib/route-helpers";
 
 type AdminNotificationCampaignContext = {
   params: Promise<{
@@ -18,7 +19,7 @@ export async function POST(request: Request, context: AdminNotificationCampaignC
   const admin = await requireAdmin();
 
   if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
+    return accessDeniedResponse(admin);
   }
 
   const { campaignId } = await context.params;

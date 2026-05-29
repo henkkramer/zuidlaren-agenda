@@ -209,6 +209,10 @@ export default async function AdminPage() {
                 <small>filters</small>
               </span>
               <span>
+                <strong>{analytics.publicActivityLists}</strong>
+                <small>lijst API</small>
+              </span>
+              <span>
                 <strong>{analytics.attendanceClicks}</strong>
                 <small>ik-ga kliks</small>
               </span>

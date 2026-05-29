@@ -21,6 +21,7 @@ export async function getAnalyticsSnapshot() {
     sourceClicks,
     attendanceClicks,
     filterUses,
+    publicActivityLists,
     calendarExports,
     calendarExportBreakdown,
     attendanceCount,
@@ -43,6 +44,10 @@ export async function getAnalyticsSnapshot() {
     }),
     prisma.analyticsDailyMetric.aggregate({
       where: { metric: "filter_use", day: { gte: last30Days } },
+      _sum: { count: true },
+    }),
+    prisma.analyticsDailyMetric.aggregate({
+      where: { metric: "public_activity_list", day: { gte: last30Days } },
       _sum: { count: true },
     }),
     prisma.analyticsDailyMetric.aggregate({
@@ -88,6 +93,7 @@ export async function getAnalyticsSnapshot() {
     sourceClicks: sourceClicks._sum.count ?? 0,
     attendanceClicks: attendanceClicks._sum.count ?? 0,
     filterUses: filterUses._sum.count ?? 0,
+    publicActivityLists: publicActivityLists._sum.count ?? 0,
     calendarExports: calendarExports._sum.count ?? 0,
     calendarExportBreakdown: summarizeCalendarExportBreakdown(calendarExportBreakdown as AnalyticsMetricGroupRow[]),
     attendanceCount,

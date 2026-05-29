@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireBusinessPermission } from "@/lib/business-permissions";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
+import { accessDeniedResponse } from "@/lib/route-helpers";
 
 type PublishContext = {
   params: Promise<{
@@ -18,7 +19,7 @@ export async function POST(request: Request, context: PublishContext) {
   const access = await requireBusinessPermission(businessId, "publishActivities");
 
   if (!access.ok) {
-    return NextResponse.json({ error: access.error }, { status: access.status });
+    return accessDeniedResponse(access);
   }
 
   const activity = await prisma.activity.findFirst({

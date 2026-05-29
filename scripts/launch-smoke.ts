@@ -205,9 +205,12 @@ assert(
 const publicActivitiesRoute = read("app/api/public/activities/route.ts");
 assert(publicActivitiesRoute.includes("nextCursor"), "Public activities API must expose cursor pagination metadata");
 assert(publicActivitiesRoute.includes("publicApiHeaders"), "Public activities API must use stable public API headers");
+assert(publicActivitiesRoute.includes("public_activity_list"), "Public activities API must record public list analytics");
 
 const publicCalendarRoute = read("app/api/public/calendar/route.ts");
 assert(publicCalendarRoute.includes("buildPublicCalendarFeed"), "Public calendar route must build an iCalendar feed");
+assert(publicCalendarRoute.includes("getPublicActivityPage"), "Public calendar route must use the activity-only read model");
+assert(!publicCalendarRoute.includes("getPublicActivityFeed"), "Public calendar route must not load filter options");
 assert(publicCalendarRoute.includes("checkRateLimit"), "Public calendar route must rate limit exports");
 assert(publicCalendarRoute.includes("prepareCalendarResponse"), "Public calendar route must use shared calendar response preparation");
 assert(publicCalendarRoute.includes("recordAnalyticsMetric"), "Public calendar route must record aggregate calendar export analytics");
@@ -264,8 +267,12 @@ assert(calendarSupportFaq.includes("Retry-After"), "Calendar support FAQ must ex
 assert(calendarSupportFaq.includes("calendar-client-troubleshooting"), "Calendar support FAQ must link troubleshooting docs");
 
 const operatorHandoff = read("docs/operator-handoff.md");
+const deploymentDocs = read("docs/DEPLOYMENT.md");
 assert(operatorHandoff.includes("Calendar Exports"), "Operator handoff must include calendar export operations");
 assert(operatorHandoff.includes("/api/public/calendar"), "Operator handoff must list the public calendar endpoint");
+assert(deploymentDocs.includes("Source Rollback"), "Deployment docs must define source rollback");
+assert(deploymentDocs.includes("Image Rollback"), "Deployment docs must define image rollback");
+assert(deploymentDocs.includes("Database Migration Posture"), "Deployment docs must define database migration rollback posture");
 assert(operatorHandoff.includes("Retry-After"), "Operator handoff must mention rate-limit retry handling");
 assert(operatorHandoff.includes("If-None-Match"), "Operator handoff must mention conditional calendar requests");
 assert(operatorHandoff.includes("noindex, nofollow, noarchive"), "Operator handoff must mention personal feed indexing controls");

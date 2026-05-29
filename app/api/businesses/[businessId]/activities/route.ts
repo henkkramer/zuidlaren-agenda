@@ -5,6 +5,7 @@ import { mapActivityRecord } from "@/lib/activity-mapper";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slugify";
+import { accessDeniedResponse, badRequestResponse } from "@/lib/route-helpers";
 
 type BusinessActivitiesContext = {
   params: Promise<{
@@ -17,7 +18,7 @@ export async function GET(_request: Request, context: BusinessActivitiesContext)
   const access = await requireBusinessPermission(businessId);
 
   if (!access.ok) {
-    return NextResponse.json({ error: access.error }, { status: access.status });
+    return accessDeniedResponse(access);
   }
 
   const activities = await prisma.activity.findMany({
@@ -52,7 +53,7 @@ export async function POST(request: Request, context: BusinessActivitiesContext)
   const access = await requireBusinessPermission(businessId);
 
   if (!access.ok) {
-    return NextResponse.json({ error: access.error }, { status: access.status });
+    return accessDeniedResponse(access);
   }
 
   let input;
@@ -61,7 +62,7 @@ export async function POST(request: Request, context: BusinessActivitiesContext)
     const payload = (await request.json()) as BusinessActivityPayload;
     input = parseBusinessActivityPayload(payload, access.business.name);
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Ongeldige activiteit" }, { status: 400 });
+    return badRequestResponse(error instanceof Error ? error.message : "Ongeldige activiteit");
   }
 
   const category = await prisma.activityCategory.upsert({

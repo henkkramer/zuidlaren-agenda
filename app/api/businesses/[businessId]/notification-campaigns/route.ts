@@ -6,6 +6,7 @@ import { parseNotificationCampaignInput } from "@/lib/notification-campaign-inpu
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
+import { accessDeniedResponse, badRequestResponse } from "@/lib/route-helpers";
 
 type NotificationRecipient = {
   id: string;
@@ -25,7 +26,7 @@ export async function POST(request: Request, context: BusinessNotificationCampai
   const access = await requireBusinessPermission(businessId, "publishActivities");
 
   if (!access.ok) {
-    return NextResponse.json({ error: access.error }, { status: access.status });
+    return accessDeniedResponse(access);
   }
 
   const rateLimit = checkRateLimit({ key: `notification:${access.userId}:${access.business.id}`, limit: 5, windowMs: 60 * 60_000 });
@@ -39,7 +40,7 @@ export async function POST(request: Request, context: BusinessNotificationCampai
   try {
     input = parseNotificationCampaignInput(((await request.json().catch(() => null)) ?? {}) as Record<string, unknown>);
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Ongeldige notificatie-aanvraag" }, { status: 400 });
+    return badRequestResponse(error instanceof Error ? error.message : "Ongeldige notificatie-aanvraag");
   }
 
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);

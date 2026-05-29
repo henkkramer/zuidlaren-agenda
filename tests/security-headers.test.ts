@@ -18,6 +18,7 @@ test("content security policy blocks framing and object embeds", () => {
   assert.match(csp, /frame-ancestors 'none'/);
   assert.match(csp, /object-src 'none'/);
   assert.match(csp, /img-src 'self' data: blob: https:\/\/images\.unsplash\.com/);
+  assert.doesNotMatch(csp, /unsafe-eval/);
 });
 
 test("security headers are applied to all Next routes", () => {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminAuditLog, requireAdmin } from "@/lib/admin-auth";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
+import { accessDeniedResponse } from "@/lib/route-helpers";
 
 type UserContext = {
   params: Promise<{
@@ -21,7 +22,7 @@ export async function PATCH(request: Request, context: UserContext) {
   const admin = await requireAdmin();
 
   if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
+    return accessDeniedResponse(admin);
   }
 
   const { userId } = await context.params;

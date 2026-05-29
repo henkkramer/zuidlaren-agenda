@@ -3,7 +3,7 @@ import { hasActiveFilterDimensions, recordAnalyticsMetric } from "@/lib/analytic
 import { calendarRateLimitKey, calendarRateLimitResponse, prepareCalendarResponse } from "@/lib/calendar-export";
 import { buildPublicCalendarFeed } from "@/lib/calendar-feed";
 import { mobileApiVersion } from "@/lib/mobile-contracts";
-import { getPublicActivityFeed } from "@/lib/public-activities";
+import { getPublicActivityPage } from "@/lib/public-activities";
 import { parseActivityFilters } from "@/lib/public-activity-query";
 import { checkRateLimit } from "@/lib/rate-limit";
 
@@ -15,8 +15,8 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url);
   const filters = parseActivityFilters(Object.fromEntries(url.searchParams.entries()));
-  const feed = await getPublicActivityFeed({ ...filters, limit: 96 });
-  const body = buildPublicCalendarFeed(feed.activities);
+  const page = await getPublicActivityPage({ ...filters, limit: 96 });
+  const body = buildPublicCalendarFeed(page.activities);
   const { notModifiedResponse, response } = prepareCalendarResponse(request, publicApiHeaders(mobileApiVersion), "zuidlaren-agenda", body);
   if (notModifiedResponse) return notModifiedResponse;
 

@@ -5,6 +5,7 @@ import { requireBusinessPermission } from "@/lib/business-permissions";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 import { checkRateLimit, rateLimitResponse } from "@/lib/rate-limit";
+import { accessDeniedResponse, badRequestResponse } from "@/lib/route-helpers";
 
 type AiActivityAssistContext = {
   params: Promise<{
@@ -92,7 +93,7 @@ export async function POST(request: Request, context: AiActivityAssistContext) {
   const access = await requireBusinessPermission(businessId);
 
   if (!access.ok) {
-    return NextResponse.json({ error: access.error }, { status: access.status });
+    return accessDeniedResponse(access);
   }
 
   const rateLimit = checkRateLimit({ key: `ai:${access.userId}:${access.business.id}`, limit: 20, windowMs: 60 * 60_000 });
@@ -108,13 +109,13 @@ export async function POST(request: Request, context: AiActivityAssistContext) {
     payload = (await request.json()) as AiActivityAssistPayload;
     activity = sanitizeActivityInput(payload.activity, access.business.name);
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Ongeldige AI-aanvraag" }, { status: 400 });
+    return badRequestResponse(error instanceof Error ? error.message : "Ongeldige AI-aanvraag");
   }
 
   const action = payload.action;
 
   if (!isAiActivityAction(action)) {
-    return NextResponse.json({ error: "Onbekende AI-actie" }, { status: 400 });
+    return badRequestResponse("Onbekende AI-actie");
   }
 
   const promptTemplate = await getPromptTemplate(action);

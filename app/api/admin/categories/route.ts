@@ -3,6 +3,7 @@ import { createAdminAuditLog, requireAdmin } from "@/lib/admin-auth";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slugify";
+import { accessDeniedResponse, badRequestResponse } from "@/lib/route-helpers";
 
 type CategoryPayload = {
   name?: unknown;
@@ -13,7 +14,7 @@ export async function GET() {
   const admin = await requireAdmin();
 
   if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
+    return accessDeniedResponse(admin);
   }
 
   const categories = await prisma.activityCategory.findMany({
@@ -35,14 +36,14 @@ export async function POST(request: Request) {
   const admin = await requireAdmin();
 
   if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
+    return accessDeniedResponse(admin);
   }
 
   const payload = (await request.json()) as CategoryPayload;
   const name = typeof payload.name === "string" ? payload.name.trim() : "";
 
   if (!name) {
-    return NextResponse.json({ error: "Categorienaam is verplicht" }, { status: 400 });
+    return badRequestResponse("Categorienaam is verplicht");
   }
 
   const category = await prisma.activityCategory.create({
