@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireBusinessPermission } from "@/lib/business-permissions";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
+import { accessDeniedResponse, badRequestResponse } from "@/lib/route-helpers";
 
 type BusinessRouteContext = {
   params: Promise<{
@@ -37,7 +38,7 @@ export async function GET(_request: Request, context: BusinessRouteContext) {
   const access = await requireBusinessPermission(businessId);
 
   if (!access.ok) {
-    return NextResponse.json({ error: access.error }, { status: access.status });
+    return accessDeniedResponse(access);
   }
 
   const members = await prisma.businessMember.findMany({
@@ -57,7 +58,7 @@ export async function POST(request: Request, context: BusinessRouteContext) {
   const access = await requireBusinessPermission(businessId, "manageMembers");
 
   if (!access.ok) {
-    return NextResponse.json({ error: access.error }, { status: access.status });
+    return accessDeniedResponse(access);
   }
 
   const payload = (await request.json()) as CreateMemberPayload;
@@ -65,7 +66,7 @@ export async function POST(request: Request, context: BusinessRouteContext) {
   const role = payload.role === "owner" ? "OWNER" : "EMPLOYEE";
 
   if (!email.includes("@")) {
-    return NextResponse.json({ error: "Geldig e-mailadres is verplicht" }, { status: 400 });
+    return badRequestResponse("Geldig e-mailadres is verplicht");
   }
 
   const user = await prisma.user.upsert({

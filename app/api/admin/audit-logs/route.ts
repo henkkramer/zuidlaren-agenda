@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/admin-auth";
 import { prisma } from "@/lib/prisma";
+import { accessDeniedResponse } from "@/lib/route-helpers";
 
 export async function GET() {
   const admin = await requireAdmin();
 
   if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
+    return accessDeniedResponse(admin);
   }
 
   const auditLogs = await prisma.auditLog.findMany({

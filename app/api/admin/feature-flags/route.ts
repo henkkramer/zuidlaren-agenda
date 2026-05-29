@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminAuditLog, requireAdmin } from "@/lib/admin-auth";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
+import { accessDeniedResponse, badRequestResponse } from "@/lib/route-helpers";
 
 type FeatureFlagPayload = {
   enabled?: unknown;
@@ -12,7 +13,7 @@ export async function GET() {
   const admin = await requireAdmin();
 
   if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
+    return accessDeniedResponse(admin);
   }
 
   const featureFlags = await prisma.featureFlag.findMany({
@@ -29,14 +30,14 @@ export async function PATCH(request: Request) {
   const admin = await requireAdmin();
 
   if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
+    return accessDeniedResponse(admin);
   }
 
   const payload = (await request.json()) as FeatureFlagPayload;
   const key = typeof payload.key === "string" ? payload.key.trim() : "";
 
   if (!key || typeof payload.enabled !== "boolean") {
-    return NextResponse.json({ error: "Feature flag key en enabled zijn verplicht" }, { status: 400 });
+    return badRequestResponse("Feature flag key en enabled zijn verplicht");
   }
 
   const featureFlag = await prisma.featureFlag.upsert({

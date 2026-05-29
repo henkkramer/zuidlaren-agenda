@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireBusinessPermission } from "@/lib/business-permissions";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
+import { accessDeniedResponse } from "@/lib/route-helpers";
 
 type MemberRouteContext = {
   params: Promise<{
@@ -41,7 +42,7 @@ export async function PATCH(request: Request, context: MemberRouteContext) {
   const access = await requireBusinessPermission(businessId, "manageMembers");
 
   if (!access.ok) {
-    return NextResponse.json({ error: access.error }, { status: access.status });
+    return accessDeniedResponse(access);
   }
 
   const payload = (await request.json()) as UpdateMemberPayload;
@@ -88,7 +89,7 @@ export async function DELETE(request: Request, context: MemberRouteContext) {
   const access = await requireBusinessPermission(businessId, "manageMembers");
 
   if (!access.ok) {
-    return NextResponse.json({ error: access.error }, { status: access.status });
+    return accessDeniedResponse(access);
   }
 
   const member = await prisma.businessMember.update({

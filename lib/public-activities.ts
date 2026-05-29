@@ -14,81 +14,99 @@ export type PublicActivityFeed = {
   nextCursor: string | null;
 };
 
+export type PublicActivityPage = Omit<PublicActivityFeed, "filterOptions">;
+
 export async function getPublicFilterOptions(): Promise<ActivityFilterOptions> {
-  const [categories, activityCategoryRows, locations, organizers, typeRows, indoorOutdoorRows] = await Promise.all([
+  const [categories, activityRows, locations] = await Promise.all([
     prisma.activityCategory.findMany({ orderBy: { name: "asc" } }),
     prisma.activity.findMany({
       where: { status: "PUBLISHED" },
-      select: { category: { select: { name: true, slug: true } } },
+      select: {
+        category: { select: { name: true, slug: true } },
+        indoorOutdoor: true,
+        organizerName: true,
+        typeTags: true,
+      },
     }),
     prisma.location.findMany({ orderBy: { name: "asc" }, select: { name: true } }),
-    prisma.activity.findMany({ where: { status: "PUBLISHED" }, distinct: ["organizerName"], orderBy: { organizerName: "asc" }, select: { organizerName: true } }),
-    prisma.activity.findMany({ where: { status: "PUBLISHED" }, select: { typeTags: true } }),
-    prisma.activity.findMany({ where: { status: "PUBLISHED", indoorOutdoor: { not: null } }, distinct: ["indoorOutdoor"], select: { indoorOutdoor: true } }),
   ]);
   const categoryMap = new Map<string, string>();
+  const indoorOutdoor = new Set<string>();
+  const organizers = new Set<string>();
+  const types = new Set<string>();
 
   for (const category of categories) {
     categoryMap.set(category.slug, category.name);
   }
 
-  for (const row of activityCategoryRows) {
+  for (const row of activityRows) {
     categoryMap.set(row.category.slug, row.category.name);
+    if (row.indoorOutdoor) indoorOutdoor.add(row.indoorOutdoor);
+    if (row.organizerName) organizers.add(row.organizerName);
+
+    for (const tag of row.typeTags) {
+      types.add(tag);
+    }
   }
 
   return {
     categories: [...categoryMap.entries()].map(([value, label]) => ({ label, value })).sort((a, b) => a.label.localeCompare(b.label, "nl")),
-    indoorOutdoor: indoorOutdoorRows.map((row) => row.indoorOutdoor).filter((value): value is string => Boolean(value)).sort(),
+    indoorOutdoor: [...indoorOutdoor].sort((a, b) => a.localeCompare(b, "nl")),
     locations: locations.map((location) => location.name),
-    organizers: organizers.map((row) => row.organizerName),
-    types: [...new Set(typeRows.flatMap((row) => row.typeTags))].sort((a, b) => a.localeCompare(b, "nl")),
+    organizers: [...organizers].sort((a, b) => a.localeCompare(b, "nl")),
+    types: [...types].sort((a, b) => a.localeCompare(b, "nl")),
   };
 }
 
-export async function getPublicActivityFeed(filters: ActivityFilterState, currentUserId?: string): Promise<PublicActivityFeed> {
+export async function getPublicActivityPage(filters: ActivityFilterState, currentUserId?: string): Promise<PublicActivityPage> {
   const cursorWhere = buildPublicActivityCursorWhere(filters.cursor);
   const where = cursorWhere ? { AND: [buildActivityWhere(filters, currentUserId), cursorWhere] } : buildActivityWhere(filters, currentUserId);
-  const [activities, filterOptions] = await Promise.all([
-    prisma.activity.findMany({
-      where,
-      include: {
-        category: true,
-        location: true,
-        _count: {
-          select: {
-            attendances: {
-              where: {
-                status: "GOING",
-                visibility: "PUBLIC",
-              },
+  const activities = await prisma.activity.findMany({
+    where,
+    include: {
+      category: true,
+      location: true,
+      _count: {
+        select: {
+          attendances: {
+            where: {
+              status: "GOING",
+              visibility: "PUBLIC",
             },
           },
         },
-        ...(currentUserId
-          ? {
-              attendances: {
-                where: { userId: currentUserId },
-                select: { status: true, visibility: true },
-                take: 1,
-              },
-            }
-          : {}),
       },
-      take: filters.limit + 1,
-      orderBy: [{ startAt: "asc" }, { slug: "asc" }],
-    }),
-    getPublicFilterOptions(),
-  ]);
+      ...(currentUserId
+        ? {
+            attendances: {
+              where: { userId: currentUserId },
+              select: { status: true, visibility: true },
+              take: 1,
+            },
+          }
+        : {}),
+    },
+    take: filters.limit + 1,
+    orderBy: [{ startAt: "asc" }, { slug: "asc" }],
+  });
   const hasMore = activities.length > filters.limit;
   const visibleActivities = hasMore ? activities.slice(0, filters.limit) : activities;
   const lastVisibleActivity = visibleActivities.at(-1);
 
   return {
     activities: visibleActivities.map(mapActivityRecord),
-    filterOptions,
     hasMore,
     limit: filters.limit,
     nextCursor: hasMore && lastVisibleActivity ? buildPublicActivityCursor({ slug: lastVisibleActivity.slug, startAt: lastVisibleActivity.startAt }) : null,
+  };
+}
+
+export async function getPublicActivityFeed(filters: ActivityFilterState, currentUserId?: string): Promise<PublicActivityFeed> {
+  const [page, filterOptions] = await Promise.all([getPublicActivityPage(filters, currentUserId), getPublicFilterOptions()]);
+
+  return {
+    ...page,
+    filterOptions,
   };
 }
 

@@ -3,6 +3,7 @@ import { createAdminAuditLog, requireAdmin } from "@/lib/admin-auth";
 import { parseAdminReportResolution, parseAdminReportStatus } from "@/lib/admin-status-input";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
+import { accessDeniedResponse, badRequestResponse } from "@/lib/route-helpers";
 
 type ReportContext = {
   params: Promise<{
@@ -22,7 +23,7 @@ export async function PATCH(request: Request, context: ReportContext) {
   const admin = await requireAdmin();
 
   if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
+    return accessDeniedResponse(admin);
   }
 
   const { reportId } = await context.params;
@@ -30,7 +31,7 @@ export async function PATCH(request: Request, context: ReportContext) {
   const status = parseAdminReportStatus(payload.status);
 
   if (!status) {
-    return NextResponse.json({ error: "Ongeldige rapportstatus" }, { status: 400 });
+    return badRequestResponse("Ongeldige rapportstatus");
   }
 
   const report = await prisma.report.update({

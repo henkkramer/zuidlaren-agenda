@@ -3,6 +3,7 @@ import { createAdminAuditLog, requireAdmin } from "@/lib/admin-auth";
 import { parseAdminBusinessStatus } from "@/lib/admin-status-input";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
+import { accessDeniedResponse, badRequestResponse } from "@/lib/route-helpers";
 
 type BusinessContext = {
   params: Promise<{
@@ -21,7 +22,7 @@ export async function PATCH(request: Request, context: BusinessContext) {
   const admin = await requireAdmin();
 
   if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
+    return accessDeniedResponse(admin);
   }
 
   const { businessId } = await context.params;
@@ -29,7 +30,7 @@ export async function PATCH(request: Request, context: BusinessContext) {
   const status = parseAdminBusinessStatus(payload.status);
 
   if (!status) {
-    return NextResponse.json({ error: "Ongeldige bedrijfsstatus" }, { status: 400 });
+    return badRequestResponse("Ongeldige bedrijfsstatus");
   }
 
   const business = await prisma.business.update({

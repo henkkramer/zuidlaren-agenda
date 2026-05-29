@@ -3,6 +3,7 @@ import { createAdminAuditLog, requireAdmin } from "@/lib/admin-auth";
 import { rejectCrossOriginMutation } from "@/lib/csrf";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/slugify";
+import { accessDeniedResponse, badRequestResponse } from "@/lib/route-helpers";
 
 type CategoryContext = {
   params: Promise<{
@@ -22,7 +23,7 @@ export async function PATCH(request: Request, context: CategoryContext) {
   const admin = await requireAdmin();
 
   if (!admin.ok) {
-    return NextResponse.json({ error: admin.error }, { status: admin.status });
+    return accessDeniedResponse(admin);
   }
 
   const { categoryId } = await context.params;
@@ -31,7 +32,7 @@ export async function PATCH(request: Request, context: CategoryContext) {
   const slug = typeof payload.slug === "string" && payload.slug.trim() ? slugify(payload.slug) : undefined;
 
   if (!name && !slug) {
-    return NextResponse.json({ error: "Geen wijziging opgegeven" }, { status: 400 });
+    return badRequestResponse("Geen wijziging opgegeven");
   }
 
   const category = await prisma.activityCategory.update({

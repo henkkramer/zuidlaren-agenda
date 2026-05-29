@@ -18,10 +18,55 @@ docker compose ps
 docker compose logs --tail=100
 curl -fsS http://127.0.0.1:3090/api/health/release
 
-Rollback idea:
+## Rollback Drill
 
-git checkout v0.1.0
-docker compose up -d --build
+Rollback is source-first unless a tagged image rollback is available in the target environment. Always capture the current commit before changing the running release:
+
+```bash
+git rev-parse --short HEAD
+docker compose ps
+docker compose logs --tail=100 web
+```
+
+### Source Rollback
+
+Use this when production is deployed from a checked-out Git worktree:
+
+```bash
+ssh kramer
+cd /opt/apps/zuidlaren-agenda
+git fetch --all --tags
+git checkout <known-good-commit-or-tag>
+docker compose up -d --build web
+docker compose ps
+curl -fsS http://127.0.0.1:3090/api/health/release
+```
+
+### Image Rollback
+
+Use this only when compose is configured to pull immutable image tags instead of building the local source. Roll back by setting the previous known-good image tag in the compose environment, then recreate the web service:
+
+```bash
+IMAGE_TAG=<known-good-image-tag> docker compose up -d web
+docker compose ps
+curl -fsS http://127.0.0.1:3090/api/health/release
+```
+
+### Database Migration Posture
+
+- Prefer backward-compatible Prisma schema changes for MVP releases.
+- Do not roll back the database automatically during an application rollback.
+- Before destructive schema work, take a backup and document the manual restore point.
+- If a bad release included only application code, roll back source or image and leave Postgres untouched.
+- If a bad release included a destructive migration or data mutation, stop and restore from the documented backup instead of improvising a down migration.
+
+After any rollback, run the same release gate used after deployment:
+
+```bash
+curl -fsS http://127.0.0.1:3090/api/health
+curl -fsS http://127.0.0.1:3090/api/health/ready
+curl -fsS http://127.0.0.1:3090/api/health/release
+```
 
 ## Production Data Bootstrap
 
