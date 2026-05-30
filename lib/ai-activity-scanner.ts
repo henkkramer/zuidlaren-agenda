@@ -1,6 +1,7 @@
 import "server-only";
 
 import { defaultActivityScanSources, normalizeScanCandidate } from "@/lib/ai-activity-scanner-rules";
+import { fetchActivityScanSource } from "@/lib/ai-activity-source-fetcher";
 import { prisma } from "@/lib/prisma";
 
 export async function ensureDefaultScanSources() {
@@ -30,10 +31,11 @@ export async function ensureDefaultScanSources() {
 
 export async function runLocalActivityScan(actorId: string) {
   await ensureDefaultScanSources();
-  const runSummaries: Array<{ source: string; created: number; skipped: number }> = [];
+  const runSummaries: Array<{ source: string; created: number; fetchStatus: number | null; skipped: number }> = [];
+  const enabledSources = await prisma.activityScanSource.findMany({ where: { enabled: true }, orderBy: { name: "asc" } });
 
-  for (const fixture of defaultActivityScanSources) {
-    const source = await prisma.activityScanSource.findUniqueOrThrow({ where: { slug: fixture.slug } });
+  for (const source of enabledSources) {
+    const fixture = defaultActivityScanSources.find((item) => item.slug === source.slug);
     const run = await prisma.activityScanRun.create({
       data: {
         actorId,
@@ -42,10 +44,11 @@ export async function runLocalActivityScan(actorId: string) {
       },
     });
 
+    const fetchResult = await fetchActivityScanSource(source.baseUrl);
     let created = 0;
     let skipped = 0;
 
-    for (const candidate of fixture.candidates) {
+    for (const candidate of fixture?.candidates ?? []) {
       const normalized = normalizeScanCandidate(candidate);
       const existing = await prisma.activityScanCandidate.findUnique({
         where: { canonicalKey: normalized.canonicalKey },
@@ -87,13 +90,18 @@ export async function runLocalActivityScan(actorId: string) {
     await prisma.activityScanRun.update({
       where: { id: run.id },
       data: {
+        bytesFetched: fetchResult.bytesFetched,
         completedAt: new Date(),
-        status: "COMPLETED",
-        summary: { created, skipped, provider: "local-open-source-fixtures" },
+        contentType: fetchResult.contentType,
+        error: fetchResult.error,
+        fetchedAt: fetchResult.fetchedAt,
+        fetchStatus: fetchResult.status,
+        status: fetchResult.error ? "FAILED" : "COMPLETED",
+        summary: { created, skipped, provider: fixture ? "local-open-source-fixtures" : "fetch-only", fetchError: fetchResult.error ?? null },
       },
     });
     await prisma.activityScanSource.update({ where: { id: source.id }, data: { lastScannedAt: new Date() } });
-    runSummaries.push({ source: source.name, created, skipped });
+    runSummaries.push({ source: source.name, created, fetchStatus: fetchResult.status, skipped });
   }
 
   return runSummaries;

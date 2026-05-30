@@ -43,7 +43,7 @@ Status: done on `AI-scraper`.
 
 ### Sprint 2 - Source Registry and Fetching
 
-Status: to do.
+Status: done on `AI-scraper`.
 
 - Add admin CRUD for approved scan sources.
 - Fetch public website/RSS/ICS content with timeouts, size caps, and allowlist enforcement.

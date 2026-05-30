@@ -72,11 +72,13 @@ type AdminAuditLogRow = {
 };
 
 type AdminScannerSourceRow = {
+  baseUrl: string;
   enabled: boolean;
   id: string;
   kind: string;
   lastScannedAt: Date | null;
   name: string;
+  respectRobots: boolean;
 };
 
 type AdminScannerCandidateRow = {
@@ -156,7 +158,7 @@ export default async function AdminPage() {
       take: 10,
     }),
     prisma.activityScanSource.findMany({
-      select: { id: true, name: true, kind: true, enabled: true, lastScannedAt: true },
+      select: { id: true, baseUrl: true, name: true, kind: true, enabled: true, respectRobots: true, lastScannedAt: true },
       orderBy: [{ enabled: "desc" }, { name: "asc" }],
       take: 8,
     }),
@@ -371,11 +373,13 @@ export default async function AdminPage() {
             <p className="account-muted">Scan goedgekeurde openbare bronnen en beoordeel voorstellen voordat ze in de agenda komen.</p>
             <AdminAiActivityScanner
               sources={(scanSources as AdminScannerSourceRow[]).map((source) => ({
+                baseUrl: source.baseUrl,
                 enabled: source.enabled,
                 id: source.id,
                 kind: source.kind,
                 lastScannedAt: source.lastScannedAt?.toISOString() ?? null,
                 name: source.name,
+                respectRobots: source.respectRobots,
               }))}
               candidates={(scanCandidates as AdminScannerCandidateRow[]).map((candidate) => ({
                 aiNotes: candidate.aiNotes,
