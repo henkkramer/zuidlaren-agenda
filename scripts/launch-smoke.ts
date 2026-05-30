@@ -154,6 +154,22 @@ for (const status of ["published", "unpublished", "expired"]) {
 const adminActivityImport = read("components/admin-activity-import.tsx");
 assert(adminActivityImport.includes("parseActivityImportPreview"), "admin import UI must use shared import preview parsing");
 
+const aiActivityScannerRules = read("lib/ai-activity-scanner-rules.ts");
+const aiActivityScannerReview = read("lib/ai-activity-scanner-review.ts");
+const adminAiScanner = read("components/admin-ai-activity-scanner.tsx");
+const scannerRunRoute = read("app/api/admin/activity-scanner/scan-runs/route.ts");
+const scannerCandidateRoute = read("app/api/admin/activity-scanner/candidates/[candidateId]/route.ts");
+const aiScannerPlan = read("implementation-plan/23-ai-activity-scanner.md");
+assert(aiActivityScannerRules.includes("local-open-source-fixtures"), "AI activity scanner must start with a deterministic local provider");
+assert(aiActivityScannerRules.includes("privateEventFilter"), "AI scanner fixtures must represent private-event filtering intent");
+assert(aiActivityScannerReview.includes("admin.activity_scan_candidate.approve"), "AI scanner approvals must be audited");
+assert(aiActivityScannerReview.includes("revalidatePublicActivityCaches"), "AI scanner approvals must invalidate public activity caches");
+assert(adminAiScanner.includes("Scan voor nieuwe activiteiten"), "Admin UI must expose a scan action");
+assert(adminAiScanner.includes("Goedkeuren") && adminAiScanner.includes("Afwijzen"), "Admin UI must expose approve and reject actions");
+assert(scannerRunRoute.includes("runLocalActivityScan"), "Scanner run route must invoke the scanner provider");
+assert(scannerCandidateRoute.includes("approveScanCandidate") && scannerCandidateRoute.includes("rejectScanCandidate"), "Scanner candidate route must support approval and rejection");
+assert(aiScannerPlan.includes("Sprint 5 - Weekly Operations"), "AI scanner plan must define the future sprint queue");
+
 const maintenanceQueue = read("lib/content-maintenance-queue.ts");
 assert(maintenanceQueue.includes("Zuidlaardermarktweek"), "content maintenance queue must track Zuidlaardermarkt follow-up");
 assert(maintenanceQueue.includes("Open Muziek Podium"), "content maintenance queue must track Open Muziek Podium follow-up");
@@ -227,6 +243,8 @@ const adminActivitiesRoute = read("app/api/admin/activities/route.ts");
 const adminBusinessesRoute = read("app/api/admin/businesses/route.ts");
 const adminReportsRoute = read("app/api/admin/reports/route.ts");
 const prismaSchema = read("prisma/schema.prisma");
+assert(prismaSchema.includes("model ActivityScanCandidate"), "AI activity scanner must persist candidates for review and duplicate prevention");
+assert(prismaSchema.includes("enum ActivityScanCandidateStatus"), "AI activity scanner must model candidate review states");
 const tsconfig = read("tsconfig.json");
 const gitignore = read(".gitignore");
 const analyticsEventsRoute = read("app/api/analytics/events/route.ts");

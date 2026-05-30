@@ -85,6 +85,29 @@ enum WebhookEventStatus {
   FAILED
 }
 
+enum ActivityScanSourceKind {
+  WEBSITE
+  GOVERNMENT
+  SOCIAL
+  RESTAURANT
+  BAR
+  OTHER
+}
+
+enum ActivityScanRunStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+enum ActivityScanCandidateStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  DUPLICATE
+  NEEDS_REVIEW
+}
+
 model User {
   id                      String                  @id @default(cuid())
   name                    String?
@@ -249,6 +272,7 @@ model Activity {
   reports               Report[]
   notificationCampaigns NotificationCampaign[]
   analyticsDailyMetrics AnalyticsDailyMetric[]
+  scanCandidates        ActivityScanCandidate[]
 
   @@index([status, startAt])
   @@index([status, organizerName])
@@ -315,6 +339,84 @@ model Attendance {
   activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
 
   @@unique([userId, activityId])
+}
+
+model ActivityScanSource {
+  id             String                 @id @default(cuid())
+  slug           String                 @unique
+  name           String
+  kind           ActivityScanSourceKind @default(WEBSITE)
+  baseUrl        String
+  enabled        Boolean                @default(true)
+  respectRobots  Boolean                @default(true)
+  lastScannedAt  DateTime?
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  runs       ActivityScanRun[]
+  candidates ActivityScanCandidate[]
+
+  @@index([enabled, kind])
+}
+
+model ActivityScanRun {
+  id          String                @id @default(cuid())
+  status      ActivityScanRunStatus @default(RUNNING)
+  startedAt   DateTime              @default(now())
+  completedAt DateTime?
+  error       String?
+  summary     Json?
+  actorId     String?
+
+  sourceId String
+  source   ActivityScanSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  candidates ActivityScanCandidate[]
+
+  @@index([sourceId, startedAt])
+  @@index([status, startedAt])
+}
+
+model ActivityScanCandidate {
+  id                    String                      @id @default(cuid())
+  status                ActivityScanCandidateStatus @default(PENDING)
+  canonicalKey          String                      @unique
+  title                 String
+  shortDescription      String
+  description           String
+  imageUrl              String?
+  startAt               DateTime
+  endAt                 DateTime
+  locationName          String
+  address               String?
+  categorySlug          String
+  typeTags              String[]
+  indoorOutdoor         String?
+  expectedVisitors      String?
+  sourceUrl             String
+  organizerName         String
+  confidence            Int                         @default(60)
+  rejectionReason       String?
+  rawEvidence           Json?
+  aiNotes               String[]                    @default([])
+  reviewedAt            DateTime?
+  reviewedById          String?
+  createdAt             DateTime                    @default(now())
+  updatedAt             DateTime                    @updatedAt
+
+  sourceId String
+  source   ActivityScanSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+
+  scanRunId String
+  scanRun   ActivityScanRun @relation(fields: [scanRunId], references: [id], onDelete: Cascade)
+
+  approvedActivityId String?
+  approvedActivity   Activity? @relation(fields: [approvedActivityId], references: [id], onDelete: SetNull)
+
+  @@index([status, startAt])
+  @@index([sourceId, status])
+  @@index([scanRunId])
+  @@index([approvedActivityId])
 }
 
 model AuditLog {
