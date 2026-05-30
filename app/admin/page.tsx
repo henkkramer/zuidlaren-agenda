@@ -9,6 +9,8 @@ import { AdminReports } from "@/components/admin-reports";
 import { ContentMaintenancePanel } from "@/components/content-maintenance-panel";
 import { requireAdmin } from "@/lib/admin-auth";
 import { getActivityScannerOperations } from "@/lib/ai-activity-operations";
+import { getActivityExtractionProvider } from "@/lib/ai-activity-extraction";
+import { getActivityScannerPromptTemplate } from "@/lib/ai-activity-prompt";
 import { getAnalyticsSnapshot } from "@/lib/analytics-snapshot";
 import { getBillingSummary } from "@/lib/billing-summary";
 import { prisma } from "@/lib/prisma";
@@ -120,6 +122,7 @@ export default async function AdminPage() {
     scanSources,
     scanCandidates,
     scannerOperations,
+    scannerPromptTemplate,
   ] = await Promise.all([
     prisma.user.findMany({
       select: { id: true, email: true, displayName: true, isAdmin: true, disabledAt: true, createdAt: true },
@@ -174,7 +177,10 @@ export default async function AdminPage() {
       take: 20,
     }),
     getActivityScannerOperations(),
+    getActivityScannerPromptTemplate(),
   ]);
+
+  const scannerProvider = getActivityExtractionProvider();
 
   return (
     <main className="account-page" id="main-content">
@@ -380,6 +386,13 @@ export default async function AdminPage() {
             <p className="account-muted">Scan goedgekeurde openbare bronnen en beoordeel voorstellen voordat ze in de agenda komen.</p>
             <AdminAiActivityScanner
               operations={scannerOperations}
+              prompt={{
+                prompt: scannerPromptTemplate.prompt,
+                providerName: scannerProvider.name,
+                title: scannerPromptTemplate.title,
+                updatedAt: scannerPromptTemplate.updatedAt.toISOString(),
+                version: scannerPromptTemplate.version,
+              }}
               sources={(scanSources as AdminScannerSourceRow[]).map((source) => ({
                 baseUrl: source.baseUrl,
                 enabled: source.enabled,

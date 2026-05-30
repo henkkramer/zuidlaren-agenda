@@ -73,3 +73,13 @@ Status: done on `AI-scraper`.
 - Add weekly scan checklist/scheduler.
 - Add scan metrics in admin analytics.
 - Add stale source warnings and failed-source retry workflow.
+
+
+### Sprint 6 - API Provider Connectors
+
+Status: done on `AI-scraper`.
+
+- Add OpenAI and Claude/Anthropic extraction providers behind the scanner provider interface.
+- Add environment-based provider selection with local extraction as the safe default.
+- Add admin-editable extraction prompt for known and non-known public spaces.
+- Keep scan review-first with strict structured candidates and source evidence.

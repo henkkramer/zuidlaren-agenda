@@ -2,6 +2,7 @@ import "server-only";
 
 import { defaultActivityScanSources, normalizeScanCandidate } from "@/lib/ai-activity-scanner-rules";
 import { getActivityExtractionProvider } from "@/lib/ai-activity-extraction";
+import { getActivityScannerPromptTemplate } from "@/lib/ai-activity-prompt";
 import { scoreCandidateQuality } from "@/lib/ai-activity-quality";
 import { fetchActivityScanSource } from "@/lib/ai-activity-source-fetcher";
 import { prisma } from "@/lib/prisma";
@@ -34,6 +35,7 @@ export async function ensureDefaultScanSources() {
 export async function runLocalActivityScan(actorId: string, options: { sourceIds?: string[] } = {}) {
   await ensureDefaultScanSources();
   const extractionProvider = getActivityExtractionProvider();
+  const promptTemplate = await getActivityScannerPromptTemplate();
   const runSummaries: Array<{ source: string; created: number; extracted: number; fetchStatus: number | null; skipped: number }> = [];
   const enabledSources = await prisma.activityScanSource.findMany({
     where: {
@@ -62,7 +64,7 @@ export async function runLocalActivityScan(actorId: string, options: { sourceIds
           sourceName: source.name,
           sourceUrl: source.baseUrl,
           textSample: fetchResult.textSample,
-        });
+        }, promptTemplate.prompt);
     const scanCandidates = [...(fixture?.candidates ?? []), ...extractedCandidates];
     let created = 0;
     let skipped = 0;
@@ -143,6 +145,8 @@ export async function runLocalActivityScan(actorId: string, options: { sourceIds
           created,
           extracted: extractedCandidates.length,
           extractionProvider: extractionProvider.name,
+          promptTemplateId: promptTemplate.id,
+          promptTemplateVersion: promptTemplate.version,
           fixtureProvider: fixture ? "local-open-source-fixtures" : null,
           fetchError: fetchResult.error ?? null,
           skipped,

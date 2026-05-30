@@ -42,22 +42,54 @@ type ScannerOperations = {
   staleSources: Array<{ id: string; lastScannedAt: string | null; name: string }>;
 };
 
+type ScannerPrompt = {
+  prompt: string;
+  providerName: string;
+  title: string;
+  updatedAt: string;
+  version: number;
+};
+
 type AdminAiActivityScannerProps = {
   candidates: ScannerCandidate[];
   operations: ScannerOperations;
+  prompt: ScannerPrompt;
   sources: ScannerSource[];
 };
 
-export function AdminAiActivityScanner({ candidates, operations, sources }: AdminAiActivityScannerProps) {
+export function AdminAiActivityScanner({ candidates, operations, prompt, sources }: AdminAiActivityScannerProps) {
   const [items, setItems] = useState(candidates);
   const [sourceItems, setSourceItems] = useState(sources);
   const [newSourceName, setNewSourceName] = useState("");
   const [newSourceUrl, setNewSourceUrl] = useState("");
   const [newSourceKind, setNewSourceKind] = useState("WEBSITE");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [scannerPrompt, setScannerPrompt] = useState(prompt.prompt);
+  const [promptUpdatedAt, setPromptUpdatedAt] = useState(prompt.updatedAt);
   const [status, setStatus] = useState("");
   const pendingCount = items.filter((item) => item.status === "PENDING" || item.status === "NEEDS_REVIEW").length;
   const rejectedCount = items.filter((item) => item.status === "REJECTED").length;
+
+
+  async function savePrompt() {
+    setStatus("Scanprompt opslaan...");
+    const response = await fetch("/api/admin/activity-scanner/prompt", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt: scannerPrompt }),
+    });
+
+    if (!response.ok) {
+      const body = (await response.json().catch(() => null)) as { error?: string } | null;
+      setStatus(body?.error ?? "Scanprompt kon niet worden opgeslagen");
+      return;
+    }
+
+    const body = (await response.json()) as { prompt: { prompt: string; updatedAt: string } };
+    setScannerPrompt(body.prompt.prompt);
+    setPromptUpdatedAt(body.prompt.updatedAt);
+    setStatus("Scanprompt opgeslagen");
+  }
 
   async function createSource(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -214,6 +246,22 @@ export function AdminAiActivityScanner({ candidates, operations, sources }: Admi
         {operations.runStatusCounts.length ? (
           <p className="small-muted">Scanruns: {operations.runStatusCounts.map((row) => `${row.status.toLowerCase()} ${row.count}`).join(", ")}</p>
         ) : null}
+      </div>
+
+
+      <div className="admin-table">
+        <div className="admin-row">
+          <span>
+            <strong>{prompt.title}</strong>
+            <small>Provider: {prompt.providerName} · versie {prompt.version} · laatst bijgewerkt {new Date(promptUpdatedAt).toLocaleString("nl-NL")}</small>
+          </span>
+          <button className="admin-inline-button" onClick={savePrompt} type="button">Prompt opslaan</button>
+        </div>
+        <label className="account-form">
+          Scanprompt
+          <textarea maxLength={6000} onChange={(event) => setScannerPrompt(event.target.value)} rows={10} value={scannerPrompt} />
+        </label>
+        <p className="small-muted">Deze prompt wordt gebruikt door OpenAI of Claude/Anthropic wanneer `AI_ACTIVITY_PROVIDER` op `openai`, `anthropic` of `claude` staat. Zonder provider blijft de lokale extractor actief.</p>
       </div>
 
       <div className="admin-table">
