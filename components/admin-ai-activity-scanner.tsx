@@ -54,10 +54,11 @@ type AdminAiActivityScannerProps = {
   candidates: ScannerCandidate[];
   operations: ScannerOperations;
   prompt: ScannerPrompt;
+  scannerUnavailableReason?: string | null;
   sources: ScannerSource[];
 };
 
-export function AdminAiActivityScanner({ candidates, operations, prompt, sources }: AdminAiActivityScannerProps) {
+export function AdminAiActivityScanner({ candidates, operations, prompt, scannerUnavailableReason, sources }: AdminAiActivityScannerProps) {
   const [items, setItems] = useState(candidates);
   const [sourceItems, setSourceItems] = useState(sources);
   const [newSourceName, setNewSourceName] = useState("");
@@ -199,13 +200,15 @@ export function AdminAiActivityScanner({ candidates, operations, prompt, sources
 
   return (
     <div className="admin-import-panel">
+      {scannerUnavailableReason ? <p className="account-status" role="status">{scannerUnavailableReason}</p> : null}
+
       <div className="admin-import-summary">
-        <button className="primary-button" onClick={() => runScan()} type="button">
+        <button className="primary-button" disabled={Boolean(scannerUnavailableReason)} onClick={() => runScan()} type="button">
           Scan voor nieuwe activiteiten
         </button>
         <span className="status-pill">{pendingCount} te beoordelen</span>
         <span className="status-pill">{rejectedCount} afgewezen</span>
-        <button className="outline-button" disabled={operations.failedSourceCount === 0} onClick={() => runScan("failed")} type="button">Mislukte bronnen opnieuw</button>
+        <button className="outline-button" disabled={Boolean(scannerUnavailableReason) || operations.failedSourceCount === 0} onClick={() => runScan("failed")} type="button">Mislukte bronnen opnieuw</button>
         <button className="outline-button" onClick={() => bulkReview("approve")} type="button">Selectie goedkeuren</button>
         <button className="outline-button" onClick={() => bulkReview("reject")} type="button">Selectie afwijzen</button>
       </div>
@@ -255,7 +258,7 @@ export function AdminAiActivityScanner({ candidates, operations, prompt, sources
             <strong>{prompt.title}</strong>
             <small>Provider: {prompt.providerName} · versie {prompt.version} · laatst bijgewerkt {new Date(promptUpdatedAt).toLocaleString("nl-NL")}</small>
           </span>
-          <button className="admin-inline-button" onClick={savePrompt} type="button">Prompt opslaan</button>
+          <button className="admin-inline-button" disabled={Boolean(scannerUnavailableReason)} onClick={savePrompt} type="button">Prompt opslaan</button>
         </div>
         <label className="account-form">
           Scanprompt
@@ -285,7 +288,7 @@ export function AdminAiActivityScanner({ candidates, operations, prompt, sources
               <option value="OTHER">Overig</option>
             </select>
           </label>
-          <button className="outline-button" type="submit">Bron toevoegen</button>
+          <button className="outline-button" disabled={Boolean(scannerUnavailableReason)} type="submit">Bron toevoegen</button>
         </form>
         {sourceItems.map((source) => (
           <div className="admin-row" key={source.id}>

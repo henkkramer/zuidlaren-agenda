@@ -10,11 +10,12 @@ import { ContentMaintenancePanel } from "@/components/content-maintenance-panel"
 import { requireAdmin } from "@/lib/admin-auth";
 import { getActivityScannerOperations } from "@/lib/ai-activity-operations";
 import { getActivityExtractionProvider } from "@/lib/ai-activity-extraction";
-import { getActivityScannerPromptTemplate } from "@/lib/ai-activity-prompt";
+import { defaultActivityScannerPrompt, getActivityScannerPromptTemplate } from "@/lib/ai-activity-prompt";
 import { getAnalyticsSnapshot } from "@/lib/analytics-snapshot";
 import { getBillingSummary } from "@/lib/billing-summary";
 import { prisma } from "@/lib/prisma";
 import { adminActivityListSelect } from "@/lib/prisma-selects";
+import { logWarn } from "@/lib/structured-log";
 
 export const dynamic = "force-dynamic";
 
@@ -84,6 +85,63 @@ type AdminScannerSourceRow = {
   respectRobots: boolean;
 };
 
+
+type AdminScannerDashboard = {
+  candidates: AdminScannerCandidateRow[];
+  operations: Awaited<ReturnType<typeof getActivityScannerOperations>>;
+  promptTemplate: { prompt: string; title: string; updatedAt: Date; version: number };
+  sources: AdminScannerSourceRow[];
+  unavailableReason: string | null;
+};
+
+function fallbackScannerOperations(): Awaited<ReturnType<typeof getActivityScannerOperations>> {
+  return {
+    checklist: [
+      { done: false, label: "Scannerdata niet beschikbaar" },
+      { done: false, label: "Controleer database schema/deploy" },
+    ],
+    dueSourceCount: 0,
+    failedSourceCount: 0,
+    failedSources: [],
+    lastCompletedRunAt: null,
+    nextWeeklyScanAt: null,
+    pendingReviewCount: 0,
+    runStatusCounts: [],
+    staleSources: [],
+  };
+}
+
+async function getAdminScannerDashboard(): Promise<AdminScannerDashboard> {
+  try {
+    const [sources, candidates, operations, promptTemplate] = await Promise.all([
+      prisma.activityScanSource.findMany({
+        select: { id: true, baseUrl: true, name: true, kind: true, enabled: true, respectRobots: true, lastScannedAt: true },
+        orderBy: [{ enabled: "desc" }, { name: "asc" }],
+        take: 8,
+      }),
+      prisma.activityScanCandidate.findMany({
+        include: { source: { select: { name: true } } },
+        orderBy: [{ status: "asc" }, { startAt: "asc" }],
+        take: 20,
+      }),
+      getActivityScannerOperations(),
+      getActivityScannerPromptTemplate(),
+    ]);
+
+    return { candidates: candidates as AdminScannerCandidateRow[], operations, promptTemplate, sources: sources as AdminScannerSourceRow[], unavailableReason: null };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "AI scanner kon niet worden geladen";
+    logWarn("admin.activity_scanner.unavailable", { error: message });
+    return {
+      candidates: [],
+      operations: fallbackScannerOperations(),
+      promptTemplate: { prompt: defaultActivityScannerPrompt, title: "AI activiteitenscan extractie", updatedAt: new Date(0), version: 1 },
+      sources: [],
+      unavailableReason: "AI scanner is tijdelijk niet beschikbaar. Controleer of de database is bijgewerkt met het laatste schema.",
+    };
+  }
+}
+
 type AdminScannerCandidateRow = {
   aiNotes: string[];
   confidence: number;
@@ -119,10 +177,7 @@ export default async function AdminPage() {
     billing,
     featureFlags,
     auditLogs,
-    scanSources,
-    scanCandidates,
-    scannerOperations,
-    scannerPromptTemplate,
+    scannerDashboard,
   ] = await Promise.all([
     prisma.user.findMany({
       select: { id: true, email: true, displayName: true, isAdmin: true, disabledAt: true, createdAt: true },
@@ -166,18 +221,7 @@ export default async function AdminPage() {
       orderBy: { createdAt: "desc" },
       take: 10,
     }),
-    prisma.activityScanSource.findMany({
-      select: { id: true, baseUrl: true, name: true, kind: true, enabled: true, respectRobots: true, lastScannedAt: true },
-      orderBy: [{ enabled: "desc" }, { name: "asc" }],
-      take: 8,
-    }),
-    prisma.activityScanCandidate.findMany({
-      include: { source: { select: { name: true } } },
-      orderBy: [{ status: "asc" }, { startAt: "asc" }],
-      take: 20,
-    }),
-    getActivityScannerOperations(),
-    getActivityScannerPromptTemplate(),
+    getAdminScannerDashboard(),
   ]);
 
   const scannerProvider = getActivityExtractionProvider();
@@ -385,15 +429,16 @@ export default async function AdminPage() {
             <h2>AI activiteitenscan</h2>
             <p className="account-muted">Scan goedgekeurde openbare bronnen en beoordeel voorstellen voordat ze in de agenda komen.</p>
             <AdminAiActivityScanner
-              operations={scannerOperations}
+              operations={scannerDashboard.operations}
+              scannerUnavailableReason={scannerDashboard.unavailableReason}
               prompt={{
-                prompt: scannerPromptTemplate.prompt,
+                prompt: scannerDashboard.promptTemplate.prompt,
                 providerName: scannerProvider.name,
-                title: scannerPromptTemplate.title,
-                updatedAt: scannerPromptTemplate.updatedAt.toISOString(),
-                version: scannerPromptTemplate.version,
+                title: scannerDashboard.promptTemplate.title,
+                updatedAt: scannerDashboard.promptTemplate.updatedAt.toISOString(),
+                version: scannerDashboard.promptTemplate.version,
               }}
-              sources={(scanSources as AdminScannerSourceRow[]).map((source) => ({
+              sources={scannerDashboard.sources.map((source) => ({
                 baseUrl: source.baseUrl,
                 enabled: source.enabled,
                 id: source.id,
@@ -402,7 +447,7 @@ export default async function AdminPage() {
                 name: source.name,
                 respectRobots: source.respectRobots,
               }))}
-              candidates={(scanCandidates as AdminScannerCandidateRow[]).map((candidate) => ({
+              candidates={scannerDashboard.candidates.map((candidate) => ({
                 aiNotes: candidate.aiNotes,
                 confidence: candidate.confidence,
                 duplicateReason: candidate.duplicateReason,
