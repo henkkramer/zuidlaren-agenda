@@ -43,7 +43,7 @@ Status: done on `AI-scraper`.
 
 ### Sprint 2 - Source Registry and Fetching
 
-Status: to do.
+Status: done on `AI-scraper`.
 
 - Add admin CRUD for approved scan sources.
 - Fetch public website/RSS/ICS content with timeouts, size caps, and allowlist enforcement.
@@ -51,7 +51,7 @@ Status: to do.
 
 ### Sprint 3 - AI Extraction
 
-Status: to do.
+Status: done on `AI-scraper`.
 
 - Add provider abstraction for model-based extraction.
 - Extract event candidates into strict structured JSON.
@@ -60,7 +60,7 @@ Status: to do.
 
 ### Sprint 4 - Duplicate and Quality Workflow
 
-Status: to do.
+Status: done on `AI-scraper`.
 
 - Add fuzzy duplicate matching against activities and historic candidates.
 - Add confidence reasons and source quality badges.
@@ -68,7 +68,7 @@ Status: to do.
 
 ### Sprint 5 - Weekly Operations
 
-Status: to do.
+Status: done on `AI-scraper`.
 
 - Add weekly scan checklist/scheduler.
 - Add scan metrics in admin analytics.

@@ -365,6 +365,10 @@ model ActivityScanRun {
   startedAt   DateTime              @default(now())
   completedAt DateTime?
   error       String?
+  fetchStatus Int?
+  contentType String?
+  bytesFetched Int?
+  fetchedAt   DateTime?
   summary     Json?
   actorId     String?
 
@@ -396,6 +400,10 @@ model ActivityScanCandidate {
   sourceUrl             String
   organizerName         String
   confidence            Int                         @default(60)
+  duplicateScore        Int                         @default(0)
+  duplicateReason       String?
+  qualityScore          Int                         @default(60)
+  qualityReasons        String[]                    @default([])
   rejectionReason       String?
   rawEvidence           Json?
   aiNotes               String[]                    @default([])

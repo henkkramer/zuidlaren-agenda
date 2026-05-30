@@ -8,6 +8,7 @@ import { AdminNotificationCampaigns } from "@/components/admin-notification-camp
 import { AdminReports } from "@/components/admin-reports";
 import { ContentMaintenancePanel } from "@/components/content-maintenance-panel";
 import { requireAdmin } from "@/lib/admin-auth";
+import { getActivityScannerOperations } from "@/lib/ai-activity-operations";
 import { getAnalyticsSnapshot } from "@/lib/analytics-snapshot";
 import { getBillingSummary } from "@/lib/billing-summary";
 import { prisma } from "@/lib/prisma";
@@ -72,19 +73,25 @@ type AdminAuditLogRow = {
 };
 
 type AdminScannerSourceRow = {
+  baseUrl: string;
   enabled: boolean;
   id: string;
   kind: string;
   lastScannedAt: Date | null;
   name: string;
+  respectRobots: boolean;
 };
 
 type AdminScannerCandidateRow = {
   aiNotes: string[];
   confidence: number;
+  duplicateReason: string | null;
+  duplicateScore: number;
   id: string;
   locationName: string;
   organizerName: string;
+  qualityReasons: string[];
+  qualityScore: number;
   rejectionReason: string | null;
   source: { name: string };
   sourceUrl: string;
@@ -112,6 +119,7 @@ export default async function AdminPage() {
     auditLogs,
     scanSources,
     scanCandidates,
+    scannerOperations,
   ] = await Promise.all([
     prisma.user.findMany({
       select: { id: true, email: true, displayName: true, isAdmin: true, disabledAt: true, createdAt: true },
@@ -156,7 +164,7 @@ export default async function AdminPage() {
       take: 10,
     }),
     prisma.activityScanSource.findMany({
-      select: { id: true, name: true, kind: true, enabled: true, lastScannedAt: true },
+      select: { id: true, baseUrl: true, name: true, kind: true, enabled: true, respectRobots: true, lastScannedAt: true },
       orderBy: [{ enabled: "desc" }, { name: "asc" }],
       take: 8,
     }),
@@ -165,6 +173,7 @@ export default async function AdminPage() {
       orderBy: [{ status: "asc" }, { startAt: "asc" }],
       take: 20,
     }),
+    getActivityScannerOperations(),
   ]);
 
   return (
@@ -370,19 +379,26 @@ export default async function AdminPage() {
             <h2>AI activiteitenscan</h2>
             <p className="account-muted">Scan goedgekeurde openbare bronnen en beoordeel voorstellen voordat ze in de agenda komen.</p>
             <AdminAiActivityScanner
+              operations={scannerOperations}
               sources={(scanSources as AdminScannerSourceRow[]).map((source) => ({
+                baseUrl: source.baseUrl,
                 enabled: source.enabled,
                 id: source.id,
                 kind: source.kind,
                 lastScannedAt: source.lastScannedAt?.toISOString() ?? null,
                 name: source.name,
+                respectRobots: source.respectRobots,
               }))}
               candidates={(scanCandidates as AdminScannerCandidateRow[]).map((candidate) => ({
                 aiNotes: candidate.aiNotes,
                 confidence: candidate.confidence,
+                duplicateReason: candidate.duplicateReason,
+                duplicateScore: candidate.duplicateScore,
                 id: candidate.id,
                 locationName: candidate.locationName,
                 organizerName: candidate.organizerName,
+                qualityReasons: candidate.qualityReasons,
+                qualityScore: candidate.qualityScore,
                 rejectionReason: candidate.rejectionReason,
                 sourceName: candidate.source.name,
                 sourceUrl: candidate.sourceUrl,
