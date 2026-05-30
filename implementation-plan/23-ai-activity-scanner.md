@@ -51,7 +51,7 @@ Status: done on `AI-scraper`.
 
 ### Sprint 3 - AI Extraction
 
-Status: to do.
+Status: done on `AI-scraper`.
 
 - Add provider abstraction for model-based extraction.
 - Extract event candidates into strict structured JSON.

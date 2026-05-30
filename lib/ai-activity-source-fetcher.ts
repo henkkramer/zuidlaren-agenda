@@ -7,6 +7,7 @@ export type ActivitySourceFetchResult = {
   error?: string;
   fetchedAt: Date;
   status: number | null;
+  textSample: string;
 };
 
 function isAllowedPublicSourceUrl(rawUrl: string) {
@@ -26,7 +27,7 @@ export async function fetchActivityScanSource(baseUrl: string): Promise<Activity
   const fetchedAt = new Date();
 
   if (!isAllowedPublicSourceUrl(baseUrl)) {
-    return { bytesFetched: 0, contentType: null, error: "Bron-URL is niet toegestaan voor publieke scan", fetchedAt, status: null };
+    return { bytesFetched: 0, contentType: null, error: "Bron-URL is niet toegestaan voor publieke scan", fetchedAt, status: null, textSample: "" };
   }
 
   const controller = new AbortController();
@@ -45,15 +46,20 @@ export async function fetchActivityScanSource(baseUrl: string): Promise<Activity
     const contentType = response.headers.get("content-type");
     const reader = response.body?.getReader();
     let bytesFetched = 0;
+    const chunks: Uint8Array[] = [];
 
     if (reader) {
       while (bytesFetched < maxFetchBytes) {
         const { done, value } = await reader.read();
         if (done) break;
+        chunks.push(value);
         bytesFetched += value.byteLength;
       }
       await reader.cancel().catch(() => undefined);
     }
+
+    const sampleBytes = chunks.slice(0, 16);
+    const textSample = new TextDecoder("utf-8", { fatal: false }).decode(Buffer.concat(sampleBytes).slice(0, 48_000));
 
     return {
       bytesFetched,
@@ -61,6 +67,7 @@ export async function fetchActivityScanSource(baseUrl: string): Promise<Activity
       error: response.ok ? undefined : `HTTP ${response.status}`,
       fetchedAt,
       status: response.status,
+      textSample,
     };
   } catch (error) {
     return {
@@ -69,6 +76,7 @@ export async function fetchActivityScanSource(baseUrl: string): Promise<Activity
       error: error instanceof Error ? error.message : "Bron kon niet worden opgehaald",
       fetchedAt,
       status: null,
+      textSample: "",
     };
   } finally {
     clearTimeout(timeout);

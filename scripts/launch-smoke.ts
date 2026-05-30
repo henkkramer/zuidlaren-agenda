@@ -170,6 +170,7 @@ const scannerSourcesRoute = read("app/api/admin/activity-scanner/sources/route.t
 const scannerSourceRoute = read("app/api/admin/activity-scanner/sources/[sourceId]/route.ts");
 const sourceInput = read("lib/ai-activity-source-input.ts");
 const sourceFetcher = read("lib/ai-activity-source-fetcher.ts");
+const activityExtraction = read("lib/ai-activity-extraction.ts");
 assert(scannerRunRoute.includes("runLocalActivityScan"), "Scanner run route must invoke the scanner provider");
 assert(scannerCandidateRoute.includes("approveScanCandidate") && scannerCandidateRoute.includes("rejectScanCandidate"), "Scanner candidate route must support approval and rejection");
 assert(scannerSourcesRoute.includes("parseActivityScanSourceInput"), "Scanner sources route must validate source input");
@@ -177,6 +178,12 @@ assert(scannerSourceRoute.includes("admin.activity_scan_source.update"), "Scanne
 assert(sourceInput.includes("http:") && sourceInput.includes("https:"), "Scanner source input must only accept HTTP(S) URLs");
 assert(sourceFetcher.includes("maxFetchBytes") && sourceFetcher.includes("fetchTimeoutMs"), "Scanner source fetcher must enforce size and timeout limits");
 assert(sourceFetcher.includes("127.0.0.1") && sourceFetcher.includes(".internal"), "Scanner source fetcher must block local/internal URLs");
+assert(sourceFetcher.includes("textSample"), "Scanner source fetcher must return bounded text samples for extraction");
+assert(activityExtraction.includes("ActivityExtractionProvider"), "AI scanner extraction must use a provider abstraction");
+assert(activityExtraction.includes("validateExtractedCandidate"), "AI scanner extraction must validate strict structured candidates");
+assert(activityExtraction.includes("shouldRejectPrivateOrVagueCandidate"), "AI scanner extraction must filter private events");
+assert(activityExtraction.includes("evidenceSnippets"), "AI scanner extraction must store evidence snippets instead of full pages");
+assert(aiActivityScannerRules.includes("rawEvidence"), "AI scanner candidates must keep compact provenance evidence");
 assert(aiScannerPlan.includes("Sprint 5 - Weekly Operations"), "AI scanner plan must define the future sprint queue");
 
 const maintenanceQueue = read("lib/content-maintenance-queue.ts");
