@@ -71,6 +71,21 @@ export const sensitiveAuditActions: AuditActionCoverage[] = [
     purpose: "Admin moderates an activity status.",
   },
   {
+    action: "admin.activity_scan.run",
+    source: "app/api/admin/activity-scanner/scan-runs/route.ts",
+    purpose: "Admin starts an AI-assisted public source scan.",
+  },
+  {
+    action: "admin.activity_scan_candidate.approve",
+    source: "lib/ai-activity-scanner-review.ts",
+    purpose: "Admin approves a scan candidate and publishes an activity card.",
+  },
+  {
+    action: "admin.activity_scan_candidate.reject",
+    source: "lib/ai-activity-scanner-review.ts",
+    purpose: "Admin rejects a scan candidate while retaining it for duplicate prevention and review history.",
+  },
+  {
     action: "admin.user.update",
     source: "app/api/admin/users/[userId]/route.ts",
     purpose: "Admin disables users or changes admin rights.",

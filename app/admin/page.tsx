@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AdminActivities } from "@/components/admin-activities";
+import { AdminAiActivityScanner } from "@/components/admin-ai-activity-scanner";
 import { AdminActivityImport } from "@/components/admin-activity-import";
 import { AdminBusinesses } from "@/components/admin-businesses";
 import { AdminNotificationCampaigns } from "@/components/admin-notification-campaigns";
@@ -70,6 +71,28 @@ type AdminAuditLogRow = {
   targetType: string;
 };
 
+type AdminScannerSourceRow = {
+  enabled: boolean;
+  id: string;
+  kind: string;
+  lastScannedAt: Date | null;
+  name: string;
+};
+
+type AdminScannerCandidateRow = {
+  aiNotes: string[];
+  confidence: number;
+  id: string;
+  locationName: string;
+  organizerName: string;
+  rejectionReason: string | null;
+  source: { name: string };
+  sourceUrl: string;
+  startAt: Date;
+  status: string;
+  title: string;
+};
+
 export default async function AdminPage() {
   const admin = await requireAdmin();
 
@@ -77,7 +100,19 @@ export default async function AdminPage() {
     redirect("/admin/login");
   }
 
-  const [users, businesses, activities, reports, notificationCampaigns, analytics, billing, featureFlags, auditLogs] = await Promise.all([
+  const [
+    users,
+    businesses,
+    activities,
+    reports,
+    notificationCampaigns,
+    analytics,
+    billing,
+    featureFlags,
+    auditLogs,
+    scanSources,
+    scanCandidates,
+  ] = await Promise.all([
     prisma.user.findMany({
       select: { id: true, email: true, displayName: true, isAdmin: true, disabledAt: true, createdAt: true },
       orderBy: { createdAt: "desc" },
@@ -119,6 +154,16 @@ export default async function AdminPage() {
       select: { id: true, action: true, targetType: true, createdAt: true },
       orderBy: { createdAt: "desc" },
       take: 10,
+    }),
+    prisma.activityScanSource.findMany({
+      select: { id: true, name: true, kind: true, enabled: true, lastScannedAt: true },
+      orderBy: [{ enabled: "desc" }, { name: "asc" }],
+      take: 8,
+    }),
+    prisma.activityScanCandidate.findMany({
+      include: { source: { select: { name: true } } },
+      orderBy: [{ status: "asc" }, { startAt: "asc" }],
+      take: 20,
     }),
   ]);
 
@@ -319,6 +364,33 @@ export default async function AdminPage() {
                 </div>
               ))}
             </div>
+          </section>
+
+          <section className="account-card">
+            <h2>AI activiteitenscan</h2>
+            <p className="account-muted">Scan goedgekeurde openbare bronnen en beoordeel voorstellen voordat ze in de agenda komen.</p>
+            <AdminAiActivityScanner
+              sources={(scanSources as AdminScannerSourceRow[]).map((source) => ({
+                enabled: source.enabled,
+                id: source.id,
+                kind: source.kind,
+                lastScannedAt: source.lastScannedAt?.toISOString() ?? null,
+                name: source.name,
+              }))}
+              candidates={(scanCandidates as AdminScannerCandidateRow[]).map((candidate) => ({
+                aiNotes: candidate.aiNotes,
+                confidence: candidate.confidence,
+                id: candidate.id,
+                locationName: candidate.locationName,
+                organizerName: candidate.organizerName,
+                rejectionReason: candidate.rejectionReason,
+                sourceName: candidate.source.name,
+                sourceUrl: candidate.sourceUrl,
+                startAt: candidate.startAt.toISOString(),
+                status: candidate.status as "PENDING" | "APPROVED" | "REJECTED" | "DUPLICATE" | "NEEDS_REVIEW",
+                title: candidate.title,
+              }))}
+            />
           </section>
 
           <section className="account-card">
