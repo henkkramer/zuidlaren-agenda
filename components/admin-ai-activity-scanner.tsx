@@ -134,12 +134,12 @@ export function AdminAiActivityScanner({ candidates, operations, prompt, scanner
     setStatus(body.source.enabled ? "Bron geactiveerd" : "Bron uitgezet");
   }
 
-  async function runScan(mode: "all" | "failed" = "all") {
-    setStatus(mode === "failed" ? "Mislukte bronnen opnieuw scannen..." : "Scan wordt gestart...");
+  async function runScan(mode: "all" | "failed" | "discover" = "all") {
+    setStatus(mode === "discover" ? "Internet discovery wordt gestart..." : mode === "failed" ? "Mislukte bronnen opnieuw scannen..." : "Scan wordt gestart...");
     const response = await fetch("/api/admin/activity-scanner/scan-runs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: mode === "failed" ? "failed" : "all" }),
+      body: JSON.stringify({ mode }),
     });
 
     if (!response.ok) {
@@ -208,6 +208,7 @@ export function AdminAiActivityScanner({ candidates, operations, prompt, scanner
         </button>
         <span className="status-pill">{pendingCount} te beoordelen</span>
         <span className="status-pill">{rejectedCount} afgewezen</span>
+        <button className="outline-button" disabled={Boolean(scannerUnavailableReason)} onClick={() => runScan("discover")} type="button">Internet ontdekken</button>
         <button className="outline-button" disabled={Boolean(scannerUnavailableReason) || operations.failedSourceCount === 0} onClick={() => runScan("failed")} type="button">Mislukte bronnen opnieuw</button>
         <button className="outline-button" onClick={() => bulkReview("approve")} type="button">Selectie goedkeuren</button>
         <button className="outline-button" onClick={() => bulkReview("reject")} type="button">Selectie afwijzen</button>
