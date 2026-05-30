@@ -84,9 +84,13 @@ type AdminScannerSourceRow = {
 type AdminScannerCandidateRow = {
   aiNotes: string[];
   confidence: number;
+  duplicateReason: string | null;
+  duplicateScore: number;
   id: string;
   locationName: string;
   organizerName: string;
+  qualityReasons: string[];
+  qualityScore: number;
   rejectionReason: string | null;
   source: { name: string };
   sourceUrl: string;
@@ -384,9 +388,13 @@ export default async function AdminPage() {
               candidates={(scanCandidates as AdminScannerCandidateRow[]).map((candidate) => ({
                 aiNotes: candidate.aiNotes,
                 confidence: candidate.confidence,
+                duplicateReason: candidate.duplicateReason,
+                duplicateScore: candidate.duplicateScore,
                 id: candidate.id,
                 locationName: candidate.locationName,
                 organizerName: candidate.organizerName,
+                qualityReasons: candidate.qualityReasons,
+                qualityScore: candidate.qualityScore,
                 rejectionReason: candidate.rejectionReason,
                 sourceName: candidate.source.name,
                 sourceUrl: candidate.sourceUrl,

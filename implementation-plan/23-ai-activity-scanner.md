@@ -60,7 +60,7 @@ Status: done on `AI-scraper`.
 
 ### Sprint 4 - Duplicate and Quality Workflow
 
-Status: to do.
+Status: done on `AI-scraper`.
 
 - Add fuzzy duplicate matching against activities and historic candidates.
 - Add confidence reasons and source quality badges.

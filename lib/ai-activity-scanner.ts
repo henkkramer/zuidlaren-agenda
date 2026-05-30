@@ -2,6 +2,7 @@ import "server-only";
 
 import { defaultActivityScanSources, normalizeScanCandidate } from "@/lib/ai-activity-scanner-rules";
 import { getActivityExtractionProvider } from "@/lib/ai-activity-extraction";
+import { scoreCandidateQuality } from "@/lib/ai-activity-quality";
 import { fetchActivityScanSource } from "@/lib/ai-activity-source-fetcher";
 import { prisma } from "@/lib/prisma";
 
@@ -72,12 +73,32 @@ export async function runLocalActivityScan(actorId: string) {
         continue;
       }
 
+      const duplicateWindowStart = new Date(normalized.startAt);
+      duplicateWindowStart.setDate(duplicateWindowStart.getDate() - 1);
+      const duplicateWindowEnd = new Date(normalized.startAt);
+      duplicateWindowEnd.setDate(duplicateWindowEnd.getDate() + 1);
+      const [existingActivities, existingCandidates] = await Promise.all([
+        prisma.activity.findMany({
+          where: { startAt: { gte: duplicateWindowStart, lte: duplicateWindowEnd } },
+          select: { startAt: true, title: true },
+          take: 30,
+        }),
+        prisma.activityScanCandidate.findMany({
+          where: { startAt: { gte: duplicateWindowStart, lte: duplicateWindowEnd } },
+          select: { startAt: true, status: true, title: true },
+          take: 30,
+        }),
+      ]);
+      const quality = scoreCandidateQuality({ candidate, existingActivities, existingCandidates });
+
       await prisma.activityScanCandidate.create({
         data: {
           aiNotes: normalized.aiNotes,
           canonicalKey: normalized.canonicalKey,
           categorySlug: normalized.categorySlug,
           confidence: normalized.confidence,
+          duplicateReason: quality.duplicateReason,
+          duplicateScore: quality.duplicateScore,
           description: normalized.description,
           endAt: normalized.endAt,
           expectedVisitors: normalized.expectedVisitors,
@@ -86,11 +107,14 @@ export async function runLocalActivityScan(actorId: string) {
           locationName: normalized.locationName,
           address: normalized.address,
           organizerName: normalized.organizerName,
+          qualityReasons: quality.qualityReasons,
+          qualityScore: quality.qualityScore,
           rawEvidence: normalized.rawEvidence,
           scanRunId: run.id,
           shortDescription: normalized.shortDescription,
           sourceId: source.id,
           sourceUrl: normalized.sourceUrl,
+          status: quality.suggestedStatus,
           startAt: normalized.startAt,
           title: normalized.title,
           typeTags: normalized.typeTags,

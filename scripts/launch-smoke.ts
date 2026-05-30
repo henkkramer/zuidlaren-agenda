@@ -171,6 +171,8 @@ const scannerSourceRoute = read("app/api/admin/activity-scanner/sources/[sourceI
 const sourceInput = read("lib/ai-activity-source-input.ts");
 const sourceFetcher = read("lib/ai-activity-source-fetcher.ts");
 const activityExtraction = read("lib/ai-activity-extraction.ts");
+const activityQuality = read("lib/ai-activity-quality.ts");
+const scannerBulkRoute = read("app/api/admin/activity-scanner/candidates/bulk/route.ts");
 assert(scannerRunRoute.includes("runLocalActivityScan"), "Scanner run route must invoke the scanner provider");
 assert(scannerCandidateRoute.includes("approveScanCandidate") && scannerCandidateRoute.includes("rejectScanCandidate"), "Scanner candidate route must support approval and rejection");
 assert(scannerSourcesRoute.includes("parseActivityScanSourceInput"), "Scanner sources route must validate source input");
@@ -183,6 +185,10 @@ assert(activityExtraction.includes("ActivityExtractionProvider"), "AI scanner ex
 assert(activityExtraction.includes("validateExtractedCandidate"), "AI scanner extraction must validate strict structured candidates");
 assert(activityExtraction.includes("shouldRejectPrivateOrVagueCandidate"), "AI scanner extraction must filter private events");
 assert(activityExtraction.includes("evidenceSnippets"), "AI scanner extraction must store evidence snippets instead of full pages");
+assert(activityQuality.includes("scoreCandidateQuality"), "AI scanner must score candidate quality and duplicates");
+assert(activityQuality.includes("titleSimilarity"), "AI scanner duplicate matching must compare event titles");
+assert(adminAiScanner.includes("Selectie goedkeuren") && adminAiScanner.includes("Selectie afwijzen"), "Admin scanner UI must expose bulk review actions");
+assert(scannerBulkRoute.includes("candidateIds") && scannerBulkRoute.includes("approveScanCandidate"), "AI scanner bulk route must process selected candidates through review services");
 assert(aiActivityScannerRules.includes("rawEvidence"), "AI scanner candidates must keep compact provenance evidence");
 assert(aiScannerPlan.includes("Sprint 5 - Weekly Operations"), "AI scanner plan must define the future sprint queue");
 
@@ -261,6 +267,7 @@ const adminReportsRoute = read("app/api/admin/reports/route.ts");
 const prismaSchema = read("prisma/schema.prisma");
 assert(prismaSchema.includes("model ActivityScanCandidate"), "AI activity scanner must persist candidates for review and duplicate prevention");
 assert(prismaSchema.includes("enum ActivityScanCandidateStatus"), "AI activity scanner must model candidate review states");
+assert(prismaSchema.includes("duplicateScore") && prismaSchema.includes("qualityScore"), "AI scanner candidates must persist quality and duplicate scores");
 const tsconfig = read("tsconfig.json");
 const gitignore = read(".gitignore");
 const analyticsEventsRoute = read("app/api/analytics/events/route.ts");

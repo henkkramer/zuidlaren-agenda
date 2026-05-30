@@ -5,9 +5,13 @@ import { useState, type FormEvent } from "react";
 type ScannerCandidate = {
   aiNotes: string[];
   confidence: number;
+  duplicateReason: string | null;
+  duplicateScore: number;
   id: string;
   locationName: string;
   organizerName: string;
+  qualityReasons: string[];
+  qualityScore: number;
   rejectionReason: string | null;
   sourceName: string;
   sourceUrl: string;
@@ -37,6 +41,7 @@ export function AdminAiActivityScanner({ candidates, sources }: AdminAiActivityS
   const [newSourceName, setNewSourceName] = useState("");
   const [newSourceUrl, setNewSourceUrl] = useState("");
   const [newSourceKind, setNewSourceKind] = useState("WEBSITE");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [status, setStatus] = useState("");
   const pendingCount = items.filter((item) => item.status === "PENDING" || item.status === "NEEDS_REVIEW").length;
   const rejectedCount = items.filter((item) => item.status === "REJECTED").length;
@@ -95,6 +100,34 @@ export function AdminAiActivityScanner({ candidates, sources }: AdminAiActivityS
     setStatus("Scan afgerond. Ververs de pagina om nieuwe voorstellen te zien.");
   }
 
+  function toggleCandidate(candidateId: string) {
+    setSelectedIds((current) => (current.includes(candidateId) ? current.filter((id) => id !== candidateId) : [...current, candidateId]));
+  }
+
+  async function bulkReview(action: "approve" | "reject") {
+    if (selectedIds.length === 0) {
+      setStatus("Selecteer eerst voorstellen");
+      return;
+    }
+
+    const reason = action === "reject" ? window.prompt("Waarom wijs je deze voorstellen af?", "Bulk afgewezen door admin") ?? "" : "";
+    setStatus(action === "approve" ? "Voorstellen goedkeuren..." : "Voorstellen afwijzen...");
+    const response = await fetch("/api/admin/activity-scanner/candidates/bulk", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action, candidateIds: selectedIds, reason }),
+    });
+
+    if (!response.ok) {
+      setStatus("Bulkactie kon niet worden verwerkt");
+      return;
+    }
+
+    setItems((current) => current.map((item) => (selectedIds.includes(item.id) ? { ...item, status: action === "approve" ? "APPROVED" : "REJECTED", rejectionReason: reason } : item)));
+    setSelectedIds([]);
+    setStatus(action === "approve" ? "Voorstellen gepubliceerd" : "Voorstellen afgewezen");
+  }
+
   async function reviewCandidate(candidateId: string, action: "approve" | "reject") {
     const reason = action === "reject" ? window.prompt("Waarom wijs je dit voorstel af?", "Niet relevant voor publieke agenda") ?? "" : "";
     setStatus(action === "approve" ? "Voorstel goedkeuren..." : "Voorstel afwijzen...");
@@ -122,6 +155,8 @@ export function AdminAiActivityScanner({ candidates, sources }: AdminAiActivityS
         </button>
         <span className="status-pill">{pendingCount} te beoordelen</span>
         <span className="status-pill">{rejectedCount} afgewezen</span>
+        <button className="outline-button" onClick={() => bulkReview("approve")} type="button">Selectie goedkeuren</button>
+        <button className="outline-button" onClick={() => bulkReview("reject")} type="button">Selectie afwijzen</button>
       </div>
 
       <div className="admin-table">
@@ -168,13 +203,18 @@ export function AdminAiActivityScanner({ candidates, sources }: AdminAiActivityS
         {items.map((candidate) => (
           <div className="admin-report-row" key={candidate.id}>
             <span className="admin-report-main">
-              <strong>{candidate.title}</strong>
+              <label className="account-check">
+                <input checked={selectedIds.includes(candidate.id)} onChange={() => toggleCandidate(candidate.id)} type="checkbox" />
+                <strong>{candidate.title}</strong>
+              </label>
               <small>
                 {new Date(candidate.startAt).toLocaleString("nl-NL", { dateStyle: "medium", timeStyle: "short" })} · {candidate.locationName} · {candidate.sourceName}
               </small>
               <small>
-                {candidate.organizerName} · vertrouwen {candidate.confidence}% · {candidate.status.toLowerCase()}
+                {candidate.organizerName} · vertrouwen {candidate.confidence}% · kwaliteit {candidate.qualityScore}% · dubbel {candidate.duplicateScore}% · {candidate.status.toLowerCase()}
               </small>
+              {candidate.duplicateReason ? <small>Dubbelcheck: {candidate.duplicateReason}</small> : null}
+              {candidate.qualityReasons.length ? <small>Kwaliteit: {candidate.qualityReasons.join(" · ")}</small> : null}
               {candidate.aiNotes.length ? <p>{candidate.aiNotes.join(" · ")}</p> : null}
               {candidate.rejectionReason ? <small>Afwijzing: {candidate.rejectionReason}</small> : null}
               <a href={candidate.sourceUrl} rel="noreferrer" target="_blank">
