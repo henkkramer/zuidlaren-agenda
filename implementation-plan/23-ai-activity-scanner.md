@@ -83,3 +83,13 @@ Status: done on `AI-scraper`.
 - Add environment-based provider selection with local extraction as the safe default.
 - Add admin-editable extraction prompt for known and non-known public spaces.
 - Keep scan review-first with strict structured candidates and source evidence.
+
+
+### Sprint 7 - Internet Discovery
+
+Status: done on `AI-scraper`.
+
+- Add OpenAI web-search discovery mode for near-complete public activity scans.
+- Store discovered source URLs as persistent scan sources for future weekly crawls.
+- Create review candidates from discovered activities without publishing directly.
+- Keep discovery provider configurable and local-disabled by default.
