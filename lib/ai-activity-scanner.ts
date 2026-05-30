@@ -31,11 +31,17 @@ export async function ensureDefaultScanSources() {
   );
 }
 
-export async function runLocalActivityScan(actorId: string) {
+export async function runLocalActivityScan(actorId: string, options: { sourceIds?: string[] } = {}) {
   await ensureDefaultScanSources();
   const extractionProvider = getActivityExtractionProvider();
   const runSummaries: Array<{ source: string; created: number; extracted: number; fetchStatus: number | null; skipped: number }> = [];
-  const enabledSources = await prisma.activityScanSource.findMany({ where: { enabled: true }, orderBy: { name: "asc" } });
+  const enabledSources = await prisma.activityScanSource.findMany({
+    where: {
+      enabled: true,
+      ...(options.sourceIds?.length ? { id: { in: options.sourceIds } } : {}),
+    },
+    orderBy: { name: "asc" },
+  });
 
   for (const source of enabledSources) {
     const fixture = defaultActivityScanSources.find((item) => item.slug === source.slug);

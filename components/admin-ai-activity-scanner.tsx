@@ -30,12 +30,25 @@ type ScannerSource = {
   respectRobots: boolean;
 };
 
+type ScannerOperations = {
+  checklist: Array<{ done: boolean; label: string }>;
+  dueSourceCount: number;
+  failedSourceCount: number;
+  failedSources: Array<{ error: string | null; id: string; name: string; startedAt: string }>;
+  lastCompletedRunAt: string | null;
+  nextWeeklyScanAt: string | null;
+  pendingReviewCount: number;
+  runStatusCounts: Array<{ count: number; status: string }>;
+  staleSources: Array<{ id: string; lastScannedAt: string | null; name: string }>;
+};
+
 type AdminAiActivityScannerProps = {
   candidates: ScannerCandidate[];
+  operations: ScannerOperations;
   sources: ScannerSource[];
 };
 
-export function AdminAiActivityScanner({ candidates, sources }: AdminAiActivityScannerProps) {
+export function AdminAiActivityScanner({ candidates, operations, sources }: AdminAiActivityScannerProps) {
   const [items, setItems] = useState(candidates);
   const [sourceItems, setSourceItems] = useState(sources);
   const [newSourceName, setNewSourceName] = useState("");
@@ -88,16 +101,21 @@ export function AdminAiActivityScanner({ candidates, sources }: AdminAiActivityS
     setStatus(body.source.enabled ? "Bron geactiveerd" : "Bron uitgezet");
   }
 
-  async function runScan() {
-    setStatus("Scan wordt gestart...");
-    const response = await fetch("/api/admin/activity-scanner/scan-runs", { method: "POST" });
+  async function runScan(mode: "all" | "failed" = "all") {
+    setStatus(mode === "failed" ? "Mislukte bronnen opnieuw scannen..." : "Scan wordt gestart...");
+    const response = await fetch("/api/admin/activity-scanner/scan-runs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode: mode === "failed" ? "failed" : "all" }),
+    });
 
     if (!response.ok) {
       setStatus("Scan kon niet worden gestart");
       return;
     }
 
-    setStatus("Scan afgerond. Ververs de pagina om nieuwe voorstellen te zien.");
+    const body = (await response.json().catch(() => null)) as { message?: string } | null;
+    setStatus(body?.message ?? "Scan afgerond. Ververs de pagina om nieuwe voorstellen te zien.");
   }
 
   function toggleCandidate(candidateId: string) {
@@ -150,13 +168,52 @@ export function AdminAiActivityScanner({ candidates, sources }: AdminAiActivityS
   return (
     <div className="admin-import-panel">
       <div className="admin-import-summary">
-        <button className="primary-button" onClick={runScan} type="button">
+        <button className="primary-button" onClick={() => runScan()} type="button">
           Scan voor nieuwe activiteiten
         </button>
         <span className="status-pill">{pendingCount} te beoordelen</span>
         <span className="status-pill">{rejectedCount} afgewezen</span>
+        <button className="outline-button" disabled={operations.failedSourceCount === 0} onClick={() => runScan("failed")} type="button">Mislukte bronnen opnieuw</button>
         <button className="outline-button" onClick={() => bulkReview("approve")} type="button">Selectie goedkeuren</button>
         <button className="outline-button" onClick={() => bulkReview("reject")} type="button">Selectie afwijzen</button>
+      </div>
+
+
+      <div className="admin-table">
+        <div className="analytics-metric-grid">
+          <span>
+            <strong>{operations.dueSourceCount}</strong>
+            <small>bronnen toe aan weekscan</small>
+          </span>
+          <span>
+            <strong>{operations.pendingReviewCount}</strong>
+            <small>voorstellen in review</small>
+          </span>
+          <span>
+            <strong>{operations.failedSourceCount}</strong>
+            <small>mislukte bronnen</small>
+          </span>
+          <span>
+            <strong>{operations.nextWeeklyScanAt ? new Date(operations.nextWeeklyScanAt).toLocaleDateString("nl-NL") : "Nog plannen"}</strong>
+            <small>volgende weekronde</small>
+          </span>
+        </div>
+        <div className="admin-row">
+          <span>
+            <strong>Weekchecklist</strong>
+            <small>{operations.checklist.map((item) => `${item.done ? "klaar" : "open"}: ${item.label}`).join(" · ")}</small>
+          </span>
+          <span className="status-pill">{operations.lastCompletedRunAt ? `laatste scan ${new Date(operations.lastCompletedRunAt).toLocaleDateString("nl-NL")}` : "nog geen scan"}</span>
+        </div>
+        {operations.staleSources.length ? (
+          <p className="small-muted">Weekscan nodig voor: {operations.staleSources.map((source) => source.name).join(", ")}</p>
+        ) : null}
+        {operations.failedSources.length ? (
+          <p className="small-muted">Mislukt: {operations.failedSources.map((source) => `${source.name}${source.error ? ` (${source.error})` : ""}`).join(", ")}</p>
+        ) : null}
+        {operations.runStatusCounts.length ? (
+          <p className="small-muted">Scanruns: {operations.runStatusCounts.map((row) => `${row.status.toLowerCase()} ${row.count}`).join(", ")}</p>
+        ) : null}
       </div>
 
       <div className="admin-table">

@@ -8,6 +8,7 @@ import { AdminNotificationCampaigns } from "@/components/admin-notification-camp
 import { AdminReports } from "@/components/admin-reports";
 import { ContentMaintenancePanel } from "@/components/content-maintenance-panel";
 import { requireAdmin } from "@/lib/admin-auth";
+import { getActivityScannerOperations } from "@/lib/ai-activity-operations";
 import { getAnalyticsSnapshot } from "@/lib/analytics-snapshot";
 import { getBillingSummary } from "@/lib/billing-summary";
 import { prisma } from "@/lib/prisma";
@@ -118,6 +119,7 @@ export default async function AdminPage() {
     auditLogs,
     scanSources,
     scanCandidates,
+    scannerOperations,
   ] = await Promise.all([
     prisma.user.findMany({
       select: { id: true, email: true, displayName: true, isAdmin: true, disabledAt: true, createdAt: true },
@@ -171,6 +173,7 @@ export default async function AdminPage() {
       orderBy: [{ status: "asc" }, { startAt: "asc" }],
       take: 20,
     }),
+    getActivityScannerOperations(),
   ]);
 
   return (
@@ -376,6 +379,7 @@ export default async function AdminPage() {
             <h2>AI activiteitenscan</h2>
             <p className="account-muted">Scan goedgekeurde openbare bronnen en beoordeel voorstellen voordat ze in de agenda komen.</p>
             <AdminAiActivityScanner
+              operations={scannerOperations}
               sources={(scanSources as AdminScannerSourceRow[]).map((source) => ({
                 baseUrl: source.baseUrl,
                 enabled: source.enabled,

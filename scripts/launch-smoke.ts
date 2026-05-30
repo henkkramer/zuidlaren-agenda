@@ -173,6 +173,7 @@ const sourceFetcher = read("lib/ai-activity-source-fetcher.ts");
 const activityExtraction = read("lib/ai-activity-extraction.ts");
 const activityQuality = read("lib/ai-activity-quality.ts");
 const scannerBulkRoute = read("app/api/admin/activity-scanner/candidates/bulk/route.ts");
+const scannerOperations = read("lib/ai-activity-operations.ts");
 assert(scannerRunRoute.includes("runLocalActivityScan"), "Scanner run route must invoke the scanner provider");
 assert(scannerCandidateRoute.includes("approveScanCandidate") && scannerCandidateRoute.includes("rejectScanCandidate"), "Scanner candidate route must support approval and rejection");
 assert(scannerSourcesRoute.includes("parseActivityScanSourceInput"), "Scanner sources route must validate source input");
@@ -189,8 +190,12 @@ assert(activityQuality.includes("scoreCandidateQuality"), "AI scanner must score
 assert(activityQuality.includes("titleSimilarity"), "AI scanner duplicate matching must compare event titles");
 assert(adminAiScanner.includes("Selectie goedkeuren") && adminAiScanner.includes("Selectie afwijzen"), "Admin scanner UI must expose bulk review actions");
 assert(scannerBulkRoute.includes("candidateIds") && scannerBulkRoute.includes("approveScanCandidate"), "AI scanner bulk route must process selected candidates through review services");
+assert(scannerOperations.includes("deriveActivityScannerOperations"), "AI scanner operations must derive weekly checklist metrics");
+assert(scannerOperations.includes("getFailedActivityScanSourceIds"), "AI scanner operations must support failed-source retry selection");
+assert(scannerRunRoute.includes("mode") && scannerRunRoute.includes("failed"), "AI scanner run route must support failed-source retry mode");
+assert(adminAiScanner.includes("Weekchecklist") && adminAiScanner.includes("Mislukte bronnen opnieuw"), "Admin scanner UI must expose weekly operations and retry controls");
 assert(aiActivityScannerRules.includes("rawEvidence"), "AI scanner candidates must keep compact provenance evidence");
-assert(aiScannerPlan.includes("Sprint 5 - Weekly Operations"), "AI scanner plan must define the future sprint queue");
+assert(aiScannerPlan.includes("Sprint 5 - Weekly Operations") && aiScannerPlan.includes("Status: done on `AI-scraper`."), "AI scanner plan must mark the weekly operations sprint done");
 
 const maintenanceQueue = read("lib/content-maintenance-queue.ts");
 assert(maintenanceQueue.includes("Zuidlaardermarktweek"), "content maintenance queue must track Zuidlaardermarkt follow-up");

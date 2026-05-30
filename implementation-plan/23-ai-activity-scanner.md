@@ -68,7 +68,7 @@ Status: done on `AI-scraper`.
 
 ### Sprint 5 - Weekly Operations
 
-Status: to do.
+Status: done on `AI-scraper`.
 
 - Add weekly scan checklist/scheduler.
 - Add scan metrics in admin analytics.
