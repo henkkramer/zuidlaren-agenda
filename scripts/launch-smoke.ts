@@ -171,6 +171,8 @@ const scannerSourceRoute = read("app/api/admin/activity-scanner/sources/[sourceI
 const sourceInput = read("lib/ai-activity-source-input.ts");
 const sourceFetcher = read("lib/ai-activity-source-fetcher.ts");
 const activityExtraction = read("lib/ai-activity-extraction.ts");
+const activityPrompt = read("lib/ai-activity-prompt.ts");
+const scannerPromptRoute = read("app/api/admin/activity-scanner/prompt/route.ts");
 const activityQuality = read("lib/ai-activity-quality.ts");
 const scannerBulkRoute = read("app/api/admin/activity-scanner/candidates/bulk/route.ts");
 const scannerOperations = read("lib/ai-activity-operations.ts");
@@ -183,6 +185,11 @@ assert(sourceFetcher.includes("maxFetchBytes") && sourceFetcher.includes("fetchT
 assert(sourceFetcher.includes("127.0.0.1") && sourceFetcher.includes(".internal"), "Scanner source fetcher must block local/internal URLs");
 assert(sourceFetcher.includes("textSample"), "Scanner source fetcher must return bounded text samples for extraction");
 assert(activityExtraction.includes("ActivityExtractionProvider"), "AI scanner extraction must use a provider abstraction");
+assert(activityExtraction.includes("openAiActivityExtractionProvider"), "AI scanner extraction must support OpenAI provider selection");
+assert(activityExtraction.includes("anthropicActivityExtractionProvider"), "AI scanner extraction must support Claude/Anthropic provider selection");
+assert(activityExtraction.includes("AI_ACTIVITY_PROVIDER"), "AI scanner extraction must use environment-based provider selection");
+assert(activityPrompt.includes("defaultActivityScannerPrompt") && activityPrompt.includes("niet-bekende"), "AI scanner prompt must be configurable for known and non-known public spaces");
+assert(scannerPromptRoute.includes("admin.activity_scan_prompt.update"), "Admin scanner prompt route must audit prompt updates");
 assert(activityExtraction.includes("validateExtractedCandidate"), "AI scanner extraction must validate strict structured candidates");
 assert(activityExtraction.includes("shouldRejectPrivateOrVagueCandidate"), "AI scanner extraction must filter private events");
 assert(activityExtraction.includes("evidenceSnippets"), "AI scanner extraction must store evidence snippets instead of full pages");
@@ -194,6 +201,7 @@ assert(scannerOperations.includes("deriveActivityScannerOperations"), "AI scanne
 assert(scannerOperations.includes("getFailedActivityScanSourceIds"), "AI scanner operations must support failed-source retry selection");
 assert(scannerRunRoute.includes("mode") && scannerRunRoute.includes("failed"), "AI scanner run route must support failed-source retry mode");
 assert(adminAiScanner.includes("Weekchecklist") && adminAiScanner.includes("Mislukte bronnen opnieuw"), "Admin scanner UI must expose weekly operations and retry controls");
+assert(adminAiScanner.includes("Scanprompt") && adminAiScanner.includes("Prompt opslaan"), "Admin scanner UI must expose editable extraction prompt controls");
 assert(aiActivityScannerRules.includes("rawEvidence"), "AI scanner candidates must keep compact provenance evidence");
 assert(aiScannerPlan.includes("Sprint 5 - Weekly Operations") && aiScannerPlan.includes("Status: done on `AI-scraper`."), "AI scanner plan must mark the weekly operations sprint done");
 

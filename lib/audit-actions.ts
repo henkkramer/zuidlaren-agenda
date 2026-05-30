@@ -86,6 +86,11 @@ export const sensitiveAuditActions: AuditActionCoverage[] = [
     purpose: "Admin enables, disables, or updates an approved public scan source.",
   },
   {
+    action: "admin.activity_scan_prompt.update",
+    source: "app/api/admin/activity-scanner/prompt/route.ts",
+    purpose: "Admin changes the prompt used for AI-assisted activity extraction.",
+  },
+  {
     action: "admin.activity_scan_candidate.approve",
     source: "lib/ai-activity-scanner-review.ts",
     purpose: "Admin approves a scan candidate and publishes an activity card.",
